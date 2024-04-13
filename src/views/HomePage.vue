@@ -4,8 +4,8 @@
       <div>
         <ion-searchbar></ion-searchbar>
       </div>
-      <!-- <div>
-        <ion-card>
+     <!-- <div>
+        <ion-card v-for="n in 10" :key="n">
           <ion-grid>
             <ion-row>
               <ion-col size="auto" style="width: 100px">
@@ -33,80 +33,85 @@
             </ion-row>
           </ion-grid>
         </ion-card>
- 
       </div> -->
-
-      <div>
-        <ion-card v-for="(n, i) in 3" :key="i" class="content--card">
-          <ion-grid>
-            <ion-row>
-              <ion-col class="card-content ion-no-padding" size="3">
-                <div style="width: 100px"  class="card-content-wrapper--image">
-                  <img class="test-image" alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png"/>
-                </div>
-              </ion-col>
-              <ion-col class="card-content--main" size="9">
-                <ion-card-header class="ion-no-padding">
-                  <ion-card-title><span class="card-content--title">Card Title</span></ion-card-title>
-                </ion-card-header>
-
-                <hr />
-
-                <ion-card-content class="ion-no-padding">
-                  <h5 class="card-content--body">
-                    Here's a small text description for the card content.
-                    Nothing more, nothing less.
-                  </h5>
-                </ion-card-content>
-
-                <ion-grid>
-                  <ion-row class="ion-align-items-center">
-                    <ion-col>
-                      <ion-text>
-                        <span class="card-content--price">P420.00</span>
-                      </ion-text>
-                    </ion-col>
-                    <ion-col>
-                      <div>
-                        <span class="card-content--qty">Qty:</span>
-                        <span>10</span>
-                      </div>
-                    </ion-col>
-                    <ion-col>
-                      <ion-row>
-                        <ion-col>
-                          <div class="card-content-btn">
-                            <ion-button size="small">ADD</ion-button>
-                          </div>
-                        </ion-col>
-                      </ion-row>
-                    </ion-col>
-                  </ion-row>
-                </ion-grid>
-
-              </ion-col>
-            </ion-row>
-          </ion-grid>
-        </ion-card>
-      </div>
+      <VariantModal :item="selectedItem" :isOpen="isOpen"  @close="closeModal"/>
+      <ItemCard v-for="item in items" :key="item.id" :item="item" @onSelectedItem="onSelectedItem" />
     </ion-content>
   </ion-page>
 </template>
 
-<script setup lang="ts">
-import {
-  IonPage,
-  IonContent,
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
-  IonCol,
-  IonGrid,
-  IonRow,
-  IonButton,
-  IonSearchbar,
-} from "@ionic/vue";
+<script>
+import { IonPage, IonContent, IonSearchbar } from "@ionic/vue";
+import ItemCard from "@/components/ItemCard.vue";
+import VariantModal from "@/components/VariantModal.vue"
+
+export default {
+  components: {
+    IonPage,
+    IonContent,
+    IonSearchbar,
+    ItemCard,
+    VariantModal
+  },
+  data() {
+    return {
+      items: [
+        {
+          id: 1,
+          name: "Item 1",
+          description:
+            "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum, voluptate",
+          price: 120,
+          quantity: 10,
+        },
+        {
+          id: 2,
+          name: "Item 2",
+          description:
+            "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum, voluptate",
+          price: 410,
+          quantity: 20,
+        },
+        {
+          id: 3,
+          name: "Item 3",
+          description:
+            "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum, voluptate",
+          price: 30,
+          quantity: 60,
+        },
+        {
+          id: 4,
+          name: "Item 4",
+          description:
+            "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum, voluptate",
+          price: 30,
+          quantity: 60,
+        },
+        {
+          id: 5,
+          name: "Item 5",
+          description:
+            "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum, voluptate",
+          price: 30,
+          quantity: 60,
+        },
+      ],
+      isOpen: false,
+      selectedItem: {}
+    };
+  },
+
+  methods: {
+    onSelectedItem(item) {
+      this.selectedItem = item
+      this.isOpen = true
+    },
+    closeModal(){
+      this.isOpen = false
+    }
+  }
+};
 </script>
 
 <style scoped>
@@ -127,80 +132,5 @@ h3 {
   align-items: center;
 }
 
-/* my version */
 
-/* .card-img {
-  background-color: red;
-}
-
-.card-content {
-  background-color: blue;
-} */
-
-.card-content--main{
-  padding: 10px 10px 0 10px;
-}
-
-.card-content--price {
-  font-size: 15px;
-  font-weight: 600;
-  color: rgb(3, 124, 9);
-
-}
-
-ion-grid {
-  --ion-grid-padding: 0px;
-}
-
-hr {
-  border: 0;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-ion-img{
-  /* height: 300px; */
-  
-}
-
-.card-content--title{
-  font-size: 16px;
-  font-weight: 300;
-}
-
-.card-content--body{
-  font-size: 12px;
- color: #747474
-}
-
-.card-content--qty{
-  padding: 10px;
-  border-left: 1px solid #eee
-}
-
-.card-content-btn{
-  display: flex;
-    align-items: end;
-    justify-content: end;
-}
-
-
-.card-content-wrapper--image{
-  height: 100%;
-  display: flex;
-}
-
-.test-image{
-  margin: auto;
-  height: 100px;
-  padding: 10px;
-}
-
-.content--card{
-  margin-bottom: 2px;
-}
-
-ion-button {
-    --background: #f89500;
-    --color: #fff;
-  }
 </style>
