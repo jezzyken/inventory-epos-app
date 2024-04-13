@@ -40,7 +40,7 @@
                       <h3 class="ion-padding-start">69</h3>
                     </ion-row>
                     <button class="card-button">
-                      <h3>ADD</h3>
+                      ADD
                     </button>
                   </ion-row>
                 </ion-card-content>
@@ -221,11 +221,12 @@ hr {
 }
 
 ion-row {
-  margin: 5px;
+  margin: 5px 0px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 
 .card-price {
   color: #098D16;
@@ -241,9 +242,10 @@ ion-row {
   padding-left: 14px;
 }
 
-.card-button h3 {
+.card-button{
   margin: 0;
-  font-weight: 500;
+  font-size: 10px;
+  font-weight: 400;
   padding: 7px 15px;
   border-radius: 5px;
   background: #f89501;
