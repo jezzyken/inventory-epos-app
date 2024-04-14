@@ -1,45 +1,40 @@
 const Models = require("../models/Product");
+const catchAsync = require("../utils/catchAsync");
+const AppError = require("../utils/appError");
+const productService = require("../services/product/productService");
 
-const get = async (req, res) => {
-  const product = await Models.find()
-    .populate({ path: "brand", select: "name" })
-    .populate({ path: "category", select: "name" })
-    .populate({
-      path: "price",
-      select: "salePrice itemPrice",
-      populate: [
-        { path: "unit", select: "name" },
-        { path: "variant", select: "name" },
-      ],
-    });
-
-  const data = {
-    success: true,
-    product,
-  };
-  return res.status(200).send(data);
-};
-
-const getById = async (req, res) => {
-  const product = await Models.findById(req.params.id);
-  const data = {
-    success: true,
-    product,
-  };
-  return res.status(200).send(data);
-};
-
-const add = async (req, res) => {
-  const item = new Models(req.body);
-
-  const result = await item.save();
-
+const get = catchAsync(async (req, res) => {
+  const result = await productService.get();
   const data = {
     success: true,
     result,
   };
   return res.status(200).send(data);
-};
+});
+
+const getById = catchAsync(async (req, res, next) => {
+  const result = await productService.getById(req.params.id);
+
+  if (!result) {
+    return next(new AppError("No Product found with that ID", 404));
+  }
+  const data = {
+    success: true,
+    result,
+  };
+  return res.status(200).send(data);
+});
+
+const add = catchAsync(async (req, res) => {
+  const result = await productService.add(req);
+
+  const data = {
+    success: true,
+    result,
+  };
+  
+  return res.status(200).send(data);
+});
 
 const update = async (req, res) => {
   const data = {
@@ -49,14 +44,19 @@ const update = async (req, res) => {
   return res.status(200).send(data);
 };
 
-const remove = async (req, res) => {
-  const result = await Models.findByIdAndDelete(req.params.id);
+const remove = catchAsync(async (req, res, next) => {
+  const result = await productService.remove(req.params.id);
+
+  if (!result) {
+    return next(new AppError("No Product found with that ID", 404));
+  }
+
   const data = {
     success: true,
     result,
   };
   return res.status(200).send(data);
-};
+});
 
 module.exports = {
   get,
