@@ -1,21 +1,10 @@
-const Models = require("../models/Product");
+const Models = require("../models/Variant");
 
 const get = async (req, res) => {
-  const product = await Models.find()
-    .populate({ path: "brand", select: "name" })
-    .populate({ path: "category", select: "name" })
-    .populate({
-      path: "price",
-      select: "salePrice itemPrice",
-      populate: [
-        { path: "unit", select: "name" },
-        { path: "variant", select: "name" },
-      ],
-    });
-
+  const result = await Models.find();
   const data = {
     success: true,
-    product,
+    result,
   };
   return res.status(200).send(data);
 };

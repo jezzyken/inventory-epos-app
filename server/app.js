@@ -1,9 +1,16 @@
 const express = require("express")
+const bodyParser = require('body-parser');
+
 const app = express()
 
 const serverRoutes = require('./serverRoutes')
+const connectDB = require('./config/db');
 
 require('dotenv').config({path: './.env'});
+
+connectDB();
+
+app.use(bodyParser.json());
 
 serverRoutes(app);
 
