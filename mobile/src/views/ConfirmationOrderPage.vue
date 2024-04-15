@@ -8,6 +8,7 @@
         <ion-input
           class="input-margin"
           label="Customer Name"
+          fill="outline"
           label-placement="floating"
           placeholder="Name"
         ></ion-input>
