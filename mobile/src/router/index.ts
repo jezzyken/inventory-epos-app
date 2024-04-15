@@ -32,6 +32,10 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/TransactionPage.vue')
       },
       {
+        path: 'transaction-info',
+        component: () => import('@/views/TransactionInfoPage.vue')
+      },
+      {
         path: 'delivery',
         component: () => import('@/views/DeliveryPage.vue')
       },
