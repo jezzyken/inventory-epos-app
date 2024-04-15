@@ -36,6 +36,10 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/DeliveryPage.vue')
       },
       {
+        path: 'delivery-info',
+        component: () => import('@/views/DeliveryInfo.vue')
+      },
+      {
         path: 'setting',
         component: () => import('@/views/SettingPage.vue')
       }
