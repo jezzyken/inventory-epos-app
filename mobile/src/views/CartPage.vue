@@ -28,13 +28,13 @@
                   <ion-row size="auto" class="card-options">
                     <h3 class="card-price">P240.00</h3>
                     <ion-row class="card-input-qty">
-                      <button class="card-add-button">
-                        +
-                      </button>
-                      <ion-input class="input-items" type="number" value="69"></ion-input>
-                      <button class="card-minus-button">
-                        <hr>
-                      </button>
+                      <ion-button fill="outline" color="medium" size="small">
+                        <ion-icon :icon="add" color="dark"></ion-icon>
+                      </ion-button>
+                      <ion-input class="input-items" type="number" value="69" placeholder="69"></ion-input>
+                      <ion-button fill="outline" color="medium" size="small">
+                        <ion-icon :icon="remove" color="dark"></ion-icon>
+                      </ion-button>
                     </ion-row>
                   </ion-row>
                 </ion-card-content>
@@ -50,9 +50,8 @@
 </template>
 
 <script>
-import { IonPage, IonContent, IonSearchbar } from "@ionic/vue";
-import ItemCard from "@/components/ItemCard.vue";
-import VariantModal from "@/components/VariantModal.vue"
+import { IonPage, IonContent, IonSearchbar, IonIcon, IonButton } from "@ionic/vue";
+import { add, remove, } from 'ionicons/icons';
 
 export default {
   components: {
@@ -60,7 +59,12 @@ export default {
     IonContent,
     IonSearchbar,
     ItemCard,
-    VariantModal
+    VariantModal,
+    IonIcon,
+    IonButton
+  },
+  setup() {
+    return { add, remove, };
   },
   data() {
     return {
@@ -168,13 +172,13 @@ ion-row {
   align-items: center;
 }
 
-.card-input-var{
+.card-input-var {
   margin: 5px 0px;
   display: flex;
   align-items: center;
 }
 
-.var-button{
+.var-button {
   font-size: 12px;
   text-transform: uppercase;
   color: #333;
@@ -199,29 +203,15 @@ ion-row {
   padding-left: 14px;
 }
 
-.input-items{
+.input-items {
   text-align: center;
   width: 30px;
   padding: 0px 5px;
 }
 
-.card-add-button,
-.card-minus-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  background: none;
-  margin: 0;
-  height: 25px;
-  width: 25px;
-  border-radius: 50%;
-  border: 1px solid #333;
-}
-
-.card-minus-button hr {
-  height: 1px;
-  background: #333;
-  width: 6px;
+ion-button{
+  --border-radius: 50%;
+  width: 38px;
+  height: 38px;
 }
 </style>

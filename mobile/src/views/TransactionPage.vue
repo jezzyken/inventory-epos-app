@@ -1,8 +1,9 @@
 <template>
   <ion-page>
     <ion-content :fullscreen="true" class="ion-no-margin ion-no-padding home-content-container">
-      <div class="transaction-title">
-        <h1>Transactions</h1>
+      <div class="transaction-header">
+        <span class="transaction-title">Transaction</span>
+        <ion-button color="light" size="small"><ion-icon :icon="filter"></ion-icon></ion-button>
       </div>
       <div>
         <div class="transaction-lists">
@@ -26,25 +27,32 @@
 </template>
 
 <script>
-import { IonPage, IonContent } from "@ionic/vue";
+import { IonPage, IonContent, IonIcon, IonButton } from "@ionic/vue";
+import { filter } from 'ionicons/icons';
 
 export default {
   components: {
     IonPage,
-    IonContent
+    IonContent,
+    IonIcon,
+    IonButton
   },
-};
+  setup(){
+    return{filter}
+  },
+}
 </script>
 
 <style scoped>
-.transaction-title {
-  padding: 0px 20px;
+.transaction-header {
+  padding: 20px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-h1 {
+.transaction-title {
+  font-size: 2rem;
   color: #333;
 }
 
@@ -76,4 +84,6 @@ ion-row {
   justify-content: space-between;
   align-items: center;
 }
+
+
 </style>
