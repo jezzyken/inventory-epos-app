@@ -30,6 +30,11 @@ const routes = [
         name: "unit",
         component: () => import("@/views/products/UnitView"),
       },
+      {
+        path: "/variant",
+        name: "variant",
+        component: () => import("@/views/products/VariantView"),
+      },
       // ----end of products----
 
       // ----stocks----

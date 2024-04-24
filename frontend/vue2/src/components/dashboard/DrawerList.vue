@@ -45,6 +45,7 @@ export default {
               { title: "Brands", route: "/brand" },
               { title: "Units", route: "/unit" },
               { title: "Categories", route: "/category" },
+              { title: "Variants", route: "/variant" },
             ],
             title: "Products",
             appendIcon: "mdi-chevron-down",

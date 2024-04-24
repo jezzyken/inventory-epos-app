@@ -115,10 +115,10 @@ export default {
 
   methods: {
     ...mapActions({
-      "getItems": "unit/getItem",
-      "addItem": "unit/addItem",
-      "removeItem": "unit/deleteItem",
-      "updateItem": "unit/updateItem",
+      "getItems": "variant/getItem",
+      "addItem": "variant/addItem",
+      "removeItem": "variant/deleteItem",
+      "updateItem": "variant/updateItem",
     }),
 
     async initialize() {
