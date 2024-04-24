@@ -1,10 +1,10 @@
 const Models = require("../models/Product");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
-const productService = require("../services/product/productService");
+const service = require("../services/product");
 
 const get = catchAsync(async (req, res) => {
-  const result = await productService.get();
+  const result = await service.get();
   const data = {
     success: true,
     result,
@@ -13,7 +13,7 @@ const get = catchAsync(async (req, res) => {
 });
 
 const getById = catchAsync(async (req, res, next) => {
-  const result = await productService.getById(req.params.id);
+  const result = await service.getById(req.params.id);
 
   if (!result) {
     return next(new AppError("No Product found with that ID", 404));
@@ -26,13 +26,11 @@ const getById = catchAsync(async (req, res, next) => {
 });
 
 const add = catchAsync(async (req, res) => {
-  const result = await productService.add(req);
-
+  const result = await service.add(req);
   const data = {
     success: true,
     result,
   };
-  
   return res.status(200).send(data);
 });
 
@@ -45,12 +43,10 @@ const update = async (req, res) => {
 };
 
 const remove = catchAsync(async (req, res, next) => {
-  const result = await productService.remove(req.params.id);
-
+  const result = await service.remove(req.params.id);
   if (!result) {
     return next(new AppError("No Product found with that ID", 404));
   }
-
   const data = {
     success: true,
     result,
