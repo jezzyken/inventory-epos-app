@@ -11,7 +11,6 @@
               <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
                 Add
               </v-btn>
-
             </template>
             <v-card>
               <v-card-title>
@@ -21,20 +20,8 @@
               <v-card-text>
                 <v-container>
                   <v-row>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field v-model="editedItem.name" label="Dessert name"></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field v-model="editedItem.calories" label="Calories"></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field v-model="editedItem.fat" label="Fat (g)"></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field v-model="editedItem.carbs" label="Carbs (g)"></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field v-model="editedItem.protein" label="Protein (g)"></v-text-field>
+                    <v-col cols="12">
+                      <v-text-field v-model="editedItem.name" label="Brand Name"></v-text-field>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -45,9 +32,7 @@
                 <v-btn color="blue darken-1" text @click="close">
                   Cancel
                 </v-btn>
-                <v-btn color="blue darken-1" text @click="save">
-                  Save
-                </v-btn>
+                <v-btn color="blue darken-1" text @click="save"> Save </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -65,163 +50,127 @@
         </v-toolbar>
       </template>
 
-
       <template v-slot:[`item.actions`]="{ item }">
-
-
-        <v-btn x-small color="warning" @click="editItem(item)">
-          edit
-        </v-btn>
+        <v-btn x-small color="warning" @click="editItem(item)"> edit </v-btn>
 
         <span class="mr-1"></span>
 
         <v-btn x-small color="error" dark @click="deleteItem(item)">
           delete
         </v-btn>
-
-
       </template>
       <template v-slot:no-data>
-        <v-btn color="primary" @click="initialize">
-          Reset
-        </v-btn>
+        <v-btn color="primary" @click="initialize"> Reset </v-btn>
       </template>
     </v-data-table>
   </v-container>
 </template>
 
 <script>
-
 /*eslint-disable*/
+import { mapActions } from "vuex";
+
 export default {
   data: () => ({
     dialog: false,
     dialogDelete: false,
     headers: [
       {
-        text: 'Dessert (100g serving)',
-        align: 'start',
+        text: "Brand",
+        align: "start",
         sortable: false,
-        value: 'name',
+        value: "name",
       },
-      { text: 'Actions', value: 'actions', sortable: false },
+      { text: "Actions", value: "actions", sortable: false },
     ],
     desserts: [],
     editedIndex: -1,
     editedItem: {
-      name: '',
-      calories: 0,
-      fat: 0,
-      carbs: 0,
-      protein: 0,
+      name: "",
     },
     defaultItem: {
-      name: '',
-      calories: 0,
-      fat: 0,
-      carbs: 0,
-      protein: 0,
+      name: "",
     },
+    itemId: null
   }),
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+      return this.editedIndex === -1 ? "New Item" : "Edit Item";
     },
   },
 
   watch: {
     dialog(val) {
-      val || this.close()
+      val || this.close();
     },
     dialogDelete(val) {
-      val || this.closeDelete()
+      val || this.closeDelete();
     },
   },
 
   created() {
-    this.initialize()
+    this.initialize();
   },
 
   methods: {
-    initialize() {
-      this.desserts = [
-        {
-          name: 'Frozen Yogurt',
-        },
-        {
-          name: 'Ice cream sandwich',
-        },
-        {
-          name: 'Eclair',
-        },
-        {
-          name: 'Cupcake',
-        },
-        {
-          name: 'Gingerbread',
-        },
-        {
-          name: 'Jelly bean',
-        },
-        {
-          name: 'Lollipop',
-        },
-        {
-          name: 'Honeycomb',
-        },
-        {
-          name: 'Donut',
-        },
-        {
-          name: 'KitKat',
-        },
-      ]
+    ...mapActions({
+      "getItems": "brand/getItem",
+      "addItem": "brand/addItem",
+      "removeItem": "brand/deleteItem",
+      "updateItem": "brand/updateItem",
+    }),
+
+    async initialize() {
+      const results = await this.getItems()
+      this.desserts = results.result
     },
 
     editItem(item) {
-      this.editedIndex = this.desserts.indexOf(item)
-      this.editedItem = Object.assign({}, item)
-      this.dialog = true
+      this.editedIndex = this.desserts.indexOf(item);
+      this.editedItem = Object.assign({}, item);
+      this.dialog = true;
     },
 
     deleteItem(item) {
-      this.editedIndex = this.desserts.indexOf(item)
-      this.editedItem = Object.assign({}, item)
-      this.dialogDelete = true
+      this.editedIndex = this.desserts.indexOf(item);
+      this.itemId = item._id
+      this.editedItem = Object.assign({}, item);
+      this.dialogDelete = true;
     },
 
-    deleteItemConfirm() {
-      this.desserts.splice(this.editedIndex, 1)
-      this.closeDelete()
+    async deleteItemConfirm() {
+      await this.removeItem(this.itemId)
+      this.desserts.splice(this.editedIndex, 1);
+      this.closeDelete();
     },
 
     close() {
-      this.dialog = false
+      this.dialog = false;
       this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem)
-        this.editedIndex = -1
-      })
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+      });
     },
 
     closeDelete() {
-      this.dialogDelete = false
+      this.dialogDelete = false;
       this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem)
-        this.editedIndex = -1
-      })
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+      });
     },
 
-
-
-    save() {
+    async save() {
       if (this.editedIndex > -1) {
-        Object.assign(this.desserts[this.editedIndex], this.editedItem)
+        Object.assign(this.desserts[this.editedIndex], this.editedItem);
+        await this.updateItem(this.editedItem)
       } else {
-        this.desserts.push(this.editedItem)
+        this.desserts.push(this.editedItem);
+        await this.addItem(this.editedItem)
       }
-      this.close()
+      this.close();
     },
   },
-}
+};
 </script>
