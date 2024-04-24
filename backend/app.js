@@ -1,5 +1,6 @@
 const express = require("express")
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 const app = express()
 
@@ -10,7 +11,10 @@ require('dotenv').config({path: './.env'});
 
 connectDB();
 
-app.use(bodyParser.json());
+app.use(cors());
+
+app.use(bodyParser.json(), cors());
+app.options('*', cors());
 
 serverRoutes(app);
 
