@@ -2,13 +2,24 @@
   <ion-page>
     <ion-content :fullscreen="true" class="ion-no-margin ion-no-padding home-content-container">
       <div class="home-searchbar">
-        <ion-searchbar></ion-searchbar>
-      </div>
-      <div class="home-filters">
-        <div class="filters">
-          <span class="filter-all">All</span>
-          <button class="filter-button" v-for="n in 4" :key="n">Sample</button>
-        </div>
+        <ion-col>
+          <div class="searchbar">
+            <input type="text" placeholder="Search..">
+            <button class="camera-button">
+              <ion-icon :icon="cameraOutline"></ion-icon>
+            </button>
+            <button class="search-button">
+              <ion-icon :icon="searchOutline"></ion-icon>
+            </button>
+          </div>
+          <div class="filters">
+            <span class="filter-all">All</span>
+            <ion-chip v-for="n in 3" :key="n">
+              <ion-label>Sample</ion-label>
+              <ion-icon :icon="close"></ion-icon>
+            </ion-chip>
+          </div>
+        </ion-col>
       </div>
       <div>
         <ion-card v-for="n in 10" :key="n">
@@ -25,11 +36,11 @@
                     <p class="card-product-status">Available</p>
                   </ion-row>
                 </ion-card-header>
-                <hr>
+                <hr />
                 <ion-card-content class="ion-no-padding">
                   <h3>
-                    Here's a small text description for the card content. Nothing
-                    more, nothing less.
+                    Here's a small text description for the card content.
+                    Nothing more, nothing less.
                   </h3>
                   <ion-row size="auto" class="card-options">
                     <h3 class="card-price">P240.00</h3>
@@ -39,9 +50,7 @@
                       </div>
                       <h3 class="ion-padding-start">69</h3>
                     </ion-row>
-                    <button class="card-button">
-                      ADD
-                    </button>
+                    <button class="card-button">ADD</button>
                   </ion-row>
                 </ion-card-content>
               </ion-col>
@@ -56,10 +65,16 @@
 </template>
 
 <script>
-import { IonPage, IonContent, IonSearchbar, IonInput } from "@ionic/vue";
-import { lockClosed } from 'ionicons/icons';
+import {
+  IonPage,
+  IonContent,
+  IonSearchbar,
+  IonInput,
+  IonIcon,
+} from "@ionic/vue";
+import { cameraOutline, close, searchOutline } from "ionicons/icons";
 import ItemCard from "@/components/ItemCard.vue";
-import VariantModal from "@/components/VariantModal.vue"
+import VariantModal from "@/components/VariantModal.vue";
 
 export default {
   components: {
@@ -67,7 +82,13 @@ export default {
     IonContent,
     IonSearchbar,
     ItemCard,
-    VariantModal
+    VariantModal,
+    IonIcon,
+    IonInput
+
+  },
+  setup() {
+    return { cameraOutline, close, searchOutline };
   },
   data() {
     return {
@@ -114,23 +135,32 @@ export default {
         },
       ],
       isOpen: false,
-      selectedItem: {}
+      selectedItem: {},
     };
   },
 
   methods: {
     onSelectedItem(item) {
-      this.selectedItem = item
-      this.isOpen = true
+      this.selectedItem = item;
+      this.isOpen = true;
     },
     closeModal() {
-      this.isOpen = false
-    }
-  }
+      this.isOpen = false;
+    },
+  },
 };
 </script>
 
 <style scoped>
+ion-icon {
+  font-size: 24px;
+}
+
+ion-chip {
+  --background: #F8C101;
+  --color: #fff;
+}
+
 .filters {
   display: flex;
   justify-content: space-between;
@@ -138,15 +168,17 @@ export default {
 }
 
 .home-filters {
+  position: absolute;
   width: 100%;
-  margin-top: -20px;
-  padding: 10px 20px 20px 20px;
+  margin-top: 20px;
+  padding: 20px 20px 20px 20px;
   background-color: #fff;
   /* opacity: 1; */
   position: sticky;
   top: 70px;
   z-index: 1;
 }
+
 
 .filter-all {
   font-size: 20px;
@@ -159,17 +191,71 @@ export default {
   font-weight: 500;
   padding: 7px 15px;
   border-radius: 25px;
-  background: #F8C101;
+  background: #f8c101;
   color: #fff;
 }
 
 .home-searchbar {
+  display: flex;
+  align-items: center;
   background: #fff;
   /* opacity: 1; */
   padding: 10px;
+  margin-top: 20px;
   position: sticky;
   top: 0;
   z-index: 1;
+}
+
+
+.searchbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #e3e3e3;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+textarea:focus,
+input:focus {
+  outline: none;
+}
+
+.camera-button {
+  background-color: #fff;
+  padding: 6px;
+  border: 1px solid #e3e3e3;
+  border-right: none;
+}
+
+.camera-button:active {
+  transform: scale(0.98);
+  /* Scaling button to 0.98 to its original size */
+  box-shadow: 1px 2px 12px 1px rgba(0, 0, 0, 0.12);
+  /* Lowering the shadow */
+}
+
+.search-button {
+  color: #fff;
+  background-color: #f89501;
+  padding: 6px;
+  border: 1px solid #f89501;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.search-button:active {
+  transform: scale(0.98);
+  /* Scaling button to 0.98 to its original size */
+  box-shadow: 1px 2px 12px 1px rgba(0, 0, 0, 0.12);
+  /* Lowering the shadow */
 }
 
 .ion-padding-start {
@@ -192,7 +278,7 @@ h3 {
   font-weight: 300;
   text-align: left;
   font-size: 12px;
-  color: #5F5F5F;
+  color: #5f5f5f;
 }
 
 hr {
@@ -215,7 +301,7 @@ hr {
   font-weight: bold;
   font-size: 5px;
   color: #fff;
-  background: #098D16;
+  background: #098d16;
   border-radius: 2px;
   padding: 4px;
 }
@@ -227,9 +313,8 @@ ion-row {
   align-items: center;
 }
 
-
 .card-price {
-  color: #098D16;
+  color: #098d16;
   font-size: 13px;
   font-weight: bold;
 }
@@ -242,7 +327,7 @@ ion-row {
   padding-left: 14px;
 }
 
-.card-button{
+.card-button {
   margin: 0;
   font-size: 10px;
   font-weight: 400;

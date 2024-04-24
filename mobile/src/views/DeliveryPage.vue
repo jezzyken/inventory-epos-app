@@ -1,8 +1,9 @@
 <template>
   <ion-page>
     <ion-content :fullscreen="true" class="ion-no-margin ion-no-padding home-content-container">
-      <div class="delivery-title">
-        <h1>Delivery</h1>
+      <div class="delivery-header">
+        <span class="delivery-title">Delivery</span>
+        <ion-button color="light" size="small"><ion-icon :icon="filter"></ion-icon></ion-button>
       </div>
       <div>
         <div class="delivery-lists">
@@ -41,7 +42,8 @@
 </template>
 
 <script>
-import { IonPage, IonContent, IonSearchbar, } from "@ionic/vue";
+import { IonPage, IonContent, IonSearchbar, IonIcon, IonButton } from "@ionic/vue";
+import { filter } from 'ionicons/icons';
 import ItemCard from "@/components/ItemCard.vue";
 import VariantModal from "@/components/VariantModal.vue"
 
@@ -51,8 +53,13 @@ export default {
     IonContent,
     IonSearchbar,
     ItemCard,
-    VariantModal
+    VariantModal,
+    IonIcon,
+    IonButton
   },
+  setup() {
+      return { filter };
+    },
   data() {
     return {
       items: [
@@ -115,14 +122,15 @@ export default {
 </script>
 
 <style scoped>
-.delivery-title {
-  padding: 0px 20px;
+.delivery-header {
+  padding: 20px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-h1 {
+.delivery-title {
+  font-size: 2rem;
   color: #333;
 }
 
