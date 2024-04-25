@@ -1,4 +1,5 @@
 const Models = require("../../models/Product");
+const ItemPriceModel = require("../../models/ItemPrice");
 
 const get = async () => {
   const result = await customPopulate(Models.find());
@@ -11,9 +12,46 @@ const getById = async (id) => {
 };
 
 const add = async (req) => {
-  const item = new Models(req.body);
-  const result = await item.save();
-  return result;
+  const {
+    name,
+    productCode,
+    category,
+    brand,
+    criticalLimit,
+    description,
+    image,
+    price,
+  } = req.body;
+
+  const productData = {
+    name,
+    productCode,
+    category,
+    brand,
+    criticalLimit,
+    description,
+    image,
+  };
+  
+
+  const product = await Models.create(productData);
+
+  console.log(product);
+
+  const savedItemPrices = await Promise.all(
+    price.map(async (itemPriceData) => {
+      itemPriceData.product = product._id;
+      const itemPrice = await ItemPriceModel.create(itemPriceData);
+      return itemPrice._id;
+    })
+  );
+
+  product.price = savedItemPrices;
+
+  await product.save();
+  // const item = new Models(req.body);
+  // const result = await item.save();
+  // return product;
 };
 
 const remove = async (id) => {
@@ -39,5 +77,5 @@ module.exports = {
   get,
   getById,
   remove,
-  add
+  add,
 };

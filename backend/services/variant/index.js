@@ -1,15 +1,14 @@
 const Models = require("../../models/Variant");
 
 const get = async () => {
-  const result = await customPopulate(Models.find());
+  const result = await Models.find();
   return result;
 };
 
 const getById = async (id) => {
-  const result = await customPopulate(Models.findById(id));
+  const result = await Models.findById(id);
   return result;
 };
-
 const add = async (req) => {
   const item = new Models(req.body);
   const result = await item.save();

@@ -1,12 +1,12 @@
 const Models = require("../../models/Category");
 
 const get = async () => {
-  const result = await customPopulate(Models.find());
+  const result = await Models.find();
   return result;
 };
 
 const getById = async (id) => {
-  const result = await customPopulate(Models.findById(id));
+  const result = await Models.findById(id);
   return result;
 };
 
