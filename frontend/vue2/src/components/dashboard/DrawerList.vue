@@ -65,7 +65,7 @@ export default {
 
           {
             action: "mdi-silverware-fork-knife",
-            items: [{ title: "Customer" }, { title: "Supplier" }],
+            items: [{ title: "Customer", route: "/customer" }, { title: "Supplier", route: "/supplier" }],
             title: "Contacts",
             appendIcon: "mdi-chevron-down",
           },

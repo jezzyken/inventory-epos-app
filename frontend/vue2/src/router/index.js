@@ -16,6 +16,18 @@ const routes = [
         component: () => import("@/views/products/ProductView"),
       },
       {
+        path: "/product/add",
+        name: "AddProduct",
+        component: () => import("@/views/products/ProductForm"),
+        props: { mode: 'add' }
+      },
+      {
+        path: "/product/:id/edit",
+        name: "EditProduct",
+        component: () => import("@/views/products/ProductForm"),
+        props: true
+      },
+      {
         path: "/brand",
         name: "brand",
         component: () => import("@/views/products/BrandView"),
@@ -65,7 +77,7 @@ const routes = [
         component: () => import("@/views/contacts/SupplierView"),
       },
       // ----end of contacts----
-      
+
       // ----users----
       {
         path: "/user",
@@ -91,7 +103,6 @@ const routes = [
         component: () => import("@/views/SalesView"),
       },
       // ----end of sales----
-
     ],
   },
 ];
