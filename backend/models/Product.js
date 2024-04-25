@@ -1,8 +1,5 @@
 const mongoose = require("mongoose");
 
-const category = require("./Category");
-const unit = require("./Unit");
-
 const productSchema = new mongoose.Schema(
   {
     name: {
