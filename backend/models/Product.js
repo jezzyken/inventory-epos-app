@@ -26,12 +26,6 @@ const productSchema = new mongoose.Schema(
     image: {
       type: String,
     },
-    price: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "ItemPrice",
-      },
-    ],
   },
   {
     timestamps: true,

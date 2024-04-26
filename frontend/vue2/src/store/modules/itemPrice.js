@@ -8,7 +8,7 @@ const state = {
   items: [],
 };
 
-const endpoint = "products";
+const endpoint = "item-price";
 
 const actions = {
   async getItem({ commit }, data) {
@@ -23,6 +23,15 @@ const actions = {
   async getItemById({ commit }, id) {
     try {
       const response = await axios.get(`${url}/${endpoint}/${id}`);
+      return response.data;
+    } catch (error) {
+      return error.response;
+    }
+  },
+
+  async getItemByProductId({ commit }, id) {
+    try {
+      const response = await axios.get(`${url}/${endpoint}/${id}/product`);
       return response.data;
     } catch (error) {
       return error.response;

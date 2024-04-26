@@ -1,4 +1,3 @@
-const Models = require("../models/Product");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const service = require("../services/product");
@@ -26,12 +25,17 @@ const getById = catchAsync(async (req, res, next) => {
 });
 
 const add = catchAsync(async (req, res) => {
-  const result = await service.add(req);
-  const data = {
-    success: true,
-    result,
-  };
-  return res.status(200).send(data);
+  try {
+    const result = service.add(req);
+    const data = {
+      success: true,
+      result,
+    };
+    return res.status(200).send(data);
+  } catch (error) {
+  console.log(error)
+  } 
+  
 });
 
 const update = async (req, res) => {

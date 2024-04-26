@@ -1,29 +1,27 @@
 <template>
-
-  <v-container>
-
+  <v-container v-if="!isLoading">
     <v-sheet elevation="1" class="pa-5">
       <v-row>
         <v-col cols="12" md="3">
-          <v-text-field v-model="editedItem.name" label="Name"></v-text-field>
+          <v-text-field v-model="items.name" label="Name"></v-text-field>
         </v-col>
         <v-col cols="12" md="3">
-          <v-text-field v-model="editedItem.productCode" label="Product Code"></v-text-field>
+          <v-text-field v-model="items.productCode" label="Product Code"></v-text-field>
         </v-col>
         <v-col cols="12" md="3">
-          <v-text-field v-model="editedItem.category" label="Category"></v-text-field>
+          <v-select v-model="items.category" label="Select" :items="category" item-text="name" item-value="_id"></v-select>
         </v-col>
         <v-col cols="12" md="3">
-          <v-text-field v-model="editedItem.brand" label="Brand"></v-text-field>
+          <v-select v-model="items.brand" label="Select" :items="brand" item-text="name" item-value="_id"></v-select>
         </v-col>
         <v-col cols="12" md="2">
-          <v-text-field v-model="editedItem.criticalLimit" label="Critical Limit"></v-text-field>
+          <v-text-field v-model="items.criticalLimit" label="Critical Limit"></v-text-field>
         </v-col>
         <v-col cols="12" md="5">
-          <v-text-field v-model="editedItem.description" label="Description"></v-text-field>
+          <v-text-field v-model="items.description" label="Description"></v-text-field>
         </v-col>
         <v-col cols="12" md="5">
-          <v-text-field v-model="editedItem.image" label="Image URL"></v-text-field>
+          <v-text-field v-model="items.image" label="Image URL"></v-text-field>
         </v-col>
       </v-row>
     </v-sheet>
@@ -33,40 +31,32 @@
         <template v-slot:default>
           <thead>
             <tr>
-              <th class="text-left">
-                Unit
-              </th>
-              <th class="text-left">
-                Variant
-              </th>
-              <th class="text-left">
-                Item Price
-              </th>
-              <th class="text-left">
-                Sale Price
-              </th>
+              <th class="text-left">Unit</th>
+              <th class="text-left">Variant</th>
+              <th class="text-left">Item Price</th>
+              <th class="text-left">Sale Price</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, i) in editedItem.price" :key="i">
+            <tr v-for="(price, i) in priceItem" :key="i">
               <td>
-                <v-text-field v-model="item.unit" label="Unit"></v-text-field>
+                <v-select v-model="price.unit" :items="unit" label="Select" item-text="name" item-value="_id"></v-select>
               </td>
               <td>
-                <v-text-field v-model="item.variant" label="Variant"></v-text-field>
+                <v-select v-model="price.variant" :items="variant" label="Select" item-text="name" item-value="_id"></v-select>
               </td>
               <td>
-                <v-text-field v-model="item.itemPrice" label="Sale Price"></v-text-field>
+                <v-text-field v-model="price.itemPrice" label="Sale Price"></v-text-field>
               </td>
               <td>
-                <v-text-field v-model="item.salePrice" label="Item Price"></v-text-field>
+                <v-text-field v-model="price.salePrice" label="Item Price"></v-text-field>
               </td>
             </tr>
           </tbody>
         </template>
       </v-simple-table>
       <v-row justify="end" class="ma-4">
-        <v-btn dark color="primary">Add price</v-btn>
+        <v-btn dark color="primary" @click="addPrice">Add price</v-btn>
       </v-row>
     </v-sheet>
 
@@ -76,62 +66,78 @@
       <v-btn>clear</v-btn>
     </v-row>
 
-    <!-- <div>
-      <h1>{{ mode === 'add' ? 'Add Product' : 'Edit Product' }}</h1>
-    </div> -->
-
   </v-container>
-
 </template>
 
 <script>
+/*eslint-disable */
 import { mapActions } from "vuex";
+
 export default {
   props: {
     mode: String, // 'add' or 'edit'
-    userId: Number // ID of the user to edit (if in edit mode)
   },
   data() {
     return {
-      items: [],
-      editedItem: {
-        name: "",
-        description: "",
-        productCode: "",
-        brand: "661b7dfe5a892b0a98517b83",
-        category: "661b8594530be21a8d8cbf76",
-        criticalLimit: "",
-        image: "https://media.istockphoto.com/id/173633236/photo/hand-saw.webp?b=1&s=170667a&w=0&k=20&c=fk-bGhRNrB-MPIvOJXcVw9QE4fyXzJfTQeleMFwVXbA=",
-        price: [{
-          unit: "661b8b4e707762e06fc900de",
-          variant: "661ba4a1ce42007ca29cc48f"
-        }]
+      items: {
+        image:
+          "https://media.istockphoto.com/id/173633236/photo/hand-saw.webp?b=1&s=170667a&w=0&k=20&c=fk-bGhRNrB-MPIvOJXcVw9QE4fyXzJfTQeleMFwVXbA=",
       },
-      defaultItem: {
-        name: "",
-        description: "",
-        productCode: "",
-        brand: "",
-        category: "",
-        criticalLimit: "",
-        image: "",
-        price: [{}]
-      },
-
+      priceItem: [{}],
+      isLoading: false,
+      category: [],
+      unit: [],
+      variant: [],
+      brand: []
+    };
+  },
+  async created() {
+    this.fetch()
+    if (this.$route?.params?.id) {
+      this.initialize();
     }
   },
+
   methods: {
     ...mapActions({
-      "getItems": "product/getItem",
-      "addItem": "product/addItem",
-      "removeItem": "product/deleteItem",
-      "updateItem": "product/updateItem",
+      getItemById: "product/getItemById",
+      getItemByProductId: "itemPrice/getItemByProductId",
+      addItem: "product/addItem",
+      getCategoryItems: "category/getItem",
+      getVariantItems: "variant/getItem",
+      getUnitItems: "unit/getItem",
+      getBrandItems: "brand/getItem"
+
     }),
+
+    async initialize() {
+      this.isLoading = true;
+      const response = await this.getItemById(this.$route.params.id);
+      const priceResponse = await this.getItemByProductId(this.$route.params.id)
+      this.items = response.result;
+      this.priceItem = priceResponse.result
+
+      this.isLoading = false;
+    },
+
+    addPrice() {
+      this.priceItem.push({});
+    },
+
     async onAddItem() {
-      // this.items.push(this.editedItem);
-      await this.addItem(this.editedItem)
-      // console.log(this.editedItem)
+      await this.addItem({ ...this.items, prices: this.priceItem });
+    },
+
+    async fetch() {
+      const category = await this.getCategoryItems()
+      const unit = await this.getUnitItems()
+      const brand = await this.getBrandItems()
+      const variant = await this.getVariantItems()
+      this.category = category.result
+      this.unit = unit.result
+      this.brand = brand.result
+      this.variant = variant.result
     }
-  }
-}
+  },
+};
 </script>

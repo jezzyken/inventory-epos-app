@@ -1,5 +1,6 @@
 const Models = require("../../models/Product");
 const ItemPriceModel = require("../../models/ItemPrice");
+const ObjectId = require("mongoose").Types.ObjectId;
 
 const get = async () => {
   const result = await customPopulate(Models.find());
@@ -20,8 +21,9 @@ const add = async (req) => {
     criticalLimit,
     description,
     image,
-    price,
+    prices,
   } = req.body;
+
 
   const productData = {
     name,
@@ -32,26 +34,19 @@ const add = async (req) => {
     description,
     image,
   };
-  
 
   const product = await Models.create(productData);
 
-  console.log(product);
-
-  const savedItemPrices = await Promise.all(
-    price.map(async (itemPriceData) => {
+  await Promise.all(
+    prices.map(async (itemPriceData) => {
       itemPriceData.product = product._id;
-      const itemPrice = await ItemPriceModel.create(itemPriceData);
-      return itemPrice._id;
+      console.log(itemPriceData)
+      await ItemPriceModel.create(itemPriceData);
     })
   );
 
-  product.price = savedItemPrices;
-
-  await product.save();
-  // const item = new Models(req.body);
-  // const result = await item.save();
-  // return product;
+  const productx = await product.save();
+  return productx;
 };
 
 const remove = async (id) => {
@@ -62,15 +57,15 @@ const remove = async (id) => {
 const customPopulate = (query) => {
   return query
     .populate({ path: "brand", select: "name" })
-    .populate({ path: "category", select: "name" })
-    .populate({
-      path: "price",
-      select: "salePrice itemPrice",
-      populate: [
-        { path: "unit", select: "name" },
-        { path: "variant", select: "name" },
-      ],
-    });
+    .populate({ path: "category", select: "name" });
+  // .populate({
+  //   path: "price",
+  //   select: "salePrice itemPrice",
+  //   populate: [
+  //     { path: "unit", select: "name" },
+  //     { path: "variant", select: "name" },
+  //   ],
+  // });
 };
 
 module.exports = {
