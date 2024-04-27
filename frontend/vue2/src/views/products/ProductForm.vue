@@ -38,7 +38,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(price, i) in priceItem" :key="i">
+            <tr v-for="(price, i) in items.prices" :key="i">
               <td>
                 <v-select v-model="price.unit" :items="unit" label="Select" item-text="name" item-value="_id"></v-select>
               </td>
@@ -82,8 +82,9 @@ export default {
       items: {
         image:
           "https://media.istockphoto.com/id/173633236/photo/hand-saw.webp?b=1&s=170667a&w=0&k=20&c=fk-bGhRNrB-MPIvOJXcVw9QE4fyXzJfTQeleMFwVXbA=",
+          prices: [{}]
       },
-      priceItem: [{}],
+      // priceItem: [{}],
       isLoading: false,
       category: [],
       unit: [],
@@ -121,7 +122,7 @@ export default {
     },
 
     addPrice() {
-      this.priceItem.push({});
+      this.items.prices.push({});
     },
 
     async onAddItem() {
