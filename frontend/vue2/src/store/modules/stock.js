@@ -8,7 +8,7 @@ const state = {
   items: [],
 };
 
-const endpoint = "products";
+const endpoint = "stocks";
 
 const actions = {
   async getItem({ commit }, data) {
