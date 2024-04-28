@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-data-table :headers="headers" :items="desserts" sort-by="calories" class="elevation-1">
+    <v-data-table :headers="headers" :items="desserts" :loading="isLoading" sort-by="calories" class="elevation-1">
       <template v-slot:top>
         <v-toolbar flat>
           <v-toolbar-title>Products</v-toolbar-title>
@@ -139,7 +139,8 @@ export default {
       contactNo: "",
       address: ""
     },
-    itemId: null
+    itemId: null,
+    isLoading: false
   }),
 
   computed: {
@@ -159,8 +160,9 @@ export default {
 
   created() {
     this.initialize();
+    console.log('initialized back')
   },
-
+ 
   methods: {
     ...mapActions({
       "getItems": "product/getItem",
@@ -170,9 +172,10 @@ export default {
     }),
 
     async initialize() {
+      this.isLoading = true
       const results = await this.getItems()
-      console.log(results)
       this.desserts = results.result
+      this.isLoading = false
     },
 
     editItem(item) {

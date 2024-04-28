@@ -32,7 +32,6 @@ const actions = {
   async addItem({ commit }, data) {
     try {
       const response = await axios.post(`${url}/${endpoint}`, data);
-      console.log(respose)
       return response.data;
     } catch (error) {
       console.log(error)

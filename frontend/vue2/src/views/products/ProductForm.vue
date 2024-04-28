@@ -114,10 +114,7 @@ export default {
     async initialize() {
       this.isLoading = true;
       const response = await this.getItemById(this.$route.params.id);
-      const priceResponse = await this.getItemByProductId(this.$route.params.id)
       this.items = response.result;
-      this.priceItem = priceResponse.result
-
       this.isLoading = false;
     },
 
@@ -126,7 +123,8 @@ export default {
     },
 
     async onAddItem() {
-      await this.addItem({ ...this.items, prices: this.priceItem });
+      await this.addItem(this.items);
+      this.$router.push('/product');
     },
 
     async fetch() {
