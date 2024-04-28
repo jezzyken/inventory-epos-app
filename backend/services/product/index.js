@@ -24,7 +24,6 @@ const add = async (req) => {
     prices,
   } = req.body;
 
-
   const productData = {
     name,
     productCode,
@@ -33,20 +32,12 @@ const add = async (req) => {
     criticalLimit,
     description,
     image,
+    prices,
   };
 
   const product = await Models.create(productData);
 
-  await Promise.all(
-    prices.map(async (itemPriceData) => {
-      itemPriceData.product = product._id;
-      console.log(itemPriceData)
-      await ItemPriceModel.create(itemPriceData);
-    })
-  );
-
-  const productx = await product.save();
-  return productx;
+  return await product.save();
 };
 
 const remove = async (id) => {
@@ -57,7 +48,10 @@ const remove = async (id) => {
 const customPopulate = (query) => {
   return query
     .populate({ path: "brand", select: "name" })
-    .populate({ path: "category", select: "name" });
+    .populate({ path: "category", select: "name" })
+    .populate({ path: "prices.unit", select: "name" })
+    .populate({ path: "prices.variant", select: "name" });
+
   // .populate({
   //   path: "price",
   //   select: "salePrice itemPrice",

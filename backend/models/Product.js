@@ -26,6 +26,24 @@ const productSchema = new mongoose.Schema(
     image: {
       type: String,
     },
+    prices: [
+      {
+        unit: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Unit",
+        },
+        variant: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Variant",
+        },
+        itemPrice: {
+          type: String,
+        },
+        salePrice: {
+          type: String,
+        },
+      },
+    ],
   },
   {
     timestamps: true,
