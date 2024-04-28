@@ -4,7 +4,10 @@
   "description": "inventory app API",
   "main": "app.js",
   "scripts": {
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "setup-production": "npm run install-frontend && npm run build-frontend && npm install",
+    "install-frontend": "cd frontend && npm install",
+    "build-frontend": "cd frontend && npm run build"
   },
   "author": "jezrelljolampong",
   "license": "ISC",
