@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-data-table :headers="headers" :items="desserts" :loading="isLoading" sort-by="calories" class="elevation-1">
+    <v-data-table :headers="headers" :items="items" :loading="isLoading" sort-by="calories" class="elevation-1">
       <template v-slot:top>
         <v-toolbar flat>
           <v-toolbar-title>Products</v-toolbar-title>
@@ -121,9 +121,14 @@ export default {
         align: "start",
         value: "category.name",
       },
+      {
+        text: "Quantity",
+        align: "start",
+        value: "stocksQuantity",
+      },
       { text: "Actions", value: "actions", sortable: false },
     ],
-    desserts: [],
+    items: [],
     editedIndex: -1,
     editedItem: {
       name: "",
@@ -158,9 +163,8 @@ export default {
     },
   },
 
-  created() {
-    this.initialize();
-    console.log('initialized back')
+  async created() {
+    await this.initialize();
   },
  
   methods: {
@@ -174,18 +178,19 @@ export default {
     async initialize() {
       this.isLoading = true
       const results = await this.getItems()
-      this.desserts = results.result
+      console.log(results)
+      this.items = results.result
       this.isLoading = false
     },
 
     editItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
+      this.editedIndex = this.items.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
 
     deleteItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
+      this.editedIndex = this.items.indexOf(item);
       this.itemId = item._id
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
@@ -193,7 +198,7 @@ export default {
 
     async deleteItemConfirm() {
       await this.removeItem(this.itemId)
-      this.desserts.splice(this.editedIndex, 1);
+      this.items.splice(this.editedIndex, 1);
       this.closeDelete();
     },
 
@@ -215,14 +220,19 @@ export default {
 
     async save() {
       if (this.editedIndex > -1) {
-        Object.assign(this.desserts[this.editedIndex], this.editedItem);
+        Object.assign(this.items[this.editedIndex], this.editedItem);
         await this.updateItem(this.editedItem)
       } else {
-        this.desserts.push(this.editedItem);
+        this.items.push(this.editedItem);
         await this.addItem(this.editedItem)
       }
       this.close();
     },
   },
+  watch: {
+    items(val){
+      return val
+    }
+  }
 };
 </script>

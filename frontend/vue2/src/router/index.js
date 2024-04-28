@@ -55,6 +55,18 @@ const routes = [
         name: "stock",
         component: () => import("@/views/StockView"),
       },
+      {
+        path: "/stock/add",
+        name: "AddStock",
+        component: () => import("@/views/StockForm"),
+        props: { mode: 'add' }
+      },
+      {
+        path: "/stock/:id/edit",
+        name: "EditStock",
+        component: () => import("@/views/StockForm"),
+        props: true
+      },
       // ----end of stocks----
 
       // ----delivery----
