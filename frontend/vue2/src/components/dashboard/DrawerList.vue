@@ -51,37 +51,36 @@ export default {
             appendIcon: "mdi-chevron-down",
           },
           {
-            action: "mdi-silverware-fork-knife",
+            action: "mdi-package-up",
             title: "Stocks",
             route: "/stock",
             appendIcon: "",
           },
           {
-            action: "mdi-silverware-fork-knife",
+            action: "mdi-truck-delivery",
             title: "Delivery",
             appendIcon: "",
             route: "/delivery",
           },
-
           {
-            action: "mdi-silverware-fork-knife",
+            action: "mdi-contacts",
             items: [{ title: "Customer", route: "/customer" }, { title: "Supplier", route: "/supplier" }],
             title: "Contacts",
             appendIcon: "mdi-chevron-down",
           },
           {
-            action: "mdi-silverware-fork-knife",
+            action: "mdi-account-group",
             items: [{ title: "Users" }, { title: "Logs" }, { title: "Role" }],
             title: "Users",
             appendIcon: "mdi-chevron-down",
           },
           {
-            action: "mdi-silverware-fork-knife",
+            action: "mdi-invoice-list",
             title: "Sales",
             appendIcon: "",
           },
           {
-            action: "mdi-silverware-fork-knife",
+            action: "mdi-chart-box",
             items: [],
             title: "Reports",
             appendIcon: "mdi-chevron-down",
