@@ -1,9 +1,55 @@
 const Models = require("../../models/Product");
-const ItemPriceModel = require("../../models/ItemPrice");
 const ObjectId = require("mongoose").Types.ObjectId;
 
 const get = async () => {
-  const result = await customPopulate(Models.find());
+  const result = await Models.aggregate([
+    {
+      $lookup: {
+        from: "brands",
+        localField: "brand",
+        foreignField: "_id",
+        as: "brand",
+      },
+    },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "category",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    {
+      $unwind: "$brand",
+    },
+    {
+      $unwind: "$category",
+    },
+    {
+      $lookup: {
+        from: "stocks",
+        localField: "_id",
+        foreignField: "product",
+        as: "stocksQuantity",
+      },
+    },
+    {
+      $addFields: {
+        stocksQuantity: {
+          $sum: {
+            $map: {
+              input: "$stocksQuantity",
+              as: "stock",
+              in: {
+                $toInt: "$$stock.quantity",
+              },
+            },
+          },
+        },
+      },
+    },
+  ]);
+
   return result;
 };
 
@@ -40,6 +86,13 @@ const add = async (req) => {
   return await product.save();
 };
 
+const update = async (id, data) => {
+  const results = await Models.findByIdAndUpdate(id, data, {
+    new: true,
+  });
+  return results;
+};
+
 const remove = async (id) => {
   const result = await Models.findByIdAndDelete(id);
   return result;
@@ -51,20 +104,12 @@ const customPopulate = (query) => {
     .populate({ path: "category", select: "name" })
     .populate({ path: "prices.unit", select: "name" })
     .populate({ path: "prices.variant", select: "name" });
-
-  // .populate({
-  //   path: "price",
-  //   select: "salePrice itemPrice",
-  //   populate: [
-  //     { path: "unit", select: "name" },
-  //     { path: "variant", select: "name" },
-  //   ],
-  // });
 };
 
 module.exports = {
   get,
   getById,
-  remove,
   add,
+  update,
+  remove,
 };

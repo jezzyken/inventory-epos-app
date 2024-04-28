@@ -1,6 +1,7 @@
+const Models = require("../models/Stock");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
-const service = require("../services/product");
+const service = require("../services/stock");
 
 const get = catchAsync(async (req, res) => {
   const result = await service.get();
@@ -11,11 +12,11 @@ const get = catchAsync(async (req, res) => {
   return res.status(200).send(data);
 });
 
-const getById = catchAsync(async (req, res, next) => {
+const getById = catchAsync(async (req, res) => {
   const result = await service.getById(req.params.id);
 
   if (!result) {
-    return next(new AppError("No Product found with that ID", 404));
+    return next(new AppError("No Item found with that ID", 404));
   }
   const data = {
     success: true,
@@ -25,19 +26,15 @@ const getById = catchAsync(async (req, res, next) => {
 });
 
 const add = catchAsync(async (req, res) => {
-  try {
-    const result = service.add(req);
-    const data = {
-      success: true,
-      result,
-    };
-    return res.status(200).send(data);
-  } catch (error) {
-    console.log(error);
-  }
+  const result = await service.add(req);
+  const data = {
+    success: true,
+    result,
+  };
+  return res.status(200).send(data);
 });
 
-const update = async (req, res) => {
+const update = catchAsync(async (req, res, next) => {
   const results = await service.update(req.params.id, req.body);
   if (!results) {
     return next(new AppError("No Item found with that ID", 404));
@@ -47,13 +44,10 @@ const update = async (req, res) => {
     results,
   };
   return res.status(200).send(data);
-};
+});
 
-const remove = catchAsync(async (req, res, next) => {
-  const result = await service.remove(req.params.id);
-  if (!result) {
-    return next(new AppError("No Product found with that ID", 404));
-  }
+const remove = catchAsync(async (req, res) => {
+  const result = await Models.findByIdAndDelete(req.params.id);
   const data = {
     success: true,
     result,
