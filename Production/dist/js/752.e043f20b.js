@@ -1,2 +1,0 @@
-"use strict";(self["webpackChunkvue2"]=self["webpackChunkvue2"]||[]).push([[752],{9752:function(e,u,n){n.r(u),n.d(u,{default:function(){return f}});var l=function(){var e=this,u=e._self._c;return u("h1",[e._v("User Role View")])},r=[],t=n(1656),s={},c=(0,t.A)(s,l,r,!1,null,null,null),f=c.exports}}]);
-//# sourceMappingURL=752.e043f20b.js.map

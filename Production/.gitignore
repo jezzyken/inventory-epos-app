@@ -1,2 +1,9 @@
 node_modules
 .env
+
+
+backend/node_modules
+backend/frontend/node_modules
+backend/frontend/dist
+
+backend/.env
