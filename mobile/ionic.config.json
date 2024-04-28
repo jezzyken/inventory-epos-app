@@ -1,7 +1,0 @@
-{
-  "name": "inventoy-epos-app",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "vue-vite"
-}
