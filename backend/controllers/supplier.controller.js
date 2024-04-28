@@ -4,7 +4,7 @@ const AppError = require("../utils/appError");
 const service = require("../services/supplier");
 
 const get = catchAsync(async (req, res) => {
-  const result = await Models.find();
+  const result = await service.get();
   const data = {
     success: true,
     result,
