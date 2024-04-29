@@ -1,21 +1,34 @@
 <template>
   <ion-page>
-    <ion-content
-      :fullscreen="true"
-      class="ion-no-margin ion-no-padding home-content-container"
-    >
+    <ion-header>
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-back-button></ion-back-button>
+        </ion-buttons>
+        <ion-title>Delivery Info</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content :fullscreen="true">
       <div class="container">
         <ion-grid>
           <ion-row class="ion-align-items-center">
             <span class="transaction-title">Delivery Status</span>
             <div>
-              <p class="card-product-status">Available</p>
+              <p
+                :class="
+                  filteredItems.status === 'delivered'
+                    ? 'product-status-delivered'
+                    : 'product-status-pending'
+                "
+              >
+                {{ filteredItems.status }}
+              </p>
             </div>
           </ion-row>
           <ion-row class="ion-margin-top">
             <ion-col class="ion-no-padding">
               <div class="transaction-info-title">Recepient</div>
-              <div class="transaction-info-text">Ochinchin Orewa</div>
+              <div class="transaction-info-text">{{ filteredItems.name }}</div>
             </ion-col>
             <ion-col class="ion-no-padding">
               <div class="transaction-info-title">Delivery Date</div>
@@ -26,18 +39,16 @@
             <div>
               <span class="transaction-info-title">Address</span>
               <div class="transaction-info-text">
-                <span>Vorem ipsum dolor sit amet, consectetur adipiscing elit.</span>
-            </div>
+                <span>{{ filteredItems.address }}</span>
+              </div>
             </div>
             <div class="ion-margin-top">
               <span class="transaction-info-title">Note</span>
               <div class="transaction-info-text">
                 <span>
-                  Lorem ipsum dolor sit amet consectetur, adipisicing elit. Optio
-                  alias illo sunt itaque rem nostrum cupiditate reprehenderit
-                  fugit, incidunt magnam veniam error temporibus tempore.
+                  {{ filteredItems.note }}
                 </span>
-            </div>
+              </div>
             </div>
           </ion-col>
           <ion-col>
@@ -46,25 +57,20 @@
           <ion-col>
             <ion-item
               class="item-list ion-no-padding"
-              detail="false"
               lines="full"
-              v-for="n in 3"
-              :key="n"
+              v-for="order in filteredItems.orders"
+              :key="order.id"
             >
               <ion-label>
-                <ion-row>
-                  <div class="list-container">
-                    <ion-col size="3" class="ion-margin-end">
-                      <h3 class="list-title">Unit(3)</h3>
+                <ion-row class="ion-align-items-center">
+                    <ion-col size="3">
+                      <h3 class="list-title">{{ order.unit }}</h3>
                     </ion-col>
-                    <ion-col class="ion-no-padding">
+                    <ion-col size="9">
                       <p class="list-text">
-                        Torem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Nunc vulputate libero et velit interdum, ac aliquet odio
-                        mattis.
+                        {{ order.item }}
                       </p>
                     </ion-col>
-                  </div>
                 </ion-row>
               </ion-label>
             </ion-item>
@@ -77,6 +83,11 @@
 
 <script>
 import {
+  IonHeader,
+  IonTitle,
+  IonToolbar,
+  IonButtons,
+  IonBackButton,
   IonPage,
   IonContent,
   IonCol,
@@ -88,6 +99,11 @@ import {
 
 export default {
   components: {
+    IonHeader,
+    IonTitle,
+    IonToolbar,
+    IonButtons,
+    IonBackButton,
     IonPage,
     IonContent,
     IonCol,
@@ -96,17 +112,96 @@ export default {
     IonItem,
     IonLabel,
   },
+  // computed: {
+  //   filteredItems(){
+  //     return this.items.find(item => item.id == this.$route.params.id)
+  //   }
+  // },
+
+  created() {
+    this.filteredItems = this.items.find(
+      (item) => item.id == this.$route.params.id
+    );
+  },
+  data() {
+    return {
+      items: [
+        {
+          id: 1,
+          name: "Test1",
+          address: "address test1",
+          status: "pending",
+          recipient: "test1",
+          note: "test",
+          orders: [
+            {
+              id: 1,
+              unit: "1",
+              item: "1 set of kidney",
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: "Test2",
+          address: "address test2",
+          status: "pending",
+          recipient: "test2",
+          note: "test",
+          orders: [
+            {
+              id: 1,
+              unit: "2",
+              item: "1 set of kidney",
+            },
+          ],
+        },
+        {
+          id: 3,
+          name: "Test3",
+          address: "address test3",
+          status: "delivered",
+          recipient: "test3",
+          note: "test",
+          orders: [
+            {
+              id: 1,
+              unit: "3",
+              item: "cock for figthing",
+            },
+            {
+              id: 2,
+              unit: "4",
+              item: "1 ball of fury",
+            },
+          ],
+        },
+      ],
+      filteredItems: {},
+    };
+  },
 };
 </script>
 
 <style scoped>
-.card-product-status {
+.product-status-delivered {
   text-align: center;
   text-transform: uppercase;
   font-weight: bold;
   font-size: 8px;
   color: #fff;
   background: #098d16;
+  border-radius: 2px;
+  padding: 4px;
+}
+
+.product-status-pending {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 8px;
+  color: #fff;
+  background: #fbbc04;
   border-radius: 2px;
   padding: 4px;
 }
@@ -160,14 +255,8 @@ ion-item {
   margin-right: 10px;
 }
 
-.transaction-cost {
-  font-size: 20px;
-  font-weight: bold;
-  color: #098d16;
-}
-
 .container {
-  margin-top: 40px;
+  margin-top: 20px;
   padding: 0px 20px;
 }
 </style>

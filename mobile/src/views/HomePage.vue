@@ -1,71 +1,100 @@
 <template>
   <ion-page>
-    <ion-content :fullscreen="true" class="ion-no-margin ion-no-padding home-content-container">
-      <div class="home-searchbar">
+    <ion-header>
+      <ion-toolbar>
         <ion-col>
-          <div class="searchbar">
-            <input type="text" placeholder="Search..">
-            <button class="camera-button">
-              <ion-icon :icon="cameraOutline"></ion-icon>
-            </button>
-            <button class="search-button">
-              <ion-icon :icon="searchOutline"></ion-icon>
-            </button>
-          </div>
-          <div class="filters">
-            <span class="filter-all">All</span>
-            <ion-chip v-for="n in 3" :key="n">
-              <ion-label>Sample</ion-label>
-              <ion-icon :icon="close"></ion-icon>
-            </ion-chip>
+          <div class="ion-padding-horizontal">
+            <div class="searchbar">
+              <input type="text" placeholder="Search.." />
+              <button class="camera-button">
+                <ion-icon :icon="cameraOutline"></ion-icon>
+              </button>
+              <button class="search-button">
+                <ion-icon :icon="searchOutline"></ion-icon>
+              </button>
+            </div>
+            <ion-row class="ion-align-items-center ion-justify-content-between">
+              <span class="filter-all">All</span>
+              <ion-chip v-for="n in 3" :key="n">
+                <ion-label>Sample</ion-label>
+                <ion-icon class="filter" :icon="close"></ion-icon>
+              </ion-chip>
+            </ion-row>
           </div>
         </ion-col>
-      </div>
-      <div>
-        <ion-card v-for="n in 10" :key="n">
-          <ion-grid>
-            <ion-row>
-              <ion-col size="auto" style="width: 100px" class="card-img ion-no-padding">
-                <img alt="Silhouette of mountains"
-                  src="https://miro.medium.com/v2/resize:fit:1224/0*5nT8Skkw8wQs9Pzz" />
-              </ion-col>
-              <ion-col class="ion-padding-start">
-                <ion-card-header class="ion-no-padding">
+      </ion-toolbar>
+    </ion-header>
+    <ion-content :fullscreen="true" class="ion-padding-vertical">
+      <ion-card v-for="item in items" :key="item.id" :router-link="{name: 'product-description', params: {id: item._id}}">
+        <ion-grid>
+          <ion-row>
+            <ion-col
+              size="auto"
+              style="width: 100px"
+              class="card-img ion-no-padding"
+            >
+              <img
+                alt="Silhouette of mountains"
+                size="small"
+                src="https://miro.medium.com/v2/resize:fit:1224/0*5nT8Skkw8wQs9Pzz"
+              />
+            </ion-col>
+            <ion-col class="ion-padding-start">
+              <ion-card-header class="ion-no-padding">
+                <ion-row
+                  class="ion-align-items-center ion-justify-content-between"
+                >
+                  <ion-card-title class="card-title">{{ item.name }}</ion-card-title>
+                  <p :class="
+                    item.stocksQuantity > 0
+                      ? 'card-product-status-available'
+                      : 'card-product-status-out-of-stock'
+                  "
+                  >{{  item.stocksQuantity > 0 ? 'available' : 'out of stock' }}</p>
+                </ion-row>
+              </ion-card-header>
+              <hr />
+              <ion-card-content class="ion-no-padding">
+                <h3 class="ion-margin-bottom">
+                  {{ item.description }}
+                </h3>
+                <ion-row
+                  size="auto"
+                  class="ion-align-items-center ion-justify-content-between"
+                >
+                  <h3 class="card-price">{{ item.prices[0].salePrice }}</h3>
                   <ion-row>
-                    <ion-card-title class="card-title">Card Title</ion-card-title>
-                    <p class="card-product-status">Available</p>
+                    <div class="card-qty">
+                      <h3>QTY:</h3>
+                    </div>
+                    <h3 class="ion-padding-start">{{ item.stocksQuantity }}</h3>
                   </ion-row>
-                </ion-card-header>
-                <hr />
-                <ion-card-content class="ion-no-padding">
-                  <h3>
-                    Here's a small text description for the card content.
-                    Nothing more, nothing less.
-                  </h3>
-                  <ion-row size="auto" class="card-options">
-                    <h3 class="card-price">P240.00</h3>
-                    <ion-row>
-                      <div class="card-qty">
-                        <h3>QTY:</h3>
-                      </div>
-                      <h3 class="ion-padding-start">69</h3>
-                    </ion-row>
-                    <button class="card-button">ADD</button>
-                  </ion-row>
-                </ion-card-content>
-              </ion-col>
-            </ion-row>
-          </ion-grid>
-        </ion-card>
-      </div>
-      <!-- <VariantModal :item="selectedItem" :isOpen="isOpen"  @close="closeModal"/>
-      <ItemCard v-for="item in items" :key="item.id" :item="item" @onSelectedItem="onSelectedItem" /> -->
+                  <ion-button size="small" class="card-button">ADD</ion-button>
+                </ion-row>
+              </ion-card-content>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card>
     </ion-content>
   </ion-page>
 </template>
 
 <script>
 import {
+  IonLabel,
+  IonToolbar,
+  IonHeader,
+  IonChip,
+  IonCardTitle,
+  IonImg,
+  IonCard,
+  IonCol,
+  IonRow,
+  IonCardContent,
+  IonButton,
+  IonCardHeader,
+  IonGrid,
   IonPage,
   IonContent,
   IonSearchbar,
@@ -75,71 +104,48 @@ import {
 import { cameraOutline, close, searchOutline } from "ionicons/icons";
 import ItemCard from "@/components/ItemCard.vue";
 import VariantModal from "@/components/VariantModal.vue";
+import axios from 'axios';
 
 export default {
   components: {
+    IonLabel,
+    IonToolbar,
+    IonHeader,
+    IonChip,
+    IonCardTitle,
+    IonImg,
+    IonCard,
+    IonCol,
+    IonRow,
+    IonCardContent,
+    IonButton,
+    IonCardHeader,
+    IonGrid,
     IonPage,
     IonContent,
     IonSearchbar,
     ItemCard,
-    VariantModal,
     IonIcon,
-    IonInput
-
+    IonInput,
   },
   setup() {
     return { cameraOutline, close, searchOutline };
   },
+  created(){
+    this.getProduct()
+  },
   data() {
     return {
-      items: [
-        {
-          id: 1,
-          name: "Item 1",
-          description:
-            "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum, voluptate",
-          price: 120,
-          quantity: 10,
-        },
-        {
-          id: 2,
-          name: "Item 2",
-          description:
-            "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum, voluptate",
-          price: 410,
-          quantity: 20,
-        },
-        {
-          id: 3,
-          name: "Item 3",
-          description:
-            "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum, voluptate",
-          price: 30,
-          quantity: 60,
-        },
-        {
-          id: 4,
-          name: "Item 4",
-          description:
-            "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum, voluptate",
-          price: 30,
-          quantity: 60,
-        },
-        {
-          id: 5,
-          name: "Item 5",
-          description:
-            "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum, voluptate",
-          price: 30,
-          quantity: 60,
-        },
-      ],
-      isOpen: false,
-      selectedItem: {},
+      items: [],
     };
   },
-
   methods: {
+    async getProduct(){
+      const response = await axios.get('https://inventory-epos-app.onrender.com/api/v1/node/products')
+      console.log(response.data.result)
+
+      this.items = response.data.result
+    },
     onSelectedItem(item) {
       this.selectedItem = item;
       this.isOpen = true;
@@ -156,57 +162,14 @@ ion-icon {
   font-size: 24px;
 }
 
+.filter {
+  font-size: 16px;
+}
+
 ion-chip {
-  --background: #F8C101;
+  --background: #f8c101;
   --color: #fff;
 }
-
-.filters {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.home-filters {
-  position: absolute;
-  width: 100%;
-  margin-top: 20px;
-  padding: 20px 20px 20px 20px;
-  background-color: #fff;
-  /* opacity: 1; */
-  position: sticky;
-  top: 70px;
-  z-index: 1;
-}
-
-
-.filter-all {
-  font-size: 20px;
-  color: #333;
-}
-
-.filter-button {
-  font-size: 10px;
-  margin: 0;
-  font-weight: 500;
-  padding: 7px 15px;
-  border-radius: 25px;
-  background: #f8c101;
-  color: #fff;
-}
-
-.home-searchbar {
-  display: flex;
-  align-items: center;
-  background: #fff;
-  /* opacity: 1; */
-  padding: 10px;
-  margin-top: 20px;
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-
 
 .searchbar {
   position: relative;
@@ -295,8 +258,8 @@ hr {
   font-weight: 400;
 }
 
-.card-product-status,
-.card-product-status p {
+.card-product-status-available,
+.card-product-status-available p {
   text-transform: uppercase;
   font-weight: bold;
   font-size: 5px;
@@ -306,11 +269,15 @@ hr {
   padding: 4px;
 }
 
-ion-row {
-  margin: 5px 0px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.card-product-status-out-of-stock,
+.card-product-status-out-of-stock p {
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 5px;
+  color: #fff;
+  background: #fb0404;
+  border-radius: 2px;
+  padding: 4px;
 }
 
 .card-price {
@@ -327,13 +294,7 @@ ion-row {
   padding-left: 14px;
 }
 
-.card-button {
-  margin: 0;
-  font-size: 10px;
-  font-weight: 400;
-  padding: 7px 15px;
-  border-radius: 5px;
-  background: #f89501;
-  color: #fff;
+ion-button {
+  --background: #f89501;
 }
 </style>

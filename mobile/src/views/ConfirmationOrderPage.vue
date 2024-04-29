@@ -1,9 +1,14 @@
 <template>
   <ion-page>
-    <ion-content
-      :fullscreen="true"
-      class="ion-no-margin ion-no-padding home-content-container"
-    >
+    <ion-header>
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-back-button></ion-back-button>
+        </ion-buttons>
+        <ion-title>Checkout</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content :fullscreen="true">
       <div class="container">
         <ion-input
           class="input-margin"
@@ -93,40 +98,40 @@
           </div>
         </div>
       </div>
-      <!-- <VariantModal :item="selectedItem" :isOpen="isOpen"  @close="closeModal"/>
-      <ItemCard v-for="item in items" :key="item.id" :item="item" @onSelectedItem="onSelectedItem" /> -->
     </ion-content>
+    <ion-footer>
+      <ion-toolbar class="ion-padding-horizontal">
+          <ion-button expand="block" router-link="/confirmation-order">
+            <span>Confirm Order</span>
+          </ion-button>
+      </ion-toolbar>
+    </ion-footer>
   </ion-page>
 </template>
 
-<script>
+<script setup lang="ts">
 import {
   IonPage,
+  IonHeader,
+  IonFooter,
+  IonTitle,
+  IonToolbar,
+  IonButtons,
+  IonButton,
+  IonBackButton,
   IonContent,
-  IonSearchbar,
-  IonItem,
   IonInput,
-  IonList,
   IonRadio,
   IonRadioGroup,
 } from "@ionic/vue";
-
-
-export default {
-  components: {
-    IonPage,
-    IonContent,
-    IonSearchbar,
-    IonItem,
-    IonInput,
-    IonList,
-    IonRadio,
-    IonRadioGroup,
-  },
-};
 </script>
 
 <style scoped>
+ion-button{
+  --background: #FF4500;
+
+}
+
 .delivery-title {
   font-size: 14px;
   color: #333;

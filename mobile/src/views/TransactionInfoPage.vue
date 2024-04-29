@@ -1,34 +1,41 @@
 <template>
   <ion-page>
-    <ion-content
-      :fullscreen="true"
-      class="ion-no-margin ion-no-padding home-content-container"
-    >
+    <ion-header>
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-back-button></ion-back-button>
+        </ion-buttons>
+        <ion-title>transaction Info</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content :fullscreen="true">
       <div class="container">
         <ion-grid>
-          <ion-row>
-            <ion-col
-              ><h3 class="transaction-title">Transaction Info</h3></ion-col
-            >
-            <ion-col class="ion-text-end transaction-cost">
-              <div><h3>P5,000.00</h3></div>
+          <ion-row class="ion-align-items-center ion-justify-content-between">
+            <ion-col>
+              <span class="transaction-title">Transaction Info</span>
+            </ion-col>
+            <ion-col class="ion-text-end">
+              <span class="transaction-cost">{{ filteredItems.cost }}</span>
             </ion-col>
           </ion-row>
           <ion-row>
             <ion-col>
               <div class="transaction-info-title">Transaction No.</div>
-              <div class="transaction-info-text">XXXXX69420</div>
+              <div class="transaction-info-text">
+                {{ filteredItems.contact }}
+              </div>
             </ion-col>
             <ion-col>
               <div class="transaction-info-title">Customer</div>
-              <div class="transaction-info-text">Ochinchin Orewa</div>
+              <div class="transaction-info-text">{{ filteredItems.name }}</div>
             </ion-col>
           </ion-row>
           <ion-row>
             <ion-col>
               <span class="transaction-info-title">Date & Time</span>
               <div class="transaction-info-text">
-                <span>01-24-2024 4:20PM</span>
+                <span>{{ filteredItems.date }}</span>
               </div>
             </ion-col>
           </ion-row>
@@ -38,25 +45,20 @@
           <ion-col>
             <ion-item
               class="item-list"
-              detail="false"
               lines="full"
-              v-for="n in 3"
-              :key="n"
+              v-for="purchasedItem in filteredItems.purchasedItems"
+              :key="purchasedItem.id"
             >
               <ion-label>
-                <ion-row>
-                  <div class="list-container">
+                <ion-row class="ion-align-items-center">
                     <ion-col size="3">
-                        <h3 class="list-title">Unit(3)</h3>
+                      <span class="list-title">{{ purchasedItem.unit }}</span>
                     </ion-col>
-                    <ion-col>
+                    <ion-col size="9">
                       <p class="list-text">
-                        Torem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Nunc vulputate libero et velit interdum, ac aliquet odio
-                        mattis.
+                        {{ purchasedItem.item }}
                       </p>
                     </ion-col>
-                  </div>
                 </ion-row>
               </ion-label>
             </ion-item>
@@ -69,6 +71,11 @@
 
 <script>
 import {
+  IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonTitle,
+  IonBackButton,
   IonPage,
   IonContent,
   IonCol,
@@ -80,6 +87,11 @@ import {
 
 export default {
   components: {
+    IonHeader,
+    IonToolbar,
+    IonButtons,
+    IonTitle,
+    IonBackButton,
     IonPage,
     IonContent,
     IonCol,
@@ -88,24 +100,87 @@ export default {
     IonItem,
     IonLabel,
   },
+  created() {
+    this.filteredItems = this.items.find(
+      (item) => item.id == this.$route.params.id
+    );
+  },
+  data() {
+    return {
+      items: [
+        {
+          id: 1,
+          name: "Test1",
+          address: "address test1",
+          cost: "P5,000.00",
+          contact: "09123456781",
+          date: "01 Dec, 2024",
+          recipient: "test1",
+          note: "test",
+          purchasedItems: [
+            {
+              id: 1,
+              unit: "1",
+              item: "1 set of kidney",
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: "Test2",
+          address: "address test2",
+          cost: "P5,000.00",
+          contact: "09123456781",
+          date: "02 Dec, 2024",
+          recipient: "test2",
+          note: "test",
+          purchasedItems: [
+            {
+              id: 1,
+              unit: "2",
+              item: "1 set of kidney",
+            },
+          ],
+        },
+        {
+          id: 3,
+          name: "Test3",
+          address: "address test3",
+          cost: "P4,200.00",
+          contact: "09123456781",
+          date: "03 Dec, 2024",
+          recipient: "test3",
+          note: "test",
+          purchasedItems: [
+            {
+              id: 1,
+              unit: "3",
+              item: "cock for figthing",
+            },
+            {
+              id: 2,
+              unit: "4",
+              item: "1 ball of fury",
+            },
+          ],
+        },
+      ],
+      filteredItems: {},
+    };
+  },
 };
 </script>
 
 <style scoped>
-ion-item{
+ion-item {
   --inner-padding-end: 0px;
   --padding-end: 0px;
 }
 
-.item-list{
+.item-list {
   margin-bottom: 20px;
   padding-left: 0px;
   padding-right: 0px;
-}
-
-.list-container {
-  display: flex;
-  align-items: center;
 }
 
 .list-title {
@@ -134,7 +209,7 @@ ion-item{
 }
 
 .transaction-title {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
   color: #333;
 }
@@ -146,7 +221,7 @@ ion-item{
 }
 
 .container {
-  margin-top: 40px;
+  margin-top: 20px;
   padding: 0px 20px;
 }
 </style>

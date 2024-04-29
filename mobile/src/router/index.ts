@@ -1,50 +1,68 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
 import NavigationPage from '@/views/NavigationPage.vue';
+import CartPage from '@/views/CartPage.vue';
+import ConfirmationOrderPage from '@/views/ConfirmationOrderPage.vue';
+import TransactionInfoPage from '@/views/TransactionInfoPage.vue';
+import DeliveryInfo from '@/views/DeliveryInfo.vue';
+import ProductDescription from '@/views/ProductDescription.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    redirect: '/navs/home'
+    redirect: '/home'
   },
   {
-    path: '/navs/',
+    path: '/product-description/:id',
+    name: 'product-description',
+    component: ProductDescription,
+  },
+  {
+    path: '/cart-page',
+    name: 'cart-page',
+    component: CartPage,
+  },
+  {
+    path: '/confirmation-order',
+    name: 'confirmation-order',
+    component: ConfirmationOrderPage,
+  },
+  {
+    path: '/transaction-details/:id',
+    name: 'transaction-details',
+    component: TransactionInfoPage,
+  },
+  {
+    path: '/delivery-details/:id',
+    name: 'delivery-details',
+    component: DeliveryInfo,
+  },
+  {
+    path: '',
     component: NavigationPage,
     children: [
       {
         path: '',
-        redirect: '/navs/home'
+        redirect: '/home'
       },
       {
-        path: 'home',
+        path: '/home',
         component: () => import('@/views/HomePage.vue')
       },
       {
-        path: 'cart',
+        path: '/cart',
         component: () => import('@/views/CartPage.vue')
       },
       {
-        path: 'cart-confirmation',
-        component: () => import('@/views/ConfirmationOrderPage.vue')
-      },
-      {
-        path: 'transaction',
+        path: '/transaction',
         component: () => import('@/views/TransactionPage.vue')
       },
       {
-        path: 'transaction-info',
-        component: () => import('@/views/TransactionInfoPage.vue')
-      },
-      {
-        path: 'delivery',
+        path: '/delivery',
         component: () => import('@/views/DeliveryPage.vue')
       },
       {
-        path: 'delivery-info',
-        component: () => import('@/views/DeliveryInfo.vue')
-      },
-      {
-        path: 'setting',
+        path: '/setting',
         component: () => import('@/views/SettingPage.vue')
       }
     ]
