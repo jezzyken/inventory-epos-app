@@ -6,7 +6,7 @@
           <ion-back-button></ion-back-button>
         </ion-buttons>
         <ion-img
-          src="https://miro.medium.com/v2/resize:fit:1224/0*5nT8Skkw8wQs9Pzz"
+        :src="items.image"
         >
         </ion-img>
       </ion-toolbar>
@@ -168,6 +168,7 @@ ion-card,
   box-shadow: none;
   border: #e9e9e9 1px solid;
   margin-right: 16px;
+  margin-bottom: 16px;
 }
 
 .product-cost {

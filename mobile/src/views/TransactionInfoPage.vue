@@ -8,8 +8,7 @@
         <ion-title>transaction Info</ion-title>
       </ion-toolbar>
     </ion-header>
-    <ion-content :fullscreen="true">
-      <div class="container">
+    <ion-content :fullscreen="true" class="ion-padding">
         <ion-grid>
           <ion-row class="ion-align-items-center ion-justify-content-between">
             <ion-col>
@@ -64,7 +63,6 @@
             </ion-item>
           </ion-col>
         </ion-grid>
-      </div>
     </ion-content>
   </ion-page>
 </template>
@@ -218,10 +216,5 @@ ion-item {
   font-size: 20px;
   font-weight: bold;
   color: #098d16;
-}
-
-.container {
-  margin-top: 20px;
-  padding: 0px 20px;
 }
 </style>

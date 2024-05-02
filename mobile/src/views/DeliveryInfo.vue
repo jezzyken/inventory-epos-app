@@ -8,8 +8,7 @@
         <ion-title>Delivery Info</ion-title>
       </ion-toolbar>
     </ion-header>
-    <ion-content :fullscreen="true">
-      <div class="container">
+    <ion-content :fullscreen="true"  class="ion-padding">
         <ion-grid>
           <ion-row class="ion-align-items-center">
             <span class="transaction-title">Delivery Status</span>
@@ -76,7 +75,6 @@
             </ion-item>
           </ion-col>
         </ion-grid>
-      </div>
     </ion-content>
   </ion-page>
 </template>
@@ -253,10 +251,5 @@ ion-item {
   font-weight: bold;
   color: #333;
   margin-right: 10px;
-}
-
-.container {
-  margin-top: 20px;
-  padding: 0px 20px;
 }
 </style>

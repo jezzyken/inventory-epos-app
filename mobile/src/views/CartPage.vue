@@ -9,8 +9,7 @@
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
-      <div>
-        <ion-card v-for="n in 10" :key="n">
+        <ion-card v-for="n in 10" :key="n" class="ion-margin">
           <ion-grid>
             <ion-row>
               <ion-col
@@ -91,7 +90,6 @@
             </ion-row>
           </ion-grid>
         </ion-card>
-      </div>
     </ion-content>
     <ion-footer>
       <ion-toolbar>

@@ -24,8 +24,8 @@
         </ion-col>
       </ion-toolbar>
     </ion-header>
-    <ion-content :fullscreen="true" class="ion-padding-vertical">
-      <ion-card v-for="item in items" :key="item.id" :router-link="{name: 'product-description', params: {id: item._id}}">
+    <ion-content :fullscreen="true">
+      <ion-card  class="ion-margin" v-for="item in items" :key="item.id" :router-link="{name: 'product-description', params: {id: item._id}}">
         <ion-grid>
           <ion-row>
             <ion-col
@@ -35,11 +35,10 @@
             >
               <img
                 alt="Silhouette of mountains"
-                size="small"
-                src="https://miro.medium.com/v2/resize:fit:1224/0*5nT8Skkw8wQs9Pzz"
+                :src="item.image"
               />
             </ion-col>
-            <ion-col class="ion-padding-start">
+            <ion-col>
               <ion-card-header class="ion-no-padding">
                 <ion-row
                   class="ion-align-items-center ion-justify-content-between"
@@ -55,9 +54,9 @@
               </ion-card-header>
               <hr />
               <ion-card-content class="ion-no-padding">
-                <h3 class="ion-margin-bottom">
+                <p class="ion-margin-bottom product-description">
                   {{ item.description }}
-                </h3>
+                </p>
                 <ion-row
                   size="auto"
                   class="ion-align-items-center ion-justify-content-between"
@@ -221,10 +220,6 @@ input:focus {
   /* Lowering the shadow */
 }
 
-.ion-padding-start {
-  padding-left: 10px;
-}
-
 .card-img {
   display: flex;
   align-items: center;
@@ -254,12 +249,14 @@ hr {
 
 .card-title {
   color: #333;
-  font-size: 20px;
+  font-size: 14px;
   font-weight: 400;
+  width: 155px;
 }
 
 .card-product-status-available,
 .card-product-status-available p {
+  display: inline-block;
   text-transform: uppercase;
   font-weight: bold;
   font-size: 5px;
@@ -278,6 +275,10 @@ hr {
   background: #fb0404;
   border-radius: 2px;
   padding: 4px;
+}
+
+.product-description{
+  font-size: 10px;
 }
 
 .card-price {
