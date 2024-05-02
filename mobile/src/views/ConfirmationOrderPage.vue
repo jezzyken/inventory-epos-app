@@ -10,51 +10,116 @@
     </ion-header>
     <ion-content :fullscreen="true" class="ion-padding-horizontal">
       <div class="container accordion-collapsed">
-        <ion-input class="input-margin" fill="outline" placeholder="Name"></ion-input>
+        <ion-input
+          v-model="items.name1"
+          class="input-margin"
+          fill="outline"
+          placeholder="Name"
+        ></ion-input>
         <div class="delivery-confirmation">
           <span class="delivery-title">Delivery:</span>
-          <ion-radio-group allow-empty-selection="false" value="custom-checked" class="delivery-confirmation-toggle">
-            <ion-radio @click="onToggleBtn(true)" value="pineapple">YES</ion-radio>
-            <ion-radio @click="onToggleBtn(false)" value="cherries">NO</ion-radio>
-          </ion-radio-group>
+          <ion-list>
+            <ion-radio-group
+              v-model="items.deliveryStatus"
+              allow-empty-selection="false"
+              value="custom-checked"
+              class="delivery-confirmation-toggle"
+            >
+              <ion-radio @click="onToggleBtn(true)" value="true">YES</ion-radio>
+              <ion-radio @click="onToggleBtn(false)" value="false"
+                >NO</ion-radio
+              >
+            </ion-radio-group>
+          </ion-list>
         </div>
       </div>
       <div class="form-container" :class="toggleDelivery ? 'show' : 'hide'">
         <ion-list>
-          <ion-input v-model="items.name" class="input-margin" fill="outline" placeholder="Name"></ion-input>
+          <ion-input
+            v-model="delivery.name"
+            class="input-margin"
+            fill="outline"
+            placeholder="Name"
+          ></ion-input>
           <div class="stacked-inputs">
-            <ion-input v-model="items.contact" class="input-margin" fill="outline" placeholder="Contact"></ion-input>
-            <ion-input v-model="items.date" class="input-margin" fill="outline" placeholder="DateTime"></ion-input>
+            <ion-input
+              v-model="delivery.contact"
+              class="input-margin"
+              fill="outline"
+              placeholder="Contact"
+            ></ion-input>
+            <ion-input
+              v-model="delivery.date"
+              class="input-margin"
+              fill="outline"
+              placeholder="DateTime"
+            ></ion-input>
           </div>
-          <ion-input v-model="items.address" class="input-margin" fill="outline" placeholder="Address"></ion-input>
-          <ion-input v-model="items.note" class="input-margin" fill="outline" placeholder="Notes"></ion-input>
+          <ion-input
+            v-model="delivery.address"
+            class="input-margin"
+            fill="outline"
+            placeholder="Address"
+          ></ion-input>
+          <ion-input
+            v-model="delivery.note"
+            class="input-margin"
+            fill="outline"
+            placeholder="Notes"
+          ></ion-input>
         </ion-list>
       </div>
       <div class="container">
         <h3 class="delivery-total-info">Payment Info:</h3>
-        <div class="stacked-info">
+        <ion-row class="ion-align-items-center ion-justify-content-between">
           <h3 class="delivery-total-info">Total Items:</h3>
-          <h3 class="delivery-total-info">1</h3>
-        </div>
-        <div class="stacked-info">
+          <ion-input
+            class="delivery-total-items-info"
+            :value="items.totalItems"
+          ></ion-input>
+        </ion-row>
+        <ion-row class="ion-align-items-center ion-justify-content-between">
           <h3 class="delivery-total-info">Total Price:</h3>
-          <h3 class="delivery-total-info">P420.00</h3>
-        </div>
-        <div class="stacked-info">
+          <ion-input
+            :disabled="true"
+            class="delivery-total-price-info"
+            :value="items.price"
+          ></ion-input>
+        </ion-row>
+        <ion-row class="ion-align-items-center ion-justify-content-between">
           <div class="credit-input">
             <h3 class="delivery-total-info">Cash</h3>
-            <ion-input class="input-margin" fill="outline" placeholder="P69,420.00"></ion-input>
+            <ion-input
+              v-model="items.cash"
+              @change="calculateChange"
+              class="input-margin delivery-cash-input"
+              fill="outline"
+              placeholder="P0.00"
+            ></ion-input>
           </div>
           <div class="credit-input">
             <h3 class="delivery-total-info">Change</h3>
-            <ion-input :disabled="true" class="input-margin" fill="outline" placeholder="P0.00"></ion-input>
+            <ion-input
+              v-model="items.change"
+              :disabled="true"
+              class="input-margin delivery-change-input"
+              fill="outline"
+              placeholder="P0.00"
+            ></ion-input>
           </div>
-        </div>
+        </ion-row>
       </div>
     </ion-content>
     <ion-footer>
-      <ion-toolbar class="ion-padding-horizontal">
-        <ion-button expand="block" router-link="/confirmation-order">
+      <ion-toolbar>
+        <ion-button
+          @click="submitForm"
+          class="ion-margin"
+          type="submit"
+          value="submit"
+          expand="block"
+          router-link="/cart-done"
+        >
           <span>Confirm Order</span>
         </ion-button>
       </ion-toolbar>
@@ -77,10 +142,20 @@ import {
   IonInput,
   IonRadio,
   IonRadioGroup,
+  IonRow,
+  IonItemGroup,
+  IonLabel,
+  IonItem,
+  IonTextarea,
 } from "@ionic/vue";
 
 export default {
   components: {
+    IonTextarea,
+    IonItem,
+    IonLabel,
+    IonRow,
+    IonItemGroup,
     IonList,
     IonPage,
     IonHeader,
@@ -98,17 +173,39 @@ export default {
   data() {
     return {
       toggleDelivery: false,
-      items: {},
+      items: {
+        totalItems: 10,
+        cash: "",
+        price: 420,
+      },
+
+      delivery: {
+
+      }
     };
   },
+  // computed: {
+  //   "items.change"() {
+  //     return this.items.cash - this.items.price
+  //   }
+  // },
   methods: {
     onToggleBtn(toggle) {
       this.toggleDelivery = toggle;
       if (toggle === false) {
-        for (const [key] of Object.entries(this.items)) {
-            this.items[key] = ""
+        for (const [key] of Object.entries(this.delivery)) {
+          this.delivery[key] = "";
         }
       }
+    },
+    submitForm() {
+      console.log({...this.items, ...this.delivery});
+    },
+    calculateChange() {
+      if (this.items.cash > this.items.price) {
+        return (this.items.change = this.items.cash - this.items.price);
+      }
+      this.items.change = 0;
     },
   },
 };
@@ -140,6 +237,7 @@ ion-button {
 
 h3 {
   color: #333;
+  display: inline-block;
 }
 
 .stacked-inputs {
@@ -152,12 +250,6 @@ h3 {
   font-size: 10px;
 }
 
-.stacked-info {
-  /* width: 230px; */
-  display: flex;
-  justify-content: space-between;
-}
-
 .credit-input {
   display: flex;
   flex-direction: column;
@@ -167,9 +259,37 @@ h3 {
   margin-right: 20px;
 }
 
+.delivery-total-price-info {
+  font-size: 16px;
+  color: #333;
+  text-align: end;
+  width: 100px;
+}
+
 .delivery-total-info {
   font-size: 16px;
   text-align: start;
+}
+
+.delivery-total-items-info {
+  font-size: 16px;
+  color: #333;
+  text-align: end;
+  width: 100px;
+}
+
+.delivery-cash-input {
+  font-size: 16px;
+  color: #333;
+  text-align: start;
+  width: 150px;
+}
+
+.delivery-change-input {
+  font-size: 16px;
+  color: #333;
+  text-align: start;
+  width: 150px;
 }
 
 .delivery-confirmation {
@@ -210,7 +330,7 @@ ion-radio.ios::part(container) {
 }
 
 .show {
-  max-height: 300px;
+  max-height: 400px;
 }
 
 .hide {

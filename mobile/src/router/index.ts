@@ -6,16 +6,24 @@ import ConfirmationOrderPage from '@/views/ConfirmationOrderPage.vue';
 import TransactionInfoPage from '@/views/TransactionInfoPage.vue';
 import DeliveryInfo from '@/views/DeliveryInfo.vue';
 import ProductDescription from '@/views/ProductDescription.vue';
+import CartDone from '@/views/CartDone.vue';
+import Login from '@/views/Login.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/',
-    redirect: '/home'
+    path: '/login',
+    name: 'login',
+    component: Login,
   },
   {
     path: '/product-description/:id',
     name: 'product-description',
     component: ProductDescription,
+  },
+  {
+    path: '/cart-done',
+    name: 'cart-done',
+    component: CartDone,
   },
   {
     path: '/cart-page',
@@ -38,12 +46,12 @@ const routes: Array<RouteRecordRaw> = [
     component: DeliveryInfo,
   },
   {
-    path: '',
+    path: '/',
     component: NavigationPage,
     children: [
       {
-        path: '',
-        redirect: '/home'
+        path: '/',
+        redirect: '/login'
       },
       {
         path: '/home',

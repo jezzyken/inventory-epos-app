@@ -2,25 +2,14 @@
   <ion-page>
     <ion-content :fullscreen="true" class="ion-padding">
       <div>
-        <h3>Setting</h3>
-        <ion-radio-group
-          allow-empty-selection="false"
-          value="turtles"
-          class="ion-margin"
-        >
-          <ion-radio value="dogs">Dogs</ion-radio><br />
-          <ion-radio value="cats">Cats</ion-radio><br />
-          <ion-radio value="turtles">Turtles</ion-radio><br />
-          <ion-radio value="fish">Fish</ion-radio><br />
-        </ion-radio-group>
-        <ion-list>
-          <ion-input
-          v-model="inputValue"
-          class="input-margin"
-          fill="outline"
-          placeholder="Name"
-        ></ion-input>
-        </ion-list>
+          <input :value="change">
+      </div>
+      <div>
+          <input :value="price">
+      </div>
+      <div>
+          <input type="number" v-model.number="cash">
+          <h3>Cash: {{ cash }}</h3>
       </div>
     </ion-content>
   </ion-page>
@@ -48,8 +37,16 @@ export default {
   },
   data(){
     return{
-      inputValue: []
+      cash: 0,
+      price: 420,
     }
   },
+  computed: {
+    change() {
+      return this.cash - this.price
+    }
+  },
+  methods:{
+  }
 };
 </script>
