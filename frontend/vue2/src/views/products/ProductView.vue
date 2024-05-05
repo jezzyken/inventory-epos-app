@@ -1,5 +1,6 @@
 <template>
   <v-container>
+    <ViewProductDialogVue ref="product" :items="selectedItems" />
     <v-data-table :headers="headers" :items="items" :loading="isLoading" sort-by="calories" class="elevation-1">
       <template v-slot:top>
         <v-toolbar flat>
@@ -71,10 +72,12 @@
       </template>
 
       <template v-slot:[`item.actions`]="{ item }">
-        <v-btn x-small color="warning" :to="{ name: 'EditProduct', params: { id: item._id } }"> edit </v-btn>
 
+        <v-btn x-small color="primary" @click="onViewDialog(item)"> view </v-btn>
+        
         <span class="mr-1"></span>
-
+        <v-btn x-small color="warning" :to="{ name: 'EditProduct', params: { id: item._id } }"> edit </v-btn>
+        <span class="mr-1"></span>
         <v-btn x-small color="error" dark @click="deleteItem(item)">
           delete
         </v-btn>
@@ -89,8 +92,12 @@
 <script>
 /*eslint-disable*/
 import { mapActions } from "vuex";
+import ViewProductDialogVue from '@/components/products/ViewProductDialog.vue';
 
 export default {
+  components: {
+    ViewProductDialogVue
+  },
   data: () => ({
     dialog: false,
     dialogDelete: false,
@@ -145,7 +152,9 @@ export default {
       address: ""
     },
     itemId: null,
-    isLoading: false
+    isLoading: false,
+    showFuck: false,
+    selectedItems: {}
   }),
 
   computed: {
@@ -181,6 +190,11 @@ export default {
       console.log(results)
       this.items = results.result
       this.isLoading = false
+    },
+
+    onViewDialog(item){
+      this.$refs.product.showDialog(true, item)
+      this.selectedItems = item
     },
 
     editItem(item) {

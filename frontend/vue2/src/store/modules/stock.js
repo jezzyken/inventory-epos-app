@@ -29,6 +29,15 @@ const actions = {
     }
   },
 
+  async getStockItems({ commit }, id) {
+    try {
+      const response = await axios.get(`${url}/${endpoint}/${id}/product`);
+      return response.data;
+    } catch (error) {
+      return error.response;
+    }
+  },
+
   async addItem({ commit }, data) {
     try {
       const response = await axios.post(`${url}/${endpoint}`, data);
