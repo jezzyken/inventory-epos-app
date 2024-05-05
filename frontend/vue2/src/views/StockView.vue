@@ -113,6 +113,11 @@ export default {
         value: "product.name",
       },
       {
+        text: "Variant",
+        align: "start",
+        value: "variant.name",
+      },
+      {
         text: "Supplier",
         align: "start",
         value: "supplier.name",
