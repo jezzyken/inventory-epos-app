@@ -170,6 +170,7 @@
                 item-text="variant.name"
                 outlined
                 return-object
+                @change="onSelectVariant"
               ></v-select>
             </div>
           </v-col>
@@ -218,6 +219,7 @@ export default {
       suppliers: [],
       stocks: [],
       variants: [],
+      variantId: null
     };
   },
   computed: {
@@ -261,7 +263,10 @@ export default {
       const productPrices = await this.getProductItemPrices(
         response.result.product._id
       );
+
       this.prices = productPrices.result[0].prices;
+      this.variantId = response.result.variant._id
+
       this.items = {
         ...response.result,
         variant: response.result.variant.name,
@@ -307,7 +312,7 @@ export default {
           date: this.items.date,
           product: this.items.product._id,
           supplier: this.items.supplier._id,
-          variant: item.variants.variant._id,
+          variant: this.variantId,
           quantity: this.items.quantity,
         },
       };
@@ -317,6 +322,10 @@ export default {
 
     onDeleteItem(i) {
       this.stocks.splice(i, 1);
+    },
+
+    onSelectVariant(item){
+      this.variantId = item.variant._id
     },
 
     async fetch() {
