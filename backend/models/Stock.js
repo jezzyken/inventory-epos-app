@@ -10,13 +10,17 @@ const stockSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Supplier",
     },
+    variant: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Variant",
+    },
     quantity: {
-      type: String
+      type: String,
     },
     date: {
       type: Date,
-      default: Date.now()
-    }
+      default: Date.now(),
+    },
   },
   {
     timestamp: true,

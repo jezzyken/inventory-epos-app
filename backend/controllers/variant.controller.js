@@ -12,7 +12,7 @@ const get = catchAsync(async (req, res) => {
   return res.status(200).send(data);
 });
 
-const getById = catchAsync(async (req, res) => {
+const getById = catchAsync(async (req, res, next) => {
   const result = await service.getById(req.params.id);
 
   if (!result) {
