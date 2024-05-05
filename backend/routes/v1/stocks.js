@@ -5,6 +5,8 @@ const itemController = require("../../controllers/stock.controller");
 
 router.get("/", itemController.get).post("/", itemController.add);
 
+router.get("/:id/product", itemController.getStockItems)
+
 router
   .get("/:id", itemController.getById)
   .put("/:id", itemController.update)
