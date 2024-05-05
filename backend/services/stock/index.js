@@ -31,7 +31,8 @@ const remove = async (id) => {
 const customPopulate = (query) => {
   return query
     .populate({ path: "product", select: "name productCode" })
-    .populate({ path: "supplier", select: "name" });
+    .populate({ path: "supplier", select: "name" })
+    .populate({ path: "variant"});
 };
 
 module.exports = {

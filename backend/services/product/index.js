@@ -53,6 +53,50 @@ const get = async () => {
   return result;
 };
 
+const getItemPrices = async (id) => {
+  const result = await Models.aggregate([
+    {
+      $match: {
+        _id: new ObjectId(id)
+      }
+    },
+    {
+      $unwind: "$prices",
+    },
+    {
+      $lookup: {
+        from: "variants",
+        localField: "prices.variant",
+        foreignField: "_id",
+        as: "prices.variant",
+      },
+    },
+    {
+      $unwind: "$prices.variant",
+    },
+    {
+      $lookup: {
+        from: "units",
+        localField: "prices.unit",
+        foreignField: "_id",
+        as: "prices.unit",
+      },
+    },
+    {
+      $unwind: "$prices.unit",
+    },
+    {
+      $group: {
+        _id: "$_id",
+        name: { $first: "$name" },
+        prices: { $push: "$prices" },
+      },
+    },
+  ]);
+
+  return result;
+};
+
 const getById = async (id) => {
   const result = await customPopulate(Models.findById(id));
   return result;
@@ -109,6 +153,7 @@ const customPopulate = (query) => {
 module.exports = {
   get,
   getById,
+  getItemPrices,
   add,
   update,
   remove,
