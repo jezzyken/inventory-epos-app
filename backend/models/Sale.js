@@ -1,45 +1,58 @@
 const mongoose = require("mongoose");
 
-const productSchema = new mongoose.Schema(
+const saleSchema = new mongoose.Schema(
   {
-    name: {
+    referenceCode: {
       type: String,
-      required: true,
     },
-    description: {
+    recievedAmount: {
       type: String,
-      required: true,
     },
-    productCode: {
+    paidAmount: {
       type: String,
-      required: true,
     },
-    brand: {
+    paymentType: {
       type: String,
-      required: true,
+      default: "Cash",
     },
-    category: {
+    change: {
       type: String,
-      required: true,
     },
-    unit: {
+    totalSales: {
       type: String,
-      required: true,
     },
-    criticalLimit: {
-      type: String,
-      required: true,
-      default: 5
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
-    image: {
-      type: String,
-    }
+    hasDelivery: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamp: true,
   }
 );
 
-const Product = mongoose.model("Product", productSchema);
+saleSchema.pre("save", function (next) {
+  if (!this.isNew) {
+    return next();
+  }
 
-module.exports = Product;
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const length = 8;
+  let referenceCode = "";
+  for (let i = 0; i < length; i++) {
+    referenceCode += characters.charAt(
+      Math.floor(Math.random() * characters.length)
+    );
+  }
+
+  this.referenceCode = referenceCode;
+  next();
+});
+
+const Sale = mongoose.model("Sale", saleSchema);
+
+module.exports = Sale;
