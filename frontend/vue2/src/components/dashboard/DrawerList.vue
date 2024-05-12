@@ -7,15 +7,28 @@
         </v-list-item-icon>
         <v-list-item-title>{{ item.title }}</v-list-item-title>
       </v-list-item>
-      <v-list-group v-for="list in item.list" :key="list.title" v-model="list.active" :prepend-icon="list.action"
-        @click.prevent="openRoute(list)" :append-icon="list.appendIcon" no-action link>
+      <v-list-group
+        v-for="list in item.list"
+        :key="list.title"
+        v-model="list.active"
+        :prepend-icon="list.action"
+        @click.prevent="openRoute(list)"
+        :append-icon="list.appendIcon"
+        no-action
+        link
+      >
         <template v-slot:activator>
           <v-list-item-content>
             <v-list-item-title v-text="list.title"></v-list-item-title>
           </v-list-item-content>
         </template>
 
-        <v-list-item v-for="child in list.items" :key="child.title" :to="child.route" link>
+        <v-list-item
+          v-for="child in list.items"
+          :key="child.title"
+          :to="child.route"
+          link
+        >
           <v-list-item-title v-text="child.title"></v-list-item-title>
         </v-list-item>
       </v-list-group>
@@ -24,7 +37,6 @@
 </template>
 
 <script>
-
 export default {
   data: () => ({
     admins: [
@@ -64,7 +76,10 @@ export default {
           },
           {
             action: "mdi-contacts",
-            items: [{ title: "Customer", route: "/customer" }, { title: "Supplier", route: "/supplier" }],
+            items: [
+              { title: "Customer", route: "/customer" },
+              { title: "Supplier", route: "/supplier" },
+            ],
             title: "Contacts",
             appendIcon: "mdi-chevron-down",
           },
@@ -78,6 +93,7 @@ export default {
             action: "mdi-invoice-list",
             title: "Sales",
             appendIcon: "",
+            route: "/sale",
           },
           {
             action: "mdi-chart-box",
@@ -91,17 +107,14 @@ export default {
   }),
   methods: {
     openRoute(items) {
-      let route = items.route
+      let route = items.route;
 
-      if (items.route === undefined) return
+      if (items.route === undefined) return;
 
-      if (route === this.$route.path) return
+      if (route === this.$route.path) return;
 
       this.$router.push(items.route);
-
     },
   },
-
-
 };
 </script>
