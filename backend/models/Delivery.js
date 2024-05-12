@@ -2,37 +2,28 @@ const mongoose = require("mongoose");
 
 const deliverySchema = new mongoose.Schema(
   {
+    sale:  {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Sale"
+    },
     name: {
       type: String,
-      required: true,
     },
-    description: {
+    recipientName: {
       type: String,
-      required: true,
-    },          
-    productCode: {
-      type: String,
-      required: true,
     },
-    brand: {
+    contactNo: {
       type: String,
-      required: true,
     },
-    category: {
+    address: {
       type: String,
-      required: true,
     },
-    unit: {
+    notes: {
       type: String,
-      required: true,
     },
-    criticalLimit: {
-      type: String,
-      required: true,
-      default: 5
-    },
-    image: {
-      type: String,
+    deliveryDate: {
+      type: Date,
+      default: Date.now()
     }
   },
   {
