@@ -1,6 +1,6 @@
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
-const service = require("../services/delivery");
+const service = require("../services/saleItem");
 
 const get = catchAsync(async (req, res) => {
   const result = await service.get();
@@ -11,7 +11,7 @@ const get = catchAsync(async (req, res) => {
   return res.status(200).send(data);
 });
 
-const getById = catchAsync(async (req, res) => {
+const getById = catchAsync(async (req, res, next) => {
   const result = await service.getById(req.params.id);
 
   if (!result) {
