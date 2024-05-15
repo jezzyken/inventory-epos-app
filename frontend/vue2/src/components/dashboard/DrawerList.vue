@@ -50,7 +50,7 @@ export default {
         route: "/",
         list: [
           {
-            action: "mdi-silverware-fork-knife",
+            action: "mdi-clipboard-list-outline",
             active: true,
             items: [
               { title: "Products", route: "/product" },
