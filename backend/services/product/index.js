@@ -20,6 +20,38 @@ const get = async () => {
       },
     },
     {
+      $unwind: "$prices",
+    },
+    {
+      $lookup: {
+        from: "units",
+        localField: "prices.unit",
+        foreignField: "_id",
+        as: "unitDetails",
+      },
+    },
+    {
+      $lookup: {
+        from: "variants",
+        localField: "prices.variant",
+        foreignField: "_id",
+        as: "variantDetails",
+      },
+    },
+
+    {
+      $unwind: {
+        path: "$unitDetails",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $unwind: {
+        path: "$variantDetails",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
       $unwind: "$brand",
     },
     {
@@ -48,6 +80,32 @@ const get = async () => {
         },
       },
     },
+    {
+      $group: {
+        _id: "$_id",
+        name: { $first: "$name" },
+        description: { $first: "$description" },
+        productCode: { $first: "$productCode" },
+        brand: { $first: "$brand" },
+        category: { $first: "$category" },
+        criticalLimit: { $first: "$criticalLimit" },
+        image: { $first: "$image" },
+        createdAt: { $first: "$createdAt" },
+        updatedAt: { $first: "$updatedAt" },
+        stocksQuantity: { $first: "$stocksQuantity" },
+        __v: { $first: "$__v" },
+        stocksQuantity: { $first: "$stocksQuantity" },
+        prices: {
+          $push: {
+            _id: "$prices._id",
+            unit: "$unitDetails",
+            variant: "$variantDetails",
+            itemPrice: "$prices.itemPrice",
+            salePrice: "$prices.salePrice",
+          },
+        },
+      },
+    },
   ]);
 
   return result;
@@ -57,8 +115,8 @@ const getItemPrices = async (id) => {
   const result = await Models.aggregate([
     {
       $match: {
-        _id: new ObjectId(id)
-      }
+        _id: new ObjectId(id),
+      },
     },
     {
       $unwind: "$prices",
