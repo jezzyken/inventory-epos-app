@@ -16,6 +16,7 @@
         :append-icon="list.appendIcon"
         no-action
         link
+        active-class="white--text"
       >
         <template v-slot:activator>
           <v-list-item-content>
@@ -28,6 +29,7 @@
           :key="child.title"
           :to="child.route"
           link
+          active-class="white--text"
         >
           <v-list-item-title v-text="child.title"></v-list-item-title>
         </v-list-item>

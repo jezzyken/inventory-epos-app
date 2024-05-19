@@ -6,20 +6,40 @@
           <v-text-field v-model="items.name" label="Name"></v-text-field>
         </v-col>
         <v-col cols="12" md="3">
-          <v-text-field v-model="items.productCode" label="Product Code"></v-text-field>
+          <v-text-field
+            v-model="items.productCode"
+            label="Product Code"
+          ></v-text-field>
         </v-col>
         <v-col cols="12" md="3">
-          <v-select v-model="items.category" label="Select" :items="category" item-text="name"
-            item-value="_id"></v-select>
+          <v-select
+            v-model="items.category"
+            label="Select"
+            :items="category"
+            item-text="name"
+            item-value="_id"
+          ></v-select>
         </v-col>
         <v-col cols="12" md="3">
-          <v-select v-model="items.brand" label="Select" :items="brand" item-text="name" item-value="_id"></v-select>
+          <v-select
+            v-model="items.brand"
+            label="Select"
+            :items="brand"
+            item-text="name"
+            item-value="_id"
+          ></v-select>
         </v-col>
         <v-col cols="12" md="2">
-          <v-text-field v-model="items.criticalLimit" label="Critical Limit"></v-text-field>
+          <v-text-field
+            v-model="items.criticalLimit"
+            label="Critical Limit"
+          ></v-text-field>
         </v-col>
         <v-col cols="12" md="5">
-          <v-text-field v-model="items.description" label="Description"></v-text-field>
+          <v-text-field
+            v-model="items.description"
+            label="Description"
+          ></v-text-field>
         </v-col>
         <v-col cols="12" md="5">
           <v-text-field v-model="items.image" label="Image URL"></v-text-field>
@@ -36,23 +56,45 @@
               <th class="text-left">Variant</th>
               <th class="text-left">Item Price</th>
               <th class="text-left">Sale Price</th>
+              <th class="text-left">Actions</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(price, i) in items.prices" :key="i">
               <td>
-                <v-select v-model="price.unit" :items="unit" label="Select" item-text="name"
-                  item-value="_id"></v-select>
+                <v-select
+                  v-model="price.unit"
+                  :items="unit"
+                  label="Select"
+                  item-text="name"
+                  item-value="_id"
+                ></v-select>
               </td>
               <td>
-                <v-select v-model="price.variant" :items="variant" label="Select" item-text="name"
-                  item-value="_id"></v-select>
+                <v-select
+                  v-model="price.variant"
+                  :items="variant"
+                  label="Select"
+                  item-text="name"
+                  item-value="_id"
+                ></v-select>
               </td>
               <td>
-                <v-text-field v-model="price.itemPrice" label="Sale Price"></v-text-field>
+                <v-text-field
+                  v-model="price.itemPrice"
+                  label="Item Price"
+                ></v-text-field>
               </td>
               <td>
-                <v-text-field v-model="price.salePrice" label="Item Price"></v-text-field>
+                <v-text-field
+                  v-model="price.salePrice"
+                  label="Sale Price"
+                ></v-text-field>
+              </td>
+              <td>
+                <v-btn dark color="error" x-small fab @click="onDeleteItem(i)">
+                  <v-icon>mdi-close</v-icon>
+                </v-btn>
               </td>
             </tr>
           </tbody>
@@ -138,11 +180,11 @@ export default {
         ...response.result,
         brand: response.result.brand._id,
         category: response.result.category._id,
-        prices: response.result.prices.map(item => ({
+        prices: response.result.prices.map((item) => ({
           ...item,
-          unit: item.unit._id,
-          variant: item.variant._id
-        }))
+          unit: item.unit?._id,
+          variant: item.variant._id,
+        })),
       };
       this.isLoading = false;
     },
@@ -159,10 +201,14 @@ export default {
     async onUpdateItem() {
       const data = {
         id: this.$route?.params?.id,
-        data: this.items
-      }
+        data: this.items,
+      };
       await this.updateItem(data);
-      this.$router.push('/product');
+      this.$router.push("/product");
+    },
+
+    onDeleteItem(i) {
+      this.items.prices.splice(i, 1);
     },
 
     async fetch() {
@@ -176,6 +222,5 @@ export default {
       this.variant = variant.result;
     },
   },
-
 };
 </script>
