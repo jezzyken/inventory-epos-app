@@ -46,7 +46,7 @@ const update = catchAsync(async (req, res, next) => {
 });
 
 const remove = catchAsync(async (req, res) => {
-  const result = await Models.findByIdAndDelete(req.params.id);
+  const result = await service.remove(req.params.id);
   const data = {
     success: true,
     result,

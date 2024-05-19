@@ -36,7 +36,7 @@ const add = async (req) => {
       contactNo: deliveryData.contactNo,
       address: deliveryData.address,
       notes: deliveryData.notes,
-      date: deliveryData.date ?? new Date(),
+      deliveryDate: deliveryData.deliveryDate || new Date(),
     });
     await newDelivery.save();
   }

@@ -24,6 +24,11 @@ const deliverySchema = new mongoose.Schema(
     deliveryDate: {
       type: Date,
       default: Date.now()
+    },
+    status: {
+      type: String,
+      enum: ["delivered", "pending"],
+      default: "pending"
     }
   },
   {

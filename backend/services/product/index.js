@@ -106,6 +106,11 @@ const get = async () => {
         },
       },
     },
+    {
+      $sort: {
+        _id: -1
+      }
+    }
   ]);
 
   return result;
