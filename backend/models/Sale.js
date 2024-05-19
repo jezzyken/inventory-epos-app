@@ -18,7 +18,7 @@ const saleSchema = new mongoose.Schema(
     change: {
       type: String,
     },
-    totalSales: {
+    totalSalesAmount: {
       type: String,
     },
     user: {
@@ -28,6 +28,9 @@ const saleSchema = new mongoose.Schema(
     hasDelivery: {
       type: Boolean,
       default: false,
+    },
+    totalItems: {
+      type: String,
     },
   },
   {
