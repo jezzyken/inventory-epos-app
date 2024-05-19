@@ -1,6 +1,8 @@
 const Models = require("../../models/Sale");
 const ModelSaleItems = require("../../models/SalesItem");
 const ModelDelivery= require("../../models/Delivery");
+const ModelCustomer= require("../../models/Customer");
+
 
 const get = async () => {
   const result = await Models.find();
@@ -17,9 +19,10 @@ const add = async (req) => {
 
   const newSale = new Models({
     paidAmount: saleData.paidAmount,
-    paymentType: saleData.paymentType,
+    paymentType: saleData.paymentType || 'Cash',
     change: saleData.change,
-    totalSales: saleData.totalSales,
+    totalSalesAmount: saleData.totalSalesAmount,
+    totalItems: saleData.totalItems,
     hasDelivery: saleData.hasDelivery,
   });
 
@@ -29,7 +32,6 @@ const add = async (req) => {
     const deliveryData = saleData.delivery;
     const newDelivery = new ModelDelivery({
       sale: savedSale._id,
-      name: deliveryData.name,
       recipientName: deliveryData.recipientName,
       contactNo: deliveryData.contactNo,
       address: deliveryData.address,
@@ -45,6 +47,13 @@ const add = async (req) => {
   }));
 
   const savedSaleItems = await ModelSaleItems.create(saleItems);
+
+  const customer = new ModelCustomer({
+    name: saleData.customerName,
+    sale: savedSale._id
+  });
+
+  await customer.save()
 
   return { sale: savedSale, saleItems: savedSaleItems };
 };
