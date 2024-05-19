@@ -97,6 +97,12 @@ export default {
         sortable: false,
         value: "paymentType",
       },
+            {
+        text: "Sales",
+        align: "start",
+        sortable: false,
+        value: "totalSalesAmount",
+      },
       {
         text: "Paid Amount",
         align: "start",
@@ -109,12 +115,7 @@ export default {
         sortable: false,
         value: "change",
       },
-      {
-        text: "Sales",
-        align: "start",
-        sortable: false,
-        value: "totalSales",
-      },
+
       {
         text: "Delivery",
         align: "start",

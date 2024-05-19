@@ -93,13 +93,7 @@ export default {
         text: "Date",
         align: "start",
         sortable: false,
-        value: "date",
-      },
-      {
-        text: "Name",
-        align: "start",
-        sortable: false,
-        value: "name",
+        value: "deliveryDate",
       },
       {
         text: "Recipient",
@@ -123,7 +117,7 @@ export default {
         text: "Notes",
         align: "start",
         sortable: false,
-        value: "name",
+        value: "notes",
       },
       {
         text: "Status",
