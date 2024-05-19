@@ -1,31 +1,13 @@
 const mongoose = require("mongoose");
 
-const productSchema = new mongoose.Schema(
+const customerSchema = new mongoose.Schema(
   {
     name: {
       type: String,
     },
-    description: {
-      type: String,
-    },
-    productCode: {
-      type: String,
-    },
-    brand: {
-      type: String,
-    },
-    category: {
-      type: String,
-    },
-    unit: {
-      type: String,
-    },
-    criticalLimit: {
-      type: String,
-      default: 5
-    },
-    image: {
-      type: String,
+    sale:  {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Sale"
     }
   },
   {
@@ -33,6 +15,6 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-const Product = mongoose.model("Product", productSchema);
+const Customer = mongoose.model("Customer", customerSchema);
 
-module.exports = Product;
+module.exports = Customer;
