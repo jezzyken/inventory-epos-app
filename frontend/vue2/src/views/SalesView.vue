@@ -11,11 +11,6 @@
         <v-divider class="mx-4" inset vertical></v-divider>
         <v-spacer></v-spacer>
         <v-dialog v-model="dialog" max-width="500px">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
-              Add
-            </v-btn>
-          </template>
           <v-card>
             <v-card-title>
               <span class="text-h5">{{ formTitle }}</span>
@@ -61,8 +56,16 @@
       </v-toolbar>
     </template>
 
+    <template v-slot:[`item.hasDelivery`]="{ item }">
+      <v-chip dark color="success" small class="mr-1">
+        {{ item.hasDelivery ? 'Yes' : 'No' }}
+      </v-chip>
+    </template>
+
     <template v-slot:[`item.actions`]="{ item }">
-      <v-btn x-small color="primary" @click="editItem(item)"> view </v-btn>
+      <v-btn x-small color="primary" @click="onViewItem(item._id)">
+        view
+      </v-btn>
 
       <span class="mr-1"></span>
 
@@ -97,7 +100,7 @@ export default {
         sortable: false,
         value: "paymentType",
       },
-            {
+      {
         text: "Sales",
         align: "start",
         sortable: false,
@@ -115,7 +118,12 @@ export default {
         sortable: false,
         value: "change",
       },
-
+      {
+        text: "Total Items",
+        align: "start",
+        sortable: false,
+        value: "totalItems",
+      },
       {
         text: "Delivery",
         align: "start",
@@ -167,10 +175,8 @@ export default {
       this.desserts = results.result;
     },
 
-    editItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-      this.dialog = true;
+    onViewItem(id) {
+      this.$router.push({ name: "Sales Item", query: { id: id } });
     },
 
     deleteItem(item) {
