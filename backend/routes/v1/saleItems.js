@@ -4,6 +4,7 @@ const router = express.Router();
 const itemController = require("../../controllers/saleItem.controller");
 
 router.get("/", itemController.get).post("/", itemController.add);
+router.get("/sale/:id", itemController.getBySaleId)
 
 router
   .get("/:id", itemController.getById)

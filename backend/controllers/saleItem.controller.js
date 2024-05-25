@@ -24,6 +24,19 @@ const getById = catchAsync(async (req, res, next) => {
   return res.status(200).send(data);
 });
 
+const getBySaleId = catchAsync(async (req, res, next) => {
+  const result = await service.getBySaleId(req.params.id);
+
+  if (!result) {
+    return next(new AppError("No Item found with that ID", 404));
+  }
+  const data = {
+    success: true,
+    result,
+  };
+  return res.status(200).send(data);
+});
+
 const add = catchAsync(async (req, res) => {
   const result = await service.add(req);
   const data = {
@@ -57,6 +70,7 @@ const remove = catchAsync(async (req, res) => {
 module.exports = {
   get,
   getById,
+  getBySaleId,
   add,
   update,
   remove,
