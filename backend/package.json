@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "nodemon app.js",
     "setup-production": "npm run install-frontend && npm run build-frontend && npm install",
-    "install-frontend": "cd frontend/vue2 && npm install",
-    "build-frontend": "cd frontend/vue2 && npm run build"
+    "install-frontend": "frontend/vue2 && npm install",
+    "build-frontend": "frontend/vue2 && npm run build"
   },
   "author": "jezrelljolampong",
   "license": "ISC",
