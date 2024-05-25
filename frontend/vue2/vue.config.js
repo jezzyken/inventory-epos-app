@@ -1,4 +1,6 @@
+
 const { defineConfig } = require('@vue/cli-service')
+const path = require('path');
 module.exports = defineConfig({
   transpileDependencies: [
     'vuetify'
@@ -8,5 +10,6 @@ module.exports = defineConfig({
       args[0].title = "D'tio Admin";
       return args;
     });
-  }
+  },
+  outputDir: path.resolve(__dirname,'../../backend/public'),
 })
