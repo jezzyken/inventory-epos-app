@@ -1,11 +1,60 @@
 const Models = require("../../models/Sale");
 const ModelSaleItems = require("../../models/SalesItem");
-const ModelDelivery= require("../../models/Delivery");
-const ModelCustomer= require("../../models/Customer");
-
+const ModelDelivery = require("../../models/Delivery");
+const ModelCustomer = require("../../models/Customer");
 
 const get = async () => {
-  const result = await Models.find();
+  const pipeline = [
+    {
+      $lookup: {
+        from: "saleitems",
+        localField: "_id",
+        foreignField: "sale",
+        as: "saleItems",
+      },
+    },
+    {
+      $unwind: {
+        path: "$saleItems",
+      },
+    },
+    {
+      $group: {
+        _id: "$saleItems.sale",
+        totalItems: {
+          $sum: 1,
+        },
+        rootFields: {
+          $mergeObjects: "$$ROOT",
+        },
+      },
+    },
+    {
+      $replaceRoot: {
+        newRoot: {
+          $arrayToObject: {
+            $concatArrays: [
+              [
+                {
+                  k: "_id",
+                  v: "$_id",
+                },
+              ],
+              {
+                $objectToArray: "$rootFields",
+              },
+            ],
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        saleItems: 0,
+      },
+    },
+  ];
+  const result = await Models.aggregate(pipeline);
   return result;
 };
 
@@ -19,7 +68,7 @@ const add = async (req) => {
 
   const newSale = new Models({
     paidAmount: saleData.paidAmount,
-    paymentType: saleData.paymentType || 'Cash',
+    paymentType: saleData.paymentType || "Cash",
     change: saleData.change,
     totalSalesAmount: saleData.totalSalesAmount,
     totalItems: saleData.totalItems,
@@ -28,7 +77,7 @@ const add = async (req) => {
 
   const savedSale = await newSale.save();
 
-   if (!!saleData.hasDelivery) {
+  if (!!saleData.hasDelivery) {
     const deliveryData = saleData.delivery;
     const newDelivery = new ModelDelivery({
       sale: savedSale._id,
@@ -50,10 +99,10 @@ const add = async (req) => {
 
   const customer = new ModelCustomer({
     name: saleData.customerName,
-    sale: savedSale._id
+    sale: savedSale._id,
   });
 
-  await customer.save()
+  await customer.save();
 
   return { sale: savedSale, saleItems: savedSaleItems };
 };
