@@ -114,6 +114,11 @@ const routes = [
         name: "sale",
         component: () => import("@/views/SalesView"),
       },
+      {
+        path: "/sales/view",
+        name: "Sales Item",
+        component: () => import("@/views/SalesItemView"),
+      },
       // ----end of sales----
     ],
   },
