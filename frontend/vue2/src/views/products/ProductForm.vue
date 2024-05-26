@@ -1,106 +1,159 @@
 <template>
   <v-container v-if="!isLoading">
     <v-sheet elevation="1" class="pa-5">
+      <p class="text-button">Product Information</p>
+      <v-divider class="mb-5" />
       <v-row>
         <v-col cols="12" md="3">
-          <v-text-field v-model="items.name" label="Name"></v-text-field>
+          <v-text-field
+            v-model="items.name"
+            label="Name"
+            outlined
+          ></v-text-field>
         </v-col>
         <v-col cols="12" md="3">
           <v-text-field
             v-model="items.productCode"
             label="Product Code"
+            outlined
           ></v-text-field>
         </v-col>
         <v-col cols="12" md="3">
           <v-select
             v-model="items.category"
-            label="Select"
+            label="Category"
             :items="category"
             item-text="name"
             item-value="_id"
+            outlined
           ></v-select>
         </v-col>
         <v-col cols="12" md="3">
           <v-select
             v-model="items.brand"
-            label="Select"
+            label="Brand"
             :items="brand"
             item-text="name"
             item-value="_id"
+            outlined
           ></v-select>
         </v-col>
         <v-col cols="12" md="2">
           <v-text-field
             v-model="items.criticalLimit"
             label="Critical Limit"
+            outlined
           ></v-text-field>
         </v-col>
         <v-col cols="12" md="5">
           <v-text-field
             v-model="items.description"
             label="Description"
+            outlined
           ></v-text-field>
         </v-col>
         <v-col cols="12" md="5">
-          <v-text-field v-model="items.image" label="Image URL"></v-text-field>
+          <v-text-field
+            v-model="items.image"
+            label="Image URL"
+            outlined
+          ></v-text-field>
         </v-col>
       </v-row>
     </v-sheet>
 
     <v-sheet elevation="1" class="pa-5 mt-5">
-      <v-simple-table>
-        <template v-slot:default>
-          <thead>
-            <tr>
-              <th class="text-left">Unit</th>
-              <th class="text-left">Variant</th>
-              <th class="text-left">Item Price</th>
-              <th class="text-left">Sale Price</th>
-              <th class="text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(price, i) in items.prices" :key="i">
-              <td>
-                <v-select
-                  v-model="price.unit"
-                  :items="unit"
-                  label="Select"
-                  item-text="name"
-                  item-value="_id"
-                ></v-select>
-              </td>
-              <td>
-                <v-select
-                  v-model="price.variant"
-                  :items="variant"
-                  label="Select"
-                  item-text="name"
-                  item-value="_id"
-                ></v-select>
-              </td>
-              <td>
-                <v-text-field
-                  v-model="price.itemPrice"
-                  label="Item Price"
-                ></v-text-field>
-              </td>
-              <td>
-                <v-text-field
-                  v-model="price.salePrice"
-                  label="Sale Price"
-                ></v-text-field>
-              </td>
-              <td>
-                <v-btn dark color="error" x-small fab @click="onDeleteItem(i)">
-                  <v-icon>mdi-close</v-icon>
-                </v-btn>
-              </td>
-            </tr>
-          </tbody>
-        </template>
-      </v-simple-table>
-      <v-row justify="end" class="ma-4">
+      <p class="text-button">Product Price</p>
+      <v-divider class="mb-5" />
+      <v-sheet
+        v-for="(price, i) in items.prices"
+        :key="i"
+        elevation="1"
+        class="pa-5 mb-4 price-container"
+      >
+        <v-btn
+          dark
+          color="error"
+          x-small
+          fab
+          @click="onDeleteItem(i)"
+          class="price-close-btn"
+          v-if="items.prices.length > 1"
+        >
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+        <v-row>
+          <v-col cols="12" md="3">
+            <div class="d-flex align-center">
+              <span class="mr-2">Has color properties?:</span>
+              <v-radio-group
+                v-model="price.hasColorProperties"
+                row
+                @change="handleColorPropertiesChange(price)"
+              >
+                <v-radio label="Yes" value="Yes"></v-radio>
+                <v-radio label="No" value="No"></v-radio>
+              </v-radio-group>
+            </div>
+          </v-col>
+          <v-col cols="12" md="3" v-if="price.hasColorProperties === 'Yes'">
+            <v-select
+              v-model="price.color"
+              :items="colors"
+              label="Color"
+              item-text="name"
+              item-value="_id"
+              auto-select-first
+              multiple
+              outlined
+              class="mt-3"
+              dense
+            ></v-select>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12" md="3">
+            <v-select
+              v-model="price.unit"
+              :items="unit"
+              label="Unit"
+              item-text="name"
+              item-value="_id"
+              outlined
+              dense
+            ></v-select>
+          </v-col>
+          <v-col cols="12" md="3">
+            <v-select
+              v-model="price.variant"
+              :items="variant"
+              label="Variant"
+              item-text="name"
+              item-value="_id"
+              outlined
+              dense
+            ></v-select>
+          </v-col>
+          <v-col cols="12" md="3">
+            <v-text-field
+              v-model="price.itemPrice"
+              label="Item Price"
+              outlined
+              dense
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" md="3">
+            <v-text-field
+              v-model="price.salePrice"
+              label="Sale Price"
+              outlined
+              dense
+            ></v-text-field>
+          </v-col>
+        </v-row>
+      </v-sheet>
+
+      <v-row justify="end" class="ma-0">
         <v-btn dark color="primary" @click="addPrice">Add price</v-btn>
       </v-row>
     </v-sheet>
@@ -128,7 +181,12 @@ export default {
       items: {
         image:
           "https://media.istockphoto.com/id/173633236/photo/hand-saw.webp?b=1&s=170667a&w=0&k=20&c=fk-bGhRNrB-MPIvOJXcVw9QE4fyXzJfTQeleMFwVXbA=",
-        prices: [{}],
+        prices: [
+          {
+            hasColorProperties: "No",
+            color: null,
+          },
+        ],
       },
       // priceItem: [{}],
       isLoading: false,
@@ -136,6 +194,18 @@ export default {
       unit: [],
       variant: [],
       brand: [],
+      colors: [
+        "red",
+        "orange",
+        "yellow",
+        "green",
+        "blue",
+        "indigo",
+        "violet",
+        "black",
+        "white",
+      ],
+      hasColorProperties: "No",
     };
   },
   computed: {
@@ -221,6 +291,25 @@ export default {
       this.brand = brand.result;
       this.variant = variant.result;
     },
+
+    handleColorPropertiesChange(price) {
+      if (price.hasColorProperties === "No") {
+        this.$set(price, "color", null);
+      }
+    },
   },
 };
 </script>
+
+<style scoped>
+.price-container {
+  position: relative;
+}
+
+.price-close-btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 10px 10px 0px 0px;
+}
+</style>
