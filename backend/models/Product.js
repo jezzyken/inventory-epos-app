@@ -36,7 +36,11 @@ const productSchema = new mongoose.Schema(
           type: mongoose.Schema.Types.ObjectId,
           ref: "Variant",
         },
+        color: [{ type: mongoose.Schema.Types.ObjectId, ref: "Color" }],
         itemPrice: {
+          type: String,
+        },
+        hasColorProperties: {
           type: String,
         },
         salePrice: {

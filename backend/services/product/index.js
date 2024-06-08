@@ -108,9 +108,9 @@ const get = async () => {
     },
     {
       $sort: {
-        _id: -1
-      }
-    }
+        _id: -1,
+      },
+    },
   ]);
 
   return result;
@@ -147,6 +147,14 @@ const getItemPrices = async (id) => {
     },
     {
       $unwind: "$prices.unit",
+    },
+    {
+      $lookup: {
+        from: "colors",
+        localField: "prices.color",
+        foreignField: "_id",
+        as: "prices.color",
+      },
     },
     {
       $group: {
@@ -210,7 +218,9 @@ const customPopulate = (query) => {
     .populate({ path: "brand", select: "name" })
     .populate({ path: "category", select: "name" })
     .populate({ path: "prices.unit", select: "name" })
-    .populate({ path: "prices.variant", select: "name" });
+    .populate({ path: "prices.variant", select: "name" })
+    .populate({ path: "prices.color", select: "name" });
+
 };
 
 module.exports = {
