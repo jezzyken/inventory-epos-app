@@ -60,6 +60,7 @@ export default {
               { title: "Units", route: "/unit" },
               { title: "Categories", route: "/category" },
               { title: "Variants", route: "/variant" },
+              { title: "Colors", route: "/color" },
             ],
             title: "Products",
             appendIcon: "mdi-chevron-down",
