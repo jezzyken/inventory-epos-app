@@ -4,11 +4,15 @@ const itemPriceSchema = new mongoose.Schema(
   {
     unit: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Unit"
+      ref: "Unit",
     },
     variant: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Variant"
+      ref: "Variant",
+    },
+    color: [{ type: mongoose.Schema.Types.ObjectId, ref: "Color" }],
+    hasColorProperties: {
+      type: String,
     },
     itemPrice: {
       type: String,
@@ -16,9 +20,9 @@ const itemPriceSchema = new mongoose.Schema(
     salePrice: {
       type: String,
     },
-    product:  {
+    product: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Product"
+      ref: "Product",
     },
   },
   {
