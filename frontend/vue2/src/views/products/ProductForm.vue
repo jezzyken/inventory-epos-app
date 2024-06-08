@@ -127,7 +127,7 @@
             <v-select
               v-model="price.variant"
               :items="variant"
-              label="Variant"
+              label="Variant/Size"
               item-text="name"
               item-value="_id"
               outlined
@@ -188,24 +188,12 @@ export default {
           },
         ],
       },
-      // priceItem: [{}],
       isLoading: false,
       category: [],
       unit: [],
       variant: [],
       brand: [],
-      colors: [
-        "red",
-        "orange",
-        "yellow",
-        "green",
-        "blue",
-        "indigo",
-        "violet",
-        "black",
-        "white",
-      ],
-      hasColorProperties: "No",
+      colors: [],
     };
   },
   computed: {
@@ -242,6 +230,8 @@ export default {
       getVariantItems: "variant/getItem",
       getUnitItems: "unit/getItem",
       getBrandItems: "brand/getItem",
+      getColorItems: "color/getItem",
+
     }),
     async initialize() {
       this.isLoading = true;
@@ -286,10 +276,14 @@ export default {
       const unit = await this.getUnitItems();
       const brand = await this.getBrandItems();
       const variant = await this.getVariantItems();
+      const colors = await this.getColorItems();
+
       this.category = category.result;
       this.unit = unit.result;
       this.brand = brand.result;
       this.variant = variant.result;
+      this.colors = colors.result;
+
     },
 
     handleColorPropertiesChange(price) {
