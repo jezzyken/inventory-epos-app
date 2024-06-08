@@ -74,10 +74,19 @@ export default {
   data: () => ({
     headers: [
       {
+        text: "Unit",
+        sortable: false,
+        value: "unit.name",
+      },
+      {
         text: "Variant",
-        align: "start",
         sortable: false,
         value: "variant.name",
+      },
+      {
+        text: "Colors",
+        sortable: false,
+        value: "color",
       },
       { text: "Item Price", value: "itemPrice", sortable: false },
       { text: "Sale Price", value: "salePrice", sortable: false },
@@ -117,7 +126,10 @@ export default {
       let id = await this.items._id;
       const products = await this.getItemById(id);
       const stocks = await this.getStockItems(id);
-      this.prices = products.result.prices;
+      this.prices = products.result.prices.map(item => ({
+        ...item,
+        color: item.color.map(color => color.name).join(", ")
+      }))
       this.stocks = stocks.result;
       this.isLoading = false;
     },

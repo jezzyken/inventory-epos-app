@@ -169,22 +169,6 @@
             </v-list-item>
           </v-list>
         </v-menu>
-        <!-- <v-btn x-small color="primary" @click="onViewDialog(item)">
-          view
-        </v-btn>
-
-        <span class="mr-1"></span>
-        <v-btn
-          x-small
-          color="warning"
-          :to="{ name: 'EditProduct', params: { id: item._id } }"
-        >
-          edit
-        </v-btn>
-        <span class="mr-1"></span>
-        <v-btn x-small color="error" dark @click="deleteItem(item)">
-          delete
-        </v-btn> -->
       </template>
       <template v-slot:no-data>
         <v-btn color="primary" @click="initialize"> Reset </v-btn>
