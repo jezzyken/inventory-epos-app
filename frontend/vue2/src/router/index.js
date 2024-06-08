@@ -47,6 +47,11 @@ const routes = [
         name: "variant",
         component: () => import("@/views/products/VariantView"),
       },
+      {
+        path: "/color",
+        name: "color",
+        component: () => import("@/views/products/ColorView"),
+      },
       // ----end of products----
 
       // ----stocks----
