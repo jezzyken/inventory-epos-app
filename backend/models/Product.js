@@ -42,6 +42,7 @@ const productSchema = new mongoose.Schema(
         },
         hasColorProperties: {
           type: String,
+          default: "No"
         },
         salePrice: {
           type: String,

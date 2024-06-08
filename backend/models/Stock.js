@@ -14,6 +14,10 @@ const stockSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Variant",
     },
+    color: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Color",
+    },
     quantity: {
       type: String,
     },
