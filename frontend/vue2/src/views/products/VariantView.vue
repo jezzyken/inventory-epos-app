@@ -1,9 +1,9 @@
 <template>
-  <v-container>
-    <v-data-table :headers="headers" :items="desserts" sort-by="calories" class="elevation-1">
+  <div>
+    <v-data-table :headers="headers" :items="items" sort-by="calories" class="elevation-1">
       <template v-slot:top>
         <v-toolbar flat>
-          <v-toolbar-title>Unit</v-toolbar-title>
+          <v-toolbar-title>Variants</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog" max-width="500px">
@@ -21,7 +21,23 @@
                 <v-container>
                   <v-row>
                     <v-col cols="12">
-                      <v-text-field v-model="editedItem.name" label="Brand Name"></v-text-field>
+                      <v-text-field v-model="editedItem.name" label="Variant Name" outlined></v-text-field>
+                    </v-col>
+                    <v-col cols="12">
+                      <v-combobox v-model="editedItem.items" chips clearable label="Enter variant items" multiple
+                        outlined>
+                        <template v-slot:selection="{ attrs, item, select, selected }">
+                          <v-chip v-bind="attrs" :input-value="selected" close @click="select"
+                            @click:close="remove(item)">
+                            <strong>{{ item }}</strong>
+                          </v-chip>
+                        </template>
+                      </v-combobox>
+
+                      <!-- <v-text-field v-model="editedItem.name" label="Items"></v-text-field> -->
+                    </v-col>
+                    <v-col cols="12">
+                      <v-select v-model="editedItem.isActive" :items="status" label="Status" outlined></v-select>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -63,7 +79,7 @@
         <v-btn color="primary" @click="initialize"> Reset </v-btn>
       </template>
     </v-data-table>
-  </v-container>
+  </div>
 </template>
 
 <script>
@@ -76,22 +92,39 @@ export default {
     dialogDelete: false,
     headers: [
       {
-        text: "Brand",
+        text: "Variants",
         align: "start",
         sortable: false,
         value: "name",
       },
+      {
+        text: "Items",
+        align: "start",
+        sortable: false,
+        value: "items",
+      },
+      {
+        text: "Status",
+        align: "start",
+        sortable: false,
+        value: "isActive",
+      },
       { text: "Actions", value: "actions", sortable: false },
     ],
-    desserts: [],
+    items: [],
     editedIndex: -1,
     editedItem: {
       name: "",
+      isActive: "",
+      items: [],
     },
     defaultItem: {
       name: "",
+      isActive: "",
+      items: [],
     },
-    itemId: null
+    itemId: null,
+    status: ["Active", "Disable"],
   }),
 
   computed: {
@@ -115,33 +148,38 @@ export default {
 
   methods: {
     ...mapActions({
-      "getItems": "variant/getItem",
-      "addItem": "variant/addItem",
-      "removeItem": "variant/deleteItem",
-      "updateItem": "variant/updateItem",
+      getItems: "variant/getItem",
+      addItem: "variant/addItem",
+      removeItem: "variant/deleteItem",
+      updateItem: "variant/updateItem",
     }),
 
     async initialize() {
-      const results = await this.getItems()
-      this.desserts = results.result
+      const response = await this.getItems();
+      this.items = response.result.map((item) => ({
+        ...item,
+        isActive: item.isActive ? "Active" : "Disable",
+      }));
+
+      console.log(response.result);
     },
 
     editItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
+      this.editedIndex = this.items.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
 
     deleteItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
-      this.itemId = item._id
+      this.editedIndex = this.items.indexOf(item);
+      this.itemId = item._id;
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
 
     async deleteItemConfirm() {
-      await this.removeItem(this.itemId)
-      this.desserts.splice(this.editedIndex, 1);
+      await this.removeItem(this.itemId);
+      this.items.splice(this.editedIndex, 1);
       this.closeDelete();
     },
 
@@ -162,14 +200,48 @@ export default {
     },
 
     async save() {
+      this.editedItem = {
+        ...this.editedItem,
+        isActive: this.checkStatus(this.editedItem.isActive),
+      };
+
       if (this.editedIndex > -1) {
-        Object.assign(this.desserts[this.editedIndex], this.editedItem);
-        await this.updateItem(this.editedItem)
+        Object.assign(this.items[this.editedIndex], {
+          ...this.editedItem,
+          isActive: this.editedItem.isActive ? "Active" : "Disable",
+        });
+        await this.updateItem(this.editedItem);
       } else {
-        this.desserts.push(this.editedItem);
-        await this.addItem(this.editedItem)
+        this.items.push(this.editedItem);
+        await this.addItem(this.editedItem);
       }
       this.close();
+    },
+
+    checkStatus() {
+      let status = true;
+
+      switch (this.editedItem.isActive) {
+        case "Active":
+          status = true;
+          break;
+        case "Disable":
+          status = false;
+          break;
+        default:
+          status = true;
+          break;
+      }
+
+      return status;
+    },
+
+    remove(item) {
+      let values = [...this.editedItem.items];
+
+      values.splice(values.indexOf(item), 1);
+
+      this.editedItem.items = values;
     },
   },
 };
