@@ -5,6 +5,11 @@ const variantSchema = new mongoose.Schema(
     name: {
       type: String,
     },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+    items: [{ type: String }],
   },
   {
     timestamp: true,
