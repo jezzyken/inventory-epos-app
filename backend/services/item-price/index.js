@@ -1,8 +1,9 @@
-const Models = require("../../models/ItemPrice");
+const Models = require("../../models/ProductPrice");
 const ObjectId = require("mongoose").Types.ObjectId;
 
 const get = async () => {
-  const result = await customPopulate(Models.find());
+  // const result = await customPopulate(Models.find());
+  const result = await Models.find()
   return result;
 };
 
