@@ -1,5 +1,5 @@
 const Models = require("../../models/Product");
-const ProductPriceModel = require("../../models/ProductPrice");
+const ProductPriceModel = require("../../models/ProductItems");
 
 const ObjectId = require("mongoose").Types.ObjectId;
 

@@ -1,4 +1,4 @@
-const Models = require("../../models/ProductPrice");
+const Models = require("../../models/ProductItems");
 const ObjectId = require("mongoose").Types.ObjectId;
 
 const get = async () => {
