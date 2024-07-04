@@ -34,21 +34,11 @@
               >
                 new
               </v-btn>
-              <v-btn
-                color="primary"
-                dark
-                class="mb-2 mr-1"
-                small
-              >
+              <v-btn color="primary" dark class="mb-2 mr-1" small>
                 export
                 <v-icon right dark> mdi-export </v-icon>
               </v-btn>
-              <v-btn
-                color="primary"
-                dark
-                class="mb-2 mr-1"
-                small
-              >
+              <v-btn color="primary" dark class="mb-2 mr-1" small>
                 print
                 <v-icon right dark> mdi-printer </v-icon>
               </v-btn>
@@ -163,9 +153,7 @@
               :key="i"
               @click="handleAction(action.title, item)"
             >
-              <v-list-item-title>{{
-                action.title
-              }}</v-list-item-title>
+              <v-list-item-title>{{ action.title }}</v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -223,10 +211,15 @@ export default {
         value: "category.name",
       },
       {
-        text: "Quantity",
+        text: "Type",
         align: "start",
-        value: "stocksQuantity",
+        value: "type",
       },
+      // {
+      //   text: "Quantity",
+      //   align: "start",
+      //   value: "stocksQuantity",
+      // },
       { text: "Actions", value: "actions", sortable: false },
     ],
     items: [],
