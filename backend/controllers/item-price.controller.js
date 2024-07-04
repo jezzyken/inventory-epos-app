@@ -4,7 +4,6 @@ const AppError = require("../utils/appError");
 const service = require("../services/item-price");
 
 const get = catchAsync(async (req, res) => {
-  console.log('fuck')
   const result = await service.get();
   const data = {
     success: true,
@@ -62,7 +61,7 @@ const update = catchAsync(async (req, res, next) => {
 });
 
 const remove = catchAsync(async (req, res) => {
-  const result = await Models.findByIdAndDelete(req.params.id);
+  const result = await service.remove(req.params.id);
   const data = {
     success: true,
     result,

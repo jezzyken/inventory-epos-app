@@ -26,26 +26,27 @@ const productSchema = new mongoose.Schema(
     image: {
       type: String,
     },
-    prices: [
+    unit: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Unit",
+    },
+    type: {
+      type: String,
+      enum: ["Standard", "Variants"],
+      default: "standard",
+    },
+
+    variationAttributes: [
       {
-        unit: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Unit",
+        name: {
+          type: String,
         },
-        variant: {
+        selectedValue: {
+          type: [String],
+        },
+        variantId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Variant",
-        },
-        color: [{ type: mongoose.Schema.Types.ObjectId, ref: "Color" }],
-        itemPrice: {
-          type: String,
-        },
-        hasColorProperties: {
-          type: String,
-          default: "No"
-        },
-        salePrice: {
-          type: String,
         },
       },
     ],
