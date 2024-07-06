@@ -24,7 +24,7 @@ const productSchema = new mongoose.Schema(
       ref: "Supplier",
     },
     criticalLimit: {
-      type: String,
+      type: Number,
       default: 5,
     },
     image: {
@@ -51,6 +51,9 @@ const productSchema = new mongoose.Schema(
         value: mongoose.Schema.Types.Mixed,
       },
     ],
+    stocks: {
+      type: Number,
+    },
     variants: [
       {
         type: mongoose.Schema.Types.ObjectId,
