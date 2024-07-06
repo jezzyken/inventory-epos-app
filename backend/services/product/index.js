@@ -4,29 +4,49 @@ const ProductVariantModel = require("../../models/ProductVariant");
 const ObjectId = require("mongoose").Types.ObjectId;
 
 const get = async () => {
-  const result = await customPopulate(Models.find());
+  const result = Models.aggregate([
+    ...createLookupStage(
+      "productvariants",
+      "variants",
+      "_id",
+      "variants",
+      false
+    ),
+    ...createLookupStage("categories", "category", "_id", "category", true),
+    ...createLookupStage("units", "unit", "_id", "unit", true),
+    ...createLookupStage("suppliers", "supplier", "_id", "supplier", true),
+    ...createLookupStage("brands", "brand", "_id", "brand", true),
+    {
+      $addFields: {
+        availableStocks: {
+          $cond: {
+            if: {
+              $eq: ["$type", "Variants"],
+            },
+            then: {
+              $sum: "$variants.stocks",
+            },
+            else: "$stocks",
+          },
+        },
+      },
+    },
+    {
+      $sort: {
+        _id: 1,
+      },
+    },
+  ]);
+
   return result;
 };
 
 const getItems = async () => {
   const result = Models.aggregate([
-    {
-      $lookup: {
-        from: "productvariants",
-        localField: "variants",
-        foreignField: "_id",
-        as: "variants",
-      },
-    },
-    {
-      $unwind: {
-        path: "$variants",
-        preserveNullAndEmptyArrays: true,
-      },
-    },
+    ...createLookupStage("productvariants", "variants", "_id", "variants"),
   ]);
 
-  return result
+  return result;
 };
 
 const getItemPrices = async (id) => {
@@ -100,6 +120,7 @@ const add = async (req) => {
     productCost,
     sellingPrice,
     supplier,
+    stocks,
     variants,
   } = req.body;
 
@@ -116,6 +137,7 @@ const add = async (req) => {
     productCost,
     sellingPrice,
     supplier,
+    stocks,
     variants,
   };
 
@@ -193,6 +215,36 @@ const customPopulate = (query) => {
     .populate({ path: "supplier", select: "name" })
     .populate({ path: "unit", select: "name" })
     .populate({ path: "variants" });
+};
+
+const createLookupStage = (
+  from,
+  localField,
+  foreignField,
+  as,
+  includeUnwind = false
+) => {
+  const stages = [
+    {
+      $lookup: {
+        from: from,
+        localField: localField,
+        foreignField: foreignField,
+        as: as,
+      },
+    },
+  ];
+
+  if (includeUnwind) {
+    stages.push({
+      $unwind: {
+        path: `$${as}`,
+        preserveNullAndEmptyArrays: true,
+      },
+    });
+  }
+
+  return stages;
 };
 
 module.exports = {
