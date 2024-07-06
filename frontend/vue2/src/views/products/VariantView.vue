@@ -24,7 +24,7 @@
                       <v-text-field v-model="editedItem.name" label="Variant Name" outlined></v-text-field>
                     </v-col>
                     <v-col cols="12">
-                      <v-combobox v-model="editedItem.items" chips clearable label="Enter variant items" multiple
+                      <v-combobox v-model="editedItem.values" chips clearable label="Enter variant items" multiple
                         outlined>
                         <template v-slot:selection="{ attrs, item, select, selected }">
                           <v-chip v-bind="attrs" :input-value="selected" close @click="select"
@@ -98,10 +98,10 @@ export default {
         value: "name",
       },
       {
-        text: "Items",
+        text: "Value Types",
         align: "start",
         sortable: false,
-        value: "items",
+        value: "values",
       },
       {
         text: "Status",
@@ -116,12 +116,12 @@ export default {
     editedItem: {
       name: "",
       isActive: "",
-      items: [],
+      values: [],
     },
     defaultItem: {
       name: "",
       isActive: "",
-      items: [],
+      values: [],
     },
     itemId: null,
     status: ["Active", "Disable"],
@@ -237,11 +237,11 @@ export default {
     },
 
     remove(item) {
-      let values = [...this.editedItem.items];
+      let values = [...this.editedItem.values];
 
       values.splice(values.indexOf(item), 1);
 
-      this.editedItem.items = values;
+      this.editedItem.values = values;
     },
   },
 };

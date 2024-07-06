@@ -196,11 +196,6 @@ export default {
         value: "name",
       },
       {
-        text: "Description",
-        align: "start",
-        value: "description",
-      },
-      {
         text: "Brand",
         align: "start",
         value: "brand.name",
@@ -209,6 +204,11 @@ export default {
         text: "Category",
         align: "start",
         value: "category.name",
+      },
+      {
+        text: "In Stock",
+        align: "start",
+        value: "availableStocks",
       },
       {
         text: "Type",
@@ -265,8 +265,8 @@ export default {
     },
   },
 
-  async created() {
-    await this.initialize();
+  created() {
+    this.initialize();
   },
   methods: {
     ...mapActions({
@@ -279,7 +279,6 @@ export default {
     async initialize() {
       this.isLoading = true;
       const results = await this.getItems();
-      console.log(results);
       this.items = results.result;
       this.isLoading = false;
     },
