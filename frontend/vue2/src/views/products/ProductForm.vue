@@ -38,28 +38,32 @@
             outlined
           ></v-select>
         </v-col>
-        <v-col cols="12" md="2">
-          <v-text-field
-            v-model="items.criticalLimit"
-            label="Critical Limit"
-            outlined
-          ></v-text-field>
-        </v-col>
-        <v-col cols="12" md="5">
+        <v-col cols="12" md="6">
           <v-text-field
             v-model="items.description"
             label="Description"
             outlined
           ></v-text-field>
         </v-col>
-        <v-col cols="12" md="5">
+        <v-col cols="12" md="3">
+          <v-select
+            v-model="items.supplier"
+            label="Supplier"
+            :items="suppliers"
+            item-text="name"
+            item-value="_id"
+            outlined
+          ></v-select>
+        </v-col>
+
+        <v-col cols="12" md="3">
           <v-text-field
-            v-model="items.image"
-            label="Image URL"
+            v-model="items.criticalLimit"
+            label="Critical Limit"
             outlined
           ></v-text-field>
         </v-col>
-        <v-col cols="12" md="5">
+        <v-col cols="12" md="3">
           <v-select
             :items="units"
             v-model="items.unit"
@@ -69,7 +73,15 @@
             outlined
           ></v-select>
         </v-col>
-        <v-col cols="12" md="5">
+
+        <v-col cols="12" md="9">
+          <v-text-field
+            v-model="items.image"
+            label="Image URL"
+            outlined
+          ></v-text-field>
+        </v-col>
+        <v-col cols="12" md="3">
           <v-select
             v-model="items.type"
             :items="type"
@@ -77,55 +89,46 @@
             outlined
           ></v-select>
         </v-col>
-        <v-col cols="12" md="5">
+        <v-col cols="12" md="3">
           <v-text-field
             v-model="items.productCost"
             label="Product Cost"
             outlined
           ></v-text-field>
         </v-col>
-        <v-col cols="12" md="5">
+        <v-col cols="12" md="3">
           <v-text-field
             v-model="items.sellingPrice"
             label="Product Price"
             outlined
           ></v-text-field>
         </v-col>
+        <v-col cols="12" md="3">
+          <v-text-field
+            v-model="items.stocks"
+            label="Intial Stocks"
+            outlined
+          ></v-text-field>
+        </v-col>
+      </v-row>
+    </v-sheet>
+
+    <v-sheet elevation="1" class="pa-5 mt-5" v-if="items.type === 'Variants'">
+      <p class="text-button">Variant Information</p>
+      <v-divider class="mb-5" />
+      <v-row>
         <v-col cols="12" md="5">
+          <!-- v-model="items.variant" optional model-->
           <v-select
-            v-model="items.variant"
             :items="variants"
             label="Variants"
             item-text="name"
             @change="onSelectVariant"
             return-object
             outlined
+            :loading="isLoadingVariant"
           ></v-select>
         </v-col>
-
-        <!-- <v-col cols="12" md="5">
-          <v-combobox
-            v-model="chips"
-            :items="variantItems"
-            chips
-            clearable
-            label="Your favorite hobbies"
-            multiple
-            prepend-icon="mdi-filter-variant"
-            solo
-          >
-            <template v-slot:selection="{ attrs, item, select, selected }">
-              <v-chip
-                v-bind="attrs"
-                :input-value="selected"
-                close
-                @click="select"
-              >
-                <strong>{{ item }}</strong>
-              </v-chip>
-            </template>
-</v-combobox>
-</v-col> -->
       </v-row>
 
       <v-row v-for="(vt, i) in variationAttributes" :key="i">
@@ -137,7 +140,6 @@
             v-model="vt.selectedValue"
             :items="vt.variant"
             chips
-            clearable
             label="Select variant value"
             multiple
             outlined
@@ -157,12 +159,12 @@
         </v-col>
       </v-row>
 
-      <v-row v-for="variants in items.variantItems" :key="variants.skuCode">
+      <v-row v-for="variants in items.variants" :key="variants.skuCode">
         <v-col cols="12" md="3">
           <v-text-field
             :v-model="variants.skuCode"
             label="Product Price"
-            :value="variants.skuCode"
+            :value="`${items.name}-${variants.name}`"
             outlined
           ></v-text-field>
         </v-col>
@@ -181,62 +183,27 @@
           ></v-text-field>
         </v-col>
         <v-col cols="12" md="3">
-          <v-text-field
-            v-model="variants.stockAlert"
-            label="Stock Alert"
-            outlined
-          ></v-text-field>
+          <v-row>
+            <v-col cols="6">
+            <v-text-field
+              v-model="variants.stocks"
+              label="Initial Stocks"
+              outlined
+            ></v-text-field>
+          </v-col>
+          <v-col cols="6">
+            <v-text-field
+              v-model="variants.stockAlert"
+              label="Stock Alert"
+              outlined
+            ></v-text-field>
+          </v-col>
+          </v-row>
         </v-col>
       </v-row>
     </v-sheet>
 
-    <!-- <v-sheet elevation="1" class="pa-5 mt-5">
-      <p class="text-button">Product Price</p>
-      <v-divider class="mb-5" />
-      <v-sheet v-for="(price, i) in items.prices" :key="i" elevation="1" class="pa-5 mb-4 price-container">
-        <v-btn dark color="error" x-small fab @click="onDeleteItem(i)" class="price-close-btn"
-          v-if="items.prices.length > 1">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-        <v-row>
-          <v-col cols="12" md="3">
-            <div class="d-flex align-center">
-              <span class="mr-2">Has color properties?:</span>
-              <v-radio-group v-model="price.hasColorProperties" row @change="handleColorPropertiesChange(price)">
-                <v-radio label="Yes" value="Yes"></v-radio>
-                <v-radio label="No" value="No"></v-radio>
-              </v-radio-group>
-            </div>
-          </v-col>
-          <v-col cols="12" md="3" v-if="price.hasColorProperties === 'Yes'">
-            <v-select v-model="price.color" :items="colors" label="Color" item-text="name" item-value="_id"
-              auto-select-first multiple outlined class="mt-3" dense></v-select>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="12" md="3">
-            <v-select v-model="price.unit" :items="unit" label="Unit" item-text="name" item-value="_id" outlined
-              dense></v-select>
-          </v-col>
-          <v-col cols="12" md="3">
-            <v-select v-model="price.variant" :items="variant" label="Variant/Size" item-text="name" item-value="_id"
-              outlined dense></v-select>
-          </v-col>
-          <v-col cols="12" md="3">
-            <v-text-field v-model="price.itemPrice" label="Item Price" outlined dense></v-text-field>
-          </v-col>
-          <v-col cols="12" md="3">
-            <v-text-field v-model="price.salePrice" label="Sale Price" outlined dense></v-text-field>
-          </v-col>
-        </v-row>
-      </v-sheet>
-
-      <v-row justify="end" class="ma-0">
-        <v-btn dark color="primary" @click="addPrice">Add price</v-btn>
-      </v-row>
-    </v-sheet> -->
-
-    <v-row justify="start" class="ma-0 mt-6">
+    <v-row justify="end" class="ma-0 mt-6">
       <v-btn dark :color="pageMode.color" @click="pageMode.action">{{
         pageMode.label
       }}</v-btn>
@@ -259,7 +226,7 @@ export default {
     return {
       items: {
         type: "Standard",
-        variantItems: [],
+        variants: [],
         image:
           "https://media.istockphoto.com/id/173633236/photo/hand-saw.webp?b=1&s=170667a&w=0&k=20&c=fk-bGhRNrB-MPIvOJXcVw9QE4fyXzJfTQeleMFwVXbA=",
       },
@@ -270,16 +237,11 @@ export default {
       brand: [],
       colors: [],
       units: [],
+      suppliers: [],
       type: ["Standard", "Variants"],
       chips: "",
-      variationAttributes: [
-        // {
-        //   name: "size",
-        //   selectedValue: ["s", "m", "l"],
-        //   variant: ["s", "m", "l", "xl", "xxl"],
-        //   // variant: ["s", "m", "l", "xl", "xxl"], could be refences
-        // },
-      ],
+      variationAttributes: [],
+      isLoadingVariant: false,
     };
   },
   computed: {
@@ -317,6 +279,7 @@ export default {
       getUnitItems: "unit/getItem",
       getBrandItems: "brand/getItem",
       getColorItems: "color/getItem",
+      getSupplierItems: "supplier/getItem",
     }),
     async initialize() {
       this.isLoading = true;
@@ -325,11 +288,8 @@ export default {
         ...response.result,
         brand: response.result.brand._id,
         category: response.result.category._id,
-        prices: response.result.prices.map((item) => ({
-          ...item,
-          unit: item.unit?._id,
-          variant: item.variant._id,
-        })),
+        supplier: response.result.supplier._id,
+        unit: response.result.unit._id,
       };
       this.isLoading = false;
     },
@@ -337,7 +297,6 @@ export default {
     async onAddItem() {
       await this.addItem({
         ...this.items,
-        variationAttributes: this.variationAttributes,
       });
       this.$router.push("/product");
     },
@@ -347,6 +306,7 @@ export default {
         id: this.$route?.params?.id,
         data: this.items,
       };
+
       await this.updateItem(data);
       this.$router.push("/product");
     },
@@ -356,17 +316,21 @@ export default {
     },
 
     async fetch() {
+      this.isLoadingVariant = true;
       const category = await this.getCategoryItems();
       const unit = await this.getUnitItems();
       const brand = await this.getBrandItems();
       const variants = await this.getVariantItems();
       const colors = await this.getColorItems();
+      const suppliers = await this.getSupplierItems();
 
       this.category = category.result;
       this.units = unit.result;
       this.brand = brand.result;
       this.variants = variants.result;
       this.colors = colors.result;
+      this.suppliers = suppliers.result;
+      this.isLoadingVariant = false;
     },
 
     handleColorPropertiesChange(price) {
@@ -383,35 +347,43 @@ export default {
       if (!isExist) {
         this.variationAttributes.push({
           ...item,
-          variant: item.items,
+          variant: item.values,
           variantId: item._id,
         });
       }
     },
 
     onSelectVariantAttrib() {
-      this.items.variantItems = this.genererateSkuCode(
-        this.variationAttributes
-      );
+      this.items.variants = this.generateVariants(this.variationAttributes);
+
+      console.log(this.variationAttributes);
     },
 
-    genererateSkuCode(attributes, prefix = "") {
-      if (attributes.length === 0) {
-        return [{ skuCode: `${this.items.name}-${prefix}` }];
-      }
+    generateVariants(attributes) {
+      const variants = [];
 
-      let currentAttribute = attributes[0];
-      let remainingAttributes = attributes.slice(1) || null;
-      let skuCode = [];
+      const generateCombinations = (attributeIndex, currentCombination) => {
+        if (attributeIndex === attributes.length) {
+          const name = currentCombination.map((attr) => attr.value).join("-");
+          variants.push({
+            name: name,
+            attributes: [...currentCombination],
+          });
+          return;
+        }
+        const attribute = attributes[attributeIndex];
+        attribute.selectedValue.forEach((value) => {
+          const newCombination = [
+            ...currentCombination,
+            { key: attribute.name, value: value },
+          ];
+          generateCombinations(attributeIndex + 1, newCombination);
+        });
+      };
 
-      for (let selectedValue of currentAttribute.selectedValue) {
-        let newPrefix = prefix ? `${prefix}-${selectedValue}` : selectedValue;
-        skuCode = skuCode.concat(
-          this.genererateSkuCode(remainingAttributes, newPrefix)
-        );
-      }
+      generateCombinations(0, []);
 
-      return skuCode;
+      return variants;
     },
   },
 };
