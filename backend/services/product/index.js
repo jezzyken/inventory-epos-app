@@ -1,123 +1,32 @@
 const Models = require("../../models/Product");
-const ProductPriceModel = require("../../models/ProductItems");
+const ProductVariantModel = require("../../models/ProductVariant");
 
 const ObjectId = require("mongoose").Types.ObjectId;
 
 const get = async () => {
-  // const result = await Models.aggregate([
-  //   {
-  //     $lookup: {
-  //       from: "brands",
-  //       localField: "brand",
-  //       foreignField: "_id",
-  //       as: "brand",
-  //     },
-  //   },
-  //   {
-  //     $lookup: {
-  //       from: "categories",
-  //       localField: "category",
-  //       foreignField: "_id",
-  //       as: "category",
-  //     },
-  //   },
-  //   {
-  //     $unwind: "$prices",
-  //   },
-  //   {
-  //     $lookup: {
-  //       from: "units",
-  //       localField: "prices.unit",
-  //       foreignField: "_id",
-  //       as: "unitDetails",
-  //     },
-  //   },
-  //   {
-  //     $lookup: {
-  //       from: "variants",
-  //       localField: "prices.variant",
-  //       foreignField: "_id",
-  //       as: "variantDetails",
-  //     },
-  //   },
-
-  //   {
-  //     $unwind: {
-  //       path: "$unitDetails",
-  //       preserveNullAndEmptyArrays: true,
-  //     },
-  //   },
-  //   {
-  //     $unwind: {
-  //       path: "$variantDetails",
-  //       preserveNullAndEmptyArrays: true,
-  //     },
-  //   },
-  //   {
-  //     $unwind: "$brand",
-  //   },
-  //   {
-  //     $unwind: "$category",
-  //   },
-  //   {
-  //     $lookup: {
-  //       from: "stocks",
-  //       localField: "_id",
-  //       foreignField: "product",
-  //       as: "stocksQuantity",
-  //     },
-  //   },
-  //   {
-  //     $addFields: {
-  //       stocksQuantity: {
-  //         $sum: {
-  //           $map: {
-  //             input: "$stocksQuantity",
-  //             as: "stock",
-  //             in: {
-  //               $toInt: "$$stock.quantity",
-  //             },
-  //           },
-  //         },
-  //       },
-  //     },
-  //   },
-  //   {
-  //     $group: {
-  //       _id: "$_id",
-  //       name: { $first: "$name" },
-  //       description: { $first: "$description" },
-  //       productCode: { $first: "$productCode" },
-  //       brand: { $first: "$brand" },
-  //       category: { $first: "$category" },
-  //       criticalLimit: { $first: "$criticalLimit" },
-  //       image: { $first: "$image" },
-  //       createdAt: { $first: "$createdAt" },
-  //       updatedAt: { $first: "$updatedAt" },
-  //       stocksQuantity: { $first: "$stocksQuantity" },
-  //       __v: { $first: "$__v" },
-  //       stocksQuantity: { $first: "$stocksQuantity" },
-  //       prices: {
-  //         $push: {
-  //           _id: "$prices._id",
-  //           unit: "$unitDetails",
-  //           variant: "$variantDetails",
-  //           itemPrice: "$prices.itemPrice",
-  //           salePrice: "$prices.salePrice",
-  //         },
-  //       },
-  //     },
-  //   },
-  //   {
-  //     $sort: {
-  //       _id: -1,
-  //     },
-  //   },
-  // ]);
-
-  const result = await Models.find()
-
+  const result = await customPopulate(Models.find());
   return result;
+};
+
+const getItems = async () => {
+  const result = Models.aggregate([
+    {
+      $lookup: {
+        from: "productvariants",
+        localField: "variants",
+        foreignField: "_id",
+        as: "variants",
+      },
+    },
+    {
+      $unwind: {
+        path: "$variants",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+  ]);
+
+  return result
 };
 
 const getItemPrices = async (id) => {
@@ -190,9 +99,8 @@ const add = async (req) => {
     unit,
     productCost,
     sellingPrice,
-    variant,
-    variationAttributes,
-    variantItems
+    supplier,
+    variants,
   } = req.body;
 
   const productData = {
@@ -207,28 +115,70 @@ const add = async (req) => {
     unit,
     productCost,
     sellingPrice,
-    variationAttributes,
-    variant,
+    supplier,
+    variants,
   };
 
-  const product = new Models(productData)
-  
-  await Promise.all(
-    variantItems.map(async (variant) => {
-      variant.product = product._id;
-      const res = await ProductPriceModel.create(variant);
-    })
-  );
+  const product = new Models(productData);
+
+  if (type === "Variants") {
+    const productVariant = await ProductVariantModel.insertMany(variants);
+    product.variants = productVariant.map((variant) => variant._id);
+    product.save();
+    return;
+  }
 
   return await product.save();
-
 };
 
-const update = async (id, data) => {
-  const results = await Models.findByIdAndUpdate(id, data, {
-    new: true,
-  });
-  return results;
+const update = async (req, product) => {
+  const {
+    name,
+    type,
+    image,
+    productCode,
+    category,
+    brand,
+    criticalLimit,
+    description,
+    unit,
+    productCost,
+    sellingPrice,
+    supplier,
+    variants,
+  } = req.body;
+
+  product.name = name || product.name;
+  product.productCode = productCode || product.productCode;
+  product.type = type || product.type;
+  product.description = description || product.description;
+  product.criticalLimit = criticalLimit || product.criticalLimit;
+  product.category = category || product.category._id;
+  product.supplier = supplier || product.supplier._id;
+  product.unit = unit || product.unit._id;
+  product.brand = brand || product.brand._id;
+  product.sellingPrice = sellingPrice || product.sellingPrice;
+  product.productCost = productCost || product.productCost;
+  product.image = image || product.image;
+
+  if (variants && variants.length > 0) {
+    for (const variant of variants) {
+      if (variant._id) {
+        await ProductVariantModel.findByIdAndUpdate(variant._id, variant, {
+          new: true,
+        });
+      } else {
+        const newVariant = new ProductVariantModel({
+          productId: product._id,
+          ...variant,
+        });
+        await newVariant.save();
+        product.variants.push(newVariant._id);
+      }
+    }
+  }
+
+  return await product.save();
 };
 
 const remove = async (id) => {
@@ -240,14 +190,15 @@ const customPopulate = (query) => {
   return query
     .populate({ path: "brand", select: "name" })
     .populate({ path: "category", select: "name" })
-    .populate({ path: "prices.unit", select: "name" })
-    .populate({ path: "prices.variant", select: "name" })
-    .populate({ path: "prices.color", select: "name" });
+    .populate({ path: "supplier", select: "name" })
+    .populate({ path: "unit", select: "name" })
+    .populate({ path: "variants" });
 };
 
 module.exports = {
   get,
   getById,
+  getItems,
   getItemPrices,
   add,
   update,

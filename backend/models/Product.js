@@ -5,10 +5,10 @@ const productSchema = new mongoose.Schema(
     name: {
       type: String,
     },
-    description: {
+    productCode: {
       type: String,
     },
-    productCode: {
+    description: {
       type: String,
     },
     brand: {
@@ -18,6 +18,10 @@ const productSchema = new mongoose.Schema(
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
+    },
+    supplier: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Supplier",
     },
     criticalLimit: {
       type: String,
@@ -33,21 +37,24 @@ const productSchema = new mongoose.Schema(
     type: {
       type: String,
       enum: ["Standard", "Variants"],
-      default: "standard",
+      default: "Standard",
     },
-
-    variationAttributes: [
+    productCost: {
+      type: String,
+    },
+    sellingPrice: {
+      type: String,
+    },
+    attributes: [
       {
-        name: {
-          type: String,
-        },
-        selectedValue: {
-          type: [String],
-        },
-        variantId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Variant",
-        },
+        key: String,
+        value: mongoose.Schema.Types.Mixed,
+      },
+    ],
+    variants: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "ProductVariant",
       },
     ],
   },
