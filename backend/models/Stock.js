@@ -2,21 +2,17 @@ const mongoose = require("mongoose");
 
 const stockSchema = new mongoose.Schema(
   {
-    product: {
+    productId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Product",
+    },
+    variantId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ProductVariant",
     },
     supplier: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Supplier",
-    },
-    variant: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Variant",
-    },
-    color: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Color",
     },
     quantity: {
       type: String,
