@@ -235,7 +235,6 @@ export default {
       unit: [],
       variants: [],
       brand: [],
-      colors: [],
       units: [],
       suppliers: [],
       type: ["Standard", "Variants"],
@@ -278,7 +277,6 @@ export default {
       getVariantItems: "variant/getItem",
       getUnitItems: "unit/getItem",
       getBrandItems: "brand/getItem",
-      getColorItems: "color/getItem",
       getSupplierItems: "supplier/getItem",
     }),
     async initialize() {
@@ -321,22 +319,14 @@ export default {
       const unit = await this.getUnitItems();
       const brand = await this.getBrandItems();
       const variants = await this.getVariantItems();
-      const colors = await this.getColorItems();
       const suppliers = await this.getSupplierItems();
 
       this.category = category.result;
       this.units = unit.result;
       this.brand = brand.result;
       this.variants = variants.result;
-      this.colors = colors.result;
       this.suppliers = suppliers.result;
       this.isLoadingVariant = false;
-    },
-
-    handleColorPropertiesChange(price) {
-      if (price.hasColorProperties === "No") {
-        this.$set(price, "color", null);
-      }
     },
 
     onSelectVariant(item) {

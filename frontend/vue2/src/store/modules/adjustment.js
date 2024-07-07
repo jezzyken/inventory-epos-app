@@ -8,7 +8,7 @@ const state = {
   items: [],
 };
 
-const endpoint = "colors";
+const endpoint = "adjustments";
 
 const actions = {
   async getItem({ commit }, data) {
@@ -16,7 +16,24 @@ const actions = {
       const response = await axios.get(`${url}/${endpoint}`);
       return response.data;
     } catch (error) {
-      console.log(error)
+      return error.response;
+    }
+  },
+
+  async getItemById({ commit }, id) {
+    try {
+      const response = await axios.get(`${url}/${endpoint}/${id}`);
+      return response.data;
+    } catch (error) {
+      return error.response;
+    }
+  },
+
+  async getStockItems({ commit }, id) {
+    try {
+      const response = await axios.get(`${url}/${endpoint}/${id}/product`);
+      return response.data;
+    } catch (error) {
       return error.response;
     }
   },
@@ -26,14 +43,14 @@ const actions = {
       const response = await axios.post(`${url}/${endpoint}`, data);
       return response.data;
     } catch (error) {
+      console.log(error)
       return error.response;
     }
   },
 
   async updateItem({ commit }, data) {
-    console.log(data)
     try {
-      const response = await axios.put(`${url}/${endpoint}/${data._id}`, data);
+      const response = await axios.put(`${url}/${endpoint}/${data.id}`, data.data);
       return response.data;
     } catch (error) {
       return error.response;

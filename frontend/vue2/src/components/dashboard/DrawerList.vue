@@ -53,23 +53,24 @@ export default {
         list: [
           {
             action: "mdi-clipboard-list-outline",
-            active: true,
             items: [
               { title: "Products", route: "/product" },
               { title: "Brands", route: "/brand" },
               { title: "Units", route: "/unit" },
               { title: "Categories", route: "/category" },
               { title: "Variants", route: "/variant" },
-              { title: "Colors", route: "/color" },
             ],
             title: "Products",
             appendIcon: "mdi-chevron-down",
           },
           {
             action: "mdi-package-up",
-            title: "Stocks",
-            route: "/stock",
-            appendIcon: "",
+            items: [
+              { title: "Stocks", route: "/stock" },
+              { title: "Adjustments", route: "/adjustment" },
+            ],
+            title: "Inventory",
+            appendIcon: "mdi-chevron-down",
           },
           {
             action: "mdi-truck-delivery",

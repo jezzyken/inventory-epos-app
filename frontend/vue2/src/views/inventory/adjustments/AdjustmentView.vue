@@ -1,14 +1,14 @@
 <template>
   <v-container>
-    <v-data-table :headers="headers" :items="desserts" sort-by="calories" class="elevation-1">
+    <v-data-table :headers="headers" :items="desserts" :loading="isLoading" sort-by="calories" class="elevation-1">
       <template v-slot:top>
         <v-toolbar flat>
-          <v-toolbar-title>Color</v-toolbar-title>
+          <v-toolbar-title>Adjustment</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog" max-width="500px">
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
+            <template v-slot:activator="{}">
+              <v-btn color="primary" dark class="mb-2" :to="{ name: 'AddAjustment' }">
                 Add
               </v-btn>
             </template>
@@ -21,7 +21,27 @@
                 <v-container>
                   <v-row>
                     <v-col cols="12">
-                      <v-text-field v-model="editedItem.name" label="Color Name"></v-text-field>
+                      <v-text-field v-model="editedItem.name" label="Name"></v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col cols="12">
+                      <v-text-field v-model="editedItem.company" label="Company"></v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col cols="12">
+                      <v-text-field v-model="editedItem.email" label="Email"></v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col cols="12">
+                      <v-text-field v-model="editedItem.contactNo" label="Contact No"></v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col cols="12">
+                      <v-text-field v-model="editedItem.address" label="Address"></v-text-field>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -51,7 +71,7 @@
       </template>
 
       <template v-slot:[`item.actions`]="{ item }">
-        <v-btn x-small color="warning" @click="editItem(item)"> edit </v-btn>
+        <v-btn x-small color="warning" :to="{ name: 'EditAdjustment', params: { id: item._id } }"> edit </v-btn>
 
         <span class="mr-1"></span>
 
@@ -76,10 +96,26 @@ export default {
     dialogDelete: false,
     headers: [
       {
-        text: "Color",
+        text: "Date",
         align: "start",
         sortable: false,
-        value: "name",
+        value: "date",
+      },
+      {
+        text: "Reference No",
+        align: "start",
+        sortable: false,
+        value: "referenceNo",
+      },
+      {
+        text: "Reason",
+        align: "start",
+        sortable: false,
+        value: "reason",
+      },
+      {
+        text: "Items",
+        align: "start",
       },
       { text: "Actions", value: "actions", sortable: false },
     ],
@@ -87,11 +123,20 @@ export default {
     editedIndex: -1,
     editedItem: {
       name: "",
+      company: "",
+      email: "",
+      contactNo: "",
+      address: ""
     },
     defaultItem: {
       name: "",
+      company: "",
+      email: "",
+      contactNo: "",
+      address: ""
     },
-    itemId: null
+    itemId: null,
+    isLoading: false
   }),
 
   computed: {
@@ -111,19 +156,22 @@ export default {
 
   created() {
     this.initialize();
+    console.log('initialized back')
   },
 
   methods: {
     ...mapActions({
-      "getItems": "color/getItem",
-      "addItem": "color/addItem",
-      "removeItem": "color/deleteItem",
-      "updateItem": "color/updateItem",
+      "getItems": "adjustment/getItem",
+      "addItem": "stock/addItem",
+      "removeItem": "stock/deleteItem",
+      "updateItem": "stock/updateItem",
     }),
 
     async initialize() {
+      this.isLoading = true
       const results = await this.getItems()
       this.desserts = results.result
+      this.isLoading = false
     },
 
     editItem(item) {
@@ -165,12 +213,11 @@ export default {
       if (this.editedIndex > -1) {
         Object.assign(this.desserts[this.editedIndex], this.editedItem);
         await this.updateItem(this.editedItem)
-        this.close();
       } else {
         this.desserts.push(this.editedItem);
         await this.addItem(this.editedItem)
-        this.close();
       }
+      this.close();
     },
   },
 };
