@@ -16,17 +16,19 @@
             label="Supplier"
             :items="suppliers"
             item-text="name"
+            item-value="_id"
             return-object
             outlined
           ></v-select>
         </v-col>
-        <v-col cols="12" md="6">
+        <v-col cols="12">
           <div class="d-flex">
             <v-select
               v-model="items.product"
               label="Products"
               :items="products"
               item-text="name"
+              item-value="productCode"
               outlined
               @change="onSelectItem"
               return-object
@@ -41,22 +43,20 @@
         <template v-slot:default>
           <thead>
             <tr>
-              <th class="text-left">Prooduct</th>
-              <th class="text-left">Quantity</th>
+              <th class="text-left">Product</th>
+              <th class="text-left">Stocks</th>
+              <th class="text-center">Quantity</th>
+              <th class="text-left">Supplier</th>
               <th class="text-left">Actions</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(stock, i) in stocks" :key="i">
+            <tr v-for="(stock, i) in items.stocks" :key="i">
               <td class="pa-5">
-                <v-text-field
-                  v-model="stock.product.name"
-                  label="Product"
-                  outlined
-                  hide-details
-                  dense
-                  readonly
-                ></v-text-field>
+                <span>{{ stock.name }}</span>
+              </td>
+              <td class="pa-5">
+                <span>{{ stock.availableStocks }}</span>
               </td>
               <td>
                 <div class="d-flex justify-center">
@@ -77,15 +77,48 @@
                   </v-btn>
                 </div>
               </td>
+              <td class="pa-5">
+                <div style="width: 80%">
+                  <v-select
+                    v-model="stock.supplier"
+                    label="Supplier"
+                    :items="suppliers"
+                    item-text="name"
+                    item-value="_id"
+                    outlined
+                    hide-details
+                  ></v-select>
+                </div>
+              </td>
               <td>
-                <v-btn dark color="error" x-small fab>
-                  <v-icon>mdi-close</v-icon>
+                <v-btn dark color="error" small @click="onDeleteItem(stock, i)">
+                  <v-icon>mdi-trash-can-outline</v-icon>
                 </v-btn>
               </td>
             </tr>
           </tbody>
         </template>
       </v-simple-table>
+    </v-sheet>
+
+    <v-sheet elevation="1" class="pa-5 mt-5" v-if="items.stocks != 0">
+      <v-row>
+        <v-col cols="12" md="4">
+          <v-text-field
+            v-model="items.notes"
+            label="Notes"
+            outlined
+          ></v-text-field>
+        </v-col>
+        <v-col cols="12" md="2">
+          <v-select
+            v-model="items.status"
+            label="Status"
+            :items="status"
+            outlined
+          ></v-select>
+        </v-col>
+      </v-row>
     </v-sheet>
 
     <v-row justify="end" class="ma-0 mt-6">
@@ -124,6 +157,8 @@ export default {
       variantColorItems: [],
       variantId: null,
       productId: null,
+      status: ["Pending", "Completed"],
+      deleteItemId: [],
     };
   },
   computed: {
@@ -154,51 +189,67 @@ export default {
   methods: {
     ...mapActions({
       getProductItems: "product/getItems",
-      getProductItemPrices: "product/getItemPrices",
       addItem: "stock/addItem",
       getSupplierItems: "supplier/getItem",
       getStockById: "stock/getItemById",
       updateItem: "stock/updateItem",
+      deleteItem: "stockItem/deleteItem",
     }),
 
     async initialize() {
       this.isLoading = true;
       const response = await this.getStockById(this.$route.params.id);
-      const productPrices = await this.getProductItemPrices(
-        response.result.product._id
-      );
 
-      this.prices = productPrices.result[0].prices;
-      this.variantId = response.result.variant._id;
+      const { status, notes, date, items } = response.result[0];
 
-      this.items = {
-        ...response.result,
-        variant: response.result.variant.name,
-      };
+      this.items.status = status;
+      this.items.notes = notes;
+      this.items.date = date;
+
+      for (let item of items) {
+        const data = {
+          name: item.product.name,
+          quantity: item.quantity,
+          availableStocks: item.product.stocks,
+          supplier: item.supplier._id,
+          product: item.product._id,
+          items_id: item.item_id,
+        };
+
+        if (item.product.type === "Variants") {
+          data.variant = item.variant._id;
+        }
+
+        this.items.stocks.push(data);
+      }
+
       this.isLoading = false;
     },
 
     async onSelectItem(item) {
-
       const data = {
-        product: {
-          name: item.name,
-          type: item.type,
-        },
-        productId: item._id,
+        product: item._id,
         supplier: this.items.supplier._id,
+        name: item.name,
+        availableStocks: item.availableStocks,
       };
 
-      if(item.type === 'Variants'){
-        data.variantId = item.variants._id
+      if (item.type === "Variants") {
+        data.variant = item.variants._id;
       }
 
-      this.stocks.push(data);
+      this.items.stocks.push(data);
     },
 
     async onAddItem() {
-      await this.addItem(this.stocks);
-      // this.$router.push("/stock");
+      const data = {
+        date: this.items.date,
+        notes: this.items.notes,
+        status: this.items.status,
+        stocks: this.items.stocks,
+      };
+      await this.addItem(data);
+      this.$router.push("/stock");
     },
 
     async onUpdateItem() {
@@ -206,48 +257,24 @@ export default {
         id: this.$route?.params?.id,
         data: {
           date: this.items.date,
-          product: this.items.product._id,
-          supplier: this.items.supplier._id,
-          variant: this.variantId,
-          quantity: this.items.quantity,
+          notes: this.items.notes,
+          status: this.items.status,
+          stocks: this.items.stocks,
+          deletedItems: this.deleteItemId
         },
       };
       await this.updateItem(data);
       this.$router.push("/stock");
     },
 
-    onDeleteItem(i) {
-      this.stocks.splice(i, 1);
+    async onDeleteItem(stock = null, i) {
+      this.items.stocks.splice(i, 1);
+      if (stock.items_id) {
+        if (!this.deleteItemId.includes(stock.items_id)) {
+          this.deleteItemId.push(stock.items_id);
+        }
+      }
     },
-
-    hasColorProperties(price) {
-      return price && price.hasColorProperties === "Yes";
-    },
-
-    getVariants(stock) {
-      this.variantId = stock?.variant?._id;
-      return stock.prices.map((price) => price.variant);
-    },
-    getSelectedPrice(stock) {
-      return stock.prices.find(
-        (price) => price.variant.name === stock.variants.name
-      );
-    },
-
-    // onSelectVariant(item) {
-    //   this.productId = item._id;
-    //   this.variantId = item.variant._id;
-    //   let filteredColor = this.colors.find(
-    //     (color) => color.id === this.productId
-    //   );
-    //   this.variantColorItems = filteredColor.color;
-    //   this.hasColorProperties = item.hasColorProperties;
-    //   console.log(this.variantColorItems);
-    // },
-
-    // onSelectColor(item) {
-    //   this.variantId = item.color._id;
-    // },
 
     async fetch() {
       const suppliers = await this.getSupplierItems();
@@ -256,16 +283,10 @@ export default {
       this.products = products.result.map((product) => {
         if (product.type === "Variants") {
           product.name = `${product.name}-${product.variants.name}`;
+          product.productCode = product.variants.productCode;
         }
         return product;
       });
-    },
-  },
-
-  watch: {
-    hasColorProperties(val) {
-      console.log(val);
-      return val;
     },
   },
 };

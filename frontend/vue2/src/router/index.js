@@ -47,32 +47,44 @@ const routes = [
         name: "variant",
         component: () => import("@/views/products/VariantView"),
       },
-      {
-        path: "/color",
-        name: "color",
-        component: () => import("@/views/products/ColorView"),
-      },
       // ----end of products----
 
-      // ----stocks----
+      // ----Inventory----
       {
         path: "/stock",
         name: "stock",
-        component: () => import("@/views/StockView"),
+        component: () => import("@/views/inventory/stocks/StockView"),
       },
       {
         path: "/stock/add",
         name: "AddStock",
-        component: () => import("@/views/StockForm"),
+        component: () => import("@/views/inventory/stocks/StockForm"),
         props: { mode: 'add' }
       },
       {
         path: "/stock/:id/edit",
         name: "EditStock",
-        component: () => import("@/views/StockForm"),
+        component: () => import("@/views/inventory/stocks/StockForm"),
         props: true
       },
-      // ----end of stocks----
+      {
+        path: "/adjustment",
+        name: "adjustment",
+        component: () => import("@/views/inventory/adjustments/AdjustmentView"),
+      },
+      {
+        path: "/adjustment/add",
+        name: "AddAjustment",
+        component: () => import("@/views/inventory/adjustments/AdjustmentForm"),
+        props: { mode: 'add' }
+      },
+      {
+        path: "/adjustment/:id/edit",
+        name: "EditAdjustment",
+        component: () => import("@/views/inventory/adjustments/AdjustmentForm"),
+        props: true
+      },
+      // ----end of Inventory----
 
       // ----delivery----
       {
