@@ -1,7 +1,8 @@
-const Models = require("../models/Adjustment");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
-const service = require("../services/adjustment");
+const Models = require("../models/AdjustmentItem");
+const service = require("../services/AdjustmentItem");
+
 
 const get = catchAsync(async (req, res) => {
   const result = await service.get();
@@ -59,7 +60,14 @@ const update = catchAsync(async (req, res, next) => {
 });
 
 const remove = catchAsync(async (req, res) => {
-  const result = await Models.findByIdAndDelete(req.params.id);
+  const stockItem = await Models.findById(req.params.id);
+
+  if (!stockItem) {
+    return next(new AppError("No Item found with that ID", 404));
+  }
+
+  const result = await service.remove(stockItem);
+  
   const data = {
     success: true,
     result,

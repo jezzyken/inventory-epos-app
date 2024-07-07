@@ -43,7 +43,22 @@ const get = async () => {
 
 const getItems = async () => {
   const result = Models.aggregate([
-    ...createLookupStage("productvariants", "variants", "_id", "variants"),
+    ...createLookupStage("productvariants", "variants", "_id", "variants", true),
+    {
+      $addFields: {
+        availableStocks: {
+          $cond: {
+            if: {
+              $eq: ["$type", "Variants"],
+            },
+            then: {
+              $sum: "$variants.stocks",
+            },
+            else: "$stocks",
+          },
+        },
+      },
+    },
   ]);
 
   return result;

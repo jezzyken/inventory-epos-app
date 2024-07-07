@@ -1,45 +1,23 @@
 const mongoose = require("mongoose");
 
-const productSchema = new mongoose.Schema(
+const adjustmentSchema = new mongoose.Schema(
   {
-    name: {
+    reason: {
       type: String,
-      required: true,
     },
-    description: {
+    referenceNo: {
       type: String,
-      required: true,
     },
-    productCode: {
-      type: String,
-      required: true,
+    date: {
+      type: Date,
+      default: Date.now(),
     },
-    brand: {
-      type: String,
-      required: true,
-    },
-    category: {
-      type: String,
-      required: true,
-    },
-    unit: {
-      type: String,
-      required: true,
-    },
-    criticalLimit: {
-      type: String,
-      required: true,
-      default: 5
-    },
-    image: {
-      type: String,
-    }
   },
   {
     timestamp: true,
   }
 );
 
-const Product = mongoose.model("Product", productSchema);
+const Adjustment = mongoose.model("Adjustment", adjustmentSchema);
 
-module.exports = Product;
+module.exports = Adjustment;
