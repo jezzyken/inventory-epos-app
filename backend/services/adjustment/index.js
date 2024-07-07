@@ -1,5 +1,5 @@
-const Models = require("../../models/Stock");
-const StockItemModel = require("../../models/StockItem");
+const Models = require("../../models/Adjustment");
+const AdjustmentItemModel = require("../../models/AdjustmentItem");
 const ProductModel = require("../../models/Product");
 const ProductVariantModel = require("../../models/ProductVariant");
 
@@ -40,9 +40,9 @@ const getById = async (id) => {
     },
     {
       $lookup: {
-        from: "stockitems",
+        from: "adjustmentitems",
         localField: "_id",
-        foreignField: "stock",
+        foreignField: "adjustment",
         as: "items",
       },
     },
@@ -81,27 +81,13 @@ const getById = async (id) => {
       },
     },
     {
-      $lookup: {
-        from: "suppliers",
-        localField: "items.supplier",
-        foreignField: "_id",
-        as: "supplierDetails",
-      },
-    },
-    {
-      $unwind: {
-        path: "$supplierDetails",
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-    {
       $group: {
         _id: "$_id",
-        status: {
-          $first: "$status",
+        referenceNo: {
+          $first: "$referenceNo",
         },
-        notes: {
-          $first: "$notes",
+        reason: {
+          $first: "$reason",
         },
         date: {
           $first: "$date",
@@ -111,8 +97,8 @@ const getById = async (id) => {
             item_id: "$items._id",
             product: "$productDetails",
             variant: "$variantDetails",
-            supplier: "$supplierDetails",
             quantity: "$items.quantity",
+            operation: "$items.operation",
           },
         },
       },
@@ -187,149 +173,41 @@ const getStockItems = async (id) => {
 };
 
 const add = async (req) => {
-  const { status, notes, stocks } = req.body;
+  const { reason, stocks } = req.body;
 
   const stock = new Models({
-    status: status,
-    notes: notes,
+    reason,
   });
 
   const results = await stock.save();
 
-  for (const stockItem of stocks) {
-    const { product, variant, supplier, quantity } = stockItem;
+  for (const itemData of stocks) {
+    const quantity = +itemData.quantity;
+    const operation = itemData.operation;
+    const adjustmentId = stock._id;
 
-    const stockItemEntry = new StockItemModel({
-      product,
-      variant,
-      stock: stock._id,
-      supplier,
-      quantity: Number(quantity),
+    const adjustmentItem = new AdjustmentItemModel({
+      product: itemData.product,
+      variant: itemData.variant,
+      adjustment: adjustmentId,
+      quantity: itemData.quantity,
+      operation: itemData.operation,
     });
 
-    await stockItemEntry.save();
+    await adjustmentItem.save();
 
-    if (variant) {
-      const productVariant = await ProductVariantModel.findById(variant);
-      if (productVariant) {
-        productVariant.stocks += Number(quantity);
-        await productVariant.save();
-
-        const productDoc = await ProductModel.findById(product);
-        if (productDoc) {
-          const totalStocks = await ProductVariantModel.aggregate([
-            { $match: { _id: { $in: productDoc.variants } } },
-            { $group: { _id: null, total: { $sum: "$stocks" } } },
-          ]);
-
-          productDoc.stocks = totalStocks[0] ? totalStocks[0].total : 0;
-          await productDoc.save();
-        }
-      }
-    } else {
-      const productDoc = await ProductModel.findById(product);
-      if (productDoc) {
-        productDoc.stocks += Number(quantity);
-        await productDoc.save();
-      }
-    }
-  }
-
-  return results;
-};
-
-const update = async (id, data) => {
-  const { status, notes, stocks, deletedItems } = data;
-
-  console.log(stocks)
-
-  const stock = await Models.findById(id);
-  stock.status = status;
-  stock.notes = notes;
-  const results = await stock.save();
-
-  if (deletedItems && deletedItems.length > 0) {
-    for (const stockItemId of deletedItems) {
-      const stockItem = await StockItemModel.findById(stockItemId);
-      if (!stockItem) {
-        throw new Error(`StockItem with ID ${stockItemId} not found`);
-      }
-
-      const previousQuantity = stockItem.quantity;
-      const { product, variant } = stockItem;
-
-      await stockItem.deleteOne();
-
+    if (itemData.variant) {
+      const variant = await ProductVariantModel.findById(itemData.variant);
       if (variant) {
-        const productVariant = await ProductVariantModel.findById(variant);
-        if (productVariant) {
-          productVariant.stocks -= previousQuantity;
-          await productVariant.save();
-
-          const productDoc = await ProductModel.findById(product);
-          if (productDoc) {
-            const variants = await ProductVariantModel.find({
-              _id: { $in: productDoc.variants },
-            });
-            productDoc.stocks = variants.reduce((acc, v) => acc + v.stocks, 0);
-            await productDoc.save();
-          }
-        }
-      } else {
-        const productDoc = await ProductModel.findById(product);
-        if (productDoc) {
-          productDoc.stocks -= previousQuantity;
-          await productDoc.save();
-        }
-      }
-    }
-  }
-
-  for (const stockData of stocks) {
-    const stockItemId = stockData.items_id;
-    const quantity = stockData.quantity;
-    const supplier = stockData.supplier;
-
-    let stockItem;
-    let previousQuantity = 0;
-    let currentQuantity = quantity;
-
-    if (stockItemId) {
-      stockItem = await StockItemModel.findById(stockItemId);
-      if (!stockItem) {
-        throw new Error(`StockItem with ID ${stockItemId} not found`);
-      }
-      previousQuantity = stockItem.quantity;
-      stockItem.quantity = quantity;
-      stockItem.supplier = supplier;
-      await stockItem.save();
-
-      currentQuantity = quantity;
-    } else {
-      stockItem = new StockItemModel({  
-        product: stockData.product,
-        variant: stockData.variant,
-        supplier: stockData.supplier,
-        stock: id,
-        quantity: stockData.quantity,
-      });
-      await stockItem.save();
-    }
-
-    if (stockData.variant) {
-      const variant = await ProductVariantModel.findById(stockData.variant);
-      if (variant) {
-        let quantityChange = currentQuantity - previousQuantity;
-
-        if (quantityChange < 0) {
-          variant.stocks -= Math.abs(quantityChange);
+        if (operation === "Subtraction") {
+          variant.stocks -= quantity;
         } else {
-          variant.stocks += quantityChange;
+          variant.stocks += quantity;
         }
 
         await variant.save();
 
-        const product = await ProductModel.findById(stockData.product);
+        const product = await ProductModel.findById(itemData.product);
         if (product) {
           const variants = await ProductVariantModel.find({
             _id: { $in: product.variants },
@@ -339,12 +217,116 @@ const update = async (id, data) => {
         }
       }
     } else {
-      const product = await ProductModel.findById(stockData.product);
+      const product = await ProductModel.findById(itemData.product);
+      if (product) {
+        if (operation === "Subtraction") {
+          product.stocks -= quantity;
+        } else {
+          product.stocks += quantity;
+        }
+
+        await product.save();
+      }
+    }
+  }
+
+  return results;
+};
+
+const update = async (id, data) => {
+  const { reason, stocks, deletedItems } = data;
+
+  const adjustment = await Models.findById(id);
+  adjustment.reason = reason;
+  const results = await adjustment.save();
+
+  if (deletedItems && deletedItems.length > 0) {
+    for (const itemId of deletedItems) {
+      const adjustmentItem = await AdjustmentItemModel.findById(itemId);
+      if (adjustmentItem) {
+        const previousQuantity = adjustmentItem.quantity;
+
+        if (adjustmentItem.variant) {
+          const variant = await ProductVariantModel.findById(
+            adjustmentItem.variant
+          );
+          if (variant) {
+            variant.stocks -= previousQuantity;
+            await variant.save();
+          }
+        } else {
+          const product = await ProductModel.findById(adjustmentItem.product);
+          if (product) {
+            product.stocks -= previousQuantity;
+            await product.save();
+          }
+        }
+
+        await AdjustmentItemModel.findByIdAndDelete(itemId);
+      }
+    }
+  }
+
+  for (const itemData of stocks) {
+    const adjustmentItemId = itemData.items_id;
+    const quantity = itemData.quantity;
+    const operation = itemData.operation;
+
+    let adjustmentItem;
+    let previousQuantity = 0;
+    let currentQuantity = quantity;
+
+    if (adjustmentItemId) {
+      adjustmentItem = await AdjustmentItemModel.findById(adjustmentItemId);
+      if (!adjustmentItem) {
+        throw new Error(`AdjustmentItem with ID ${adjustmentItemId} not found`);
+      }
+      previousQuantity = adjustmentItem.quantity;
+      adjustmentItem.quantity = quantity;
+      adjustmentItem.operation = operation; 
+      await adjustmentItem.save();
+
+      currentQuantity = quantity;
+    } else {
+      adjustmentItem = new AdjustmentItemModel({
+        product: itemData.product,
+        variant: itemData.variant,
+        adjustment: id,
+        quantity: itemData.quantity,
+        operation: itemData.operation,
+      });
+      await adjustmentItem.save();
+    }
+
+    if (itemData.variant) {
+      const variant = await ProductVariantModel.findById(itemData.variant);
+      if (variant) {
+        let quantityChange = currentQuantity - previousQuantity;
+
+        if (operation === "Subtraction") {
+          variant.stocks -= quantityChange;
+        } else {
+          variant.stocks += quantityChange;
+        }
+
+        await variant.save();
+
+        const product = await ProductModel.findById(itemData.product);
+        if (product) {
+          const variants = await ProductVariantModel.find({
+            _id: { $in: product.variants },
+          });
+          product.stocks = variants.reduce((acc, v) => acc + v.stocks, 0);
+          await product.save();
+        }
+      }
+    } else {
+      const product = await ProductModel.findById(itemData.product);
       if (product) {
         let quantityChange = currentQuantity - previousQuantity;
 
-        if (quantityChange < 0) {
-          product.stocks -= Math.abs(quantityChange);
+        if (operation === "Subtraction") {
+          product.stocks -= quantityChange;
         } else {
           product.stocks += quantityChange;
         }
@@ -353,6 +335,7 @@ const update = async (id, data) => {
       }
     }
   }
+
   return results;
 };
 
