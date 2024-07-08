@@ -206,6 +206,7 @@ export default {
       this.items.notes = notes;
       this.items.date = date;
 
+
       for (let item of items) {
         const data = {
           name: item.product.name,
@@ -218,6 +219,8 @@ export default {
 
         if (item.product.type === "Variants") {
           data.variant = item.variant._id;
+          data.name = `${item.product.name}-${item.variant.name}`
+          data.availableStocks = item.variant.stocks
         }
 
         this.items.stocks.push(data);
@@ -287,6 +290,7 @@ export default {
         }
         return product;
       });
+
     },
   },
 };
