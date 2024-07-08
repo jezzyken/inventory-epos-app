@@ -201,6 +201,8 @@ export default {
 
         if (item.product.type === "Variants") {
           data.variant = item.variant._id;
+          data.name = `${item.product.name}-${item.variant.name}`
+          data.availableStocks = item.variant.stocks
         }
 
         this.items.stocks.push(data);
@@ -231,7 +233,7 @@ export default {
         reason: this.items.reason,
       };
       await this.addItem(data);
-      // this.$router.push("/stock");
+      this.$router.push("/adjustment");
     },
 
     async onUpdateItem() {
@@ -246,7 +248,7 @@ export default {
         },
       };
       await this.updateItem(data);
-      this.$router.push("/stock");
+      this.$router.push("/adjustment");
     },
 
     async onDeleteItem(stock = null, i) {
