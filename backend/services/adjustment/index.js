@@ -269,7 +269,7 @@ const update = async (id, data) => {
 
   for (const itemData of stocks) {
     const adjustmentItemId = itemData.items_id;
-    const quantity = itemData.quantity;
+    const quantity = +itemData.quantity;
     const operation = itemData.operation;
 
     let adjustmentItem;
@@ -283,7 +283,7 @@ const update = async (id, data) => {
       }
       previousQuantity = adjustmentItem.quantity;
       adjustmentItem.quantity = quantity;
-      adjustmentItem.operation = operation; 
+      adjustmentItem.operation = operation;
       await adjustmentItem.save();
 
       currentQuantity = quantity;
@@ -301,12 +301,12 @@ const update = async (id, data) => {
     if (itemData.variant) {
       const variant = await ProductVariantModel.findById(itemData.variant);
       if (variant) {
-        let quantityChange = currentQuantity - previousQuantity;
-
-        if (operation === "Subtraction") {
-          variant.stocks -= quantityChange;
-        } else {
-          variant.stocks += quantityChange;
+        if (currentQuantity != previousQuantity) {
+          if (operation === "Subtraction") {
+            variant.stocks -= currentQuantity;
+          } else {
+            variant.stocks += currentQuantity;
+          }
         }
 
         await variant.save();
@@ -323,15 +323,14 @@ const update = async (id, data) => {
     } else {
       const product = await ProductModel.findById(itemData.product);
       if (product) {
-        let quantityChange = currentQuantity - previousQuantity;
-
-        if (operation === "Subtraction") {
-          product.stocks -= quantityChange;
-        } else {
-          product.stocks += quantityChange;
+        if (currentQuantity != previousQuantity) {
+          if (operation === "Subtraction") {
+            product.stocks -= currentQuantity;
+          } else {
+            product.stocks += currentQuantity;
+          }
+          await product.save();
         }
-
-        await product.save();
       }
     }
   }
