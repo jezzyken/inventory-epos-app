@@ -1,7 +1,7 @@
-const Models = require("../models/Adjustment");
+const Models = require("../models/Stock");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
-const service = require("../services/adjustment");
+const service = require("../services/stock");
 
 const get = catchAsync(async (req, res) => {
   const result = await service.get();
