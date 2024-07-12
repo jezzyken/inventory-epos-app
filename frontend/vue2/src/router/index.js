@@ -128,8 +128,20 @@ const routes = [
       // ----sales----
       {
         path: "/sale",
-        name: "sale",
-        component: () => import("@/views/SalesView"),
+        name: "stock",
+        component: () => import("@/views/sales/SalesView")
+      },
+      {
+        path: "/sale/add",
+        name: "AddSales",
+        component: () => import("@/views/sales/SalesForm"),
+        props: { mode: 'add' }
+      },
+      {
+        path: "/sale/:id/edit",
+        name: "EditSales",
+        component: () => import("@/views/sales/SalesForm"),
+        props: true
       },
       {
         path: "/sales/view",
