@@ -111,7 +111,7 @@
                   <span>Total</span>
                 </td>
                 <td class="pa-5">
-                  <span>{{ total }}</span>
+                  <span>{{ salesTotal }}</span>
                 </td>
               </tr>
               <tr>
@@ -155,9 +155,10 @@
         </v-col>
         <v-col cols="12" md="3">
           <v-text-field
-            v-model="items.cash"
+            v-model="items.amountReceived"
             label="Cash"
             outlined
+            @input="onAddAmount"
           ></v-text-field>
         </v-col>
         <v-col cols="12" md="3">
@@ -218,6 +219,7 @@ export default {
       discount: 0,
     };
   },
+
   computed: {
     buttonState() {
       let state = {
@@ -235,14 +237,14 @@ export default {
       return state;
     },
 
-    total() {
+    salesTotal() {
       const subtotal = this.items.stocks.reduce((total, stock) => {
         const subtotal =
           parseFloat(stock.sellingPrice) * parseInt(stock.quantity || 0);
         return total + subtotal;
       }, 0);
 
-      return subtotal
+      return subtotal;
     },
 
     grandTotal() {
@@ -266,22 +268,43 @@ export default {
   methods: {
     ...mapActions({
       getProductItems: "product/getItems",
-      addItem: "stock/addItem",
-      getStockById: "stock/getItemById",
+      addItem: "sale/addItem",
+      getSalesById: "sale/getItemById",
       updateItem: "stock/updateItem",
       deleteItem: "stockItem/deleteItem",
     }),
 
     async initialize() {
       this.isLoading = true;
-      const response = await this.getStockById(this.$route.params.id);
+      const response = await this.getSalesById(this.$route.params.id);
 
-      const { status, notes, date, items } = response.result[0];
-      console.log(response);
+      const {
+        date,
+        referenceCode,
+        amountReceived,
+        discount,
+        salesTotal,
+        paymentType,
+        change,
+        grandTotal,
+        hasDelivery,
+        notes,
+        customer,
+        items,
+      } = response.result[0];
 
-      this.items.status = status;
-      this.items.notes = notes;
       this.items.date = date;
+      this.items.referenceCode = referenceCode;
+      this.items.amountReceived = amountReceived;
+      this.items.discount = discount;
+      this.items.salesTotal = salesTotal;
+      this.items.paymentType = paymentType;
+      this.items.change = change;
+      this.items.grandTotal = grandTotal;
+      this.items.hasDelivery = hasDelivery;
+      this.items.notes = notes;
+      this.items.customer = customer;
+      this.onAddDiscount(discount)
 
       for (let item of items) {
         const data = {
@@ -290,9 +313,9 @@ export default {
           availableStocks: item.product.stocks,
           product: item.product._id,
           items_id: item.item_id,
-          sellingPrice: item.sellingPrice,
+          sellingPrice: item.product.sellingPrice,
           subTotal:
-            parseFloat(item.sellingPrice) * parseInt(item.quantity || 0),
+            parseFloat(item.product.sellingPrice) * parseInt(item.quantity || 0),
         };
 
         if (item.product.type === "Variants") {
@@ -300,9 +323,8 @@ export default {
           data.name = `${item.product.name}-${item.variant.name}`;
           data.availableStocks = item.variant.stocks;
           data.sellingPrice = item.variant.sellingPrice;
+          data.subTotal = parseFloat(item.variant.sellingPrice) * parseInt(item.quantity || 0);
         }
-
-        console.log(data);
 
         this.items.stocks.push(data);
       }
@@ -330,13 +352,14 @@ export default {
 
     async onAddItem() {
       const data = {
-        date: this.items.date,
-        notes: this.items.notes,
-        status: this.items.status,
+        ...this.items,
         stocks: this.items.stocks,
+        salesTotal: this.salesTotal,
+        grandTotal: this.grandTotal,
       };
+
       await this.addItem(data);
-      this.$router.push("/stock");
+      this.$router.push("/sale");
     },
 
     async onUpdateItem() {
@@ -392,6 +415,17 @@ export default {
     },
     onAddDiscount(discount) {
       this.discount = discount;
+    },
+    onAddAmount(amount) {
+      if (
+        typeof +amount === "number" &&
+        +amount !== 0 &&
+        +amount >= this.grandTotal
+      ) {
+        this.items.change = amount - this.grandTotal;
+      } else {
+        this.items.change = 0;
+      }
     },
   },
 };

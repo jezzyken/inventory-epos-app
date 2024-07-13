@@ -125,28 +125,16 @@ export default {
         value: "paymentType",
       },
       {
-        text: "Sales",
+        text: "Sales Amount",
         align: "start",
         sortable: false,
-        value: "totalSalesAmount",
+        value: "grandTotal",
       },
       {
-        text: "Paid Amount",
+        text: "Total Orders",
         align: "start",
         sortable: false,
-        value: "paidAmount",
-      },
-      {
-        text: "Change",
-        align: "start",
-        sortable: false,
-        value: "change",
-      },
-      {
-        text: "Total Items",
-        align: "start",
-        sortable: false,
-        value: "totalItems",
+        value: "noOfItems",
       },
       {
         text: "Delivery",
@@ -200,7 +188,7 @@ export default {
     },
 
     onViewItem(id) {
-      this.$router.push({ name: "Sales Item", query: { id: id } });
+      this.$router.push({ name: "EditSales", params: { id: id } });
     },
 
     deleteItem(item) {
