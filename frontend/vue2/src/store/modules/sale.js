@@ -20,10 +20,19 @@ const actions = {
     }
   },
 
+  async getItemById({ commit }, id) {
+    try {
+      const response = await axios.get(`${url}/${endpoint}/${id}`);
+      return response.data;
+    } catch (error) {
+      return error.response;
+    }
+  },
+
   async addItem({ commit }, data) {
     try {
       const response = await axios.post(`${url}/${endpoint}`, data);
-      return response.data;
+      return response;
     } catch (error) {
       return error.response;
     }
