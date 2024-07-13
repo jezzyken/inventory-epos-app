@@ -2,35 +2,45 @@ const mongoose = require("mongoose");
 
 const saleSchema = new mongoose.Schema(
   {
+    date: {
+      type: Date,
+      default: Date.now(),
+    },
     referenceCode: {
       type: String,
     },
-    recievedAmount: {
-      type: String,
+    amountReceived: {
+      type: Number,
     },
-    paidAmount: {
-      type: String,
+    discount: {
+      type: Number,
+    },
+    salesTotal: {
+      type: Number,
     },
     paymentType: {
       type: String,
       default: "Cash",
     },
     change: {
-      type: String,
+      type: Number,
     },
-    totalSalesAmount: {
-      type: String,
-    },
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+    grandTotal: {
+      type: Number,
     },
     hasDelivery: {
       type: Boolean,
       default: false,
     },
-    totalItems: {
+    notes: {
       type: String,
+    },
+    customer: {
+      type: String,
+    },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
   },
   {
