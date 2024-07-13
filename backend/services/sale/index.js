@@ -1,110 +1,181 @@
 const Models = require("../../models/Sale");
-const ModelSaleItems = require("../../models/SalesItem");
-const ModelDelivery = require("../../models/Delivery");
-const ModelCustomer = require("../../models/Customer");
+const SalesItemModel = require("../../models/SalesItem");
+const ProductModel = require("../../models/Product");
+const ProductVariantModel = require("../../models/ProductVariant");
+
+const ObjectId = require("mongoose").Types.ObjectId;
 
 const get = async () => {
-  const pipeline = [
+  const result = await Models.aggregate([
     {
       $lookup: {
         from: "saleitems",
         localField: "_id",
         foreignField: "sale",
-        as: "saleItems",
+        as: "sale",
+      },
+    },
+    {
+      $addFields: {
+        noOfItems: {
+          $size: "$sale",
+        },
+      },
+    },
+    {
+      $sort: {
+        _id: -1,
+      },
+    },
+  ]);
+  return result;
+};
+
+const getById = async (id) => {
+
+  console.log(id)
+  const result = await Models.aggregate([
+    {
+      $match: {
+        _id: new ObjectId(id),
+      },
+    },
+    {
+      $lookup: {
+        from: "saleitems",
+        localField: "_id",
+        foreignField: "sale",
+        as: "items",
       },
     },
     {
       $unwind: {
-        path: "$saleItems",
+        path: "$items",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: "products",
+        localField: "items.product",
+        foreignField: "_id",
+        as: "productDetails",
+      },
+    },
+    {
+      $unwind: {
+        path: "$productDetails",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: "productvariants",
+        localField: "items.variant",
+        foreignField: "_id",
+        as: "variantDetails",
+      },
+    },
+    {
+      $unwind: {
+        path: "$variantDetails",
+        preserveNullAndEmptyArrays: true,
       },
     },
     {
       $group: {
-        _id: "$saleItems.sale",
-        totalItems: {
-          $sum: 1,
+        _id: "$_id",
+        amountReceived: {
+          $first: "$referenceCode",
         },
-        rootFields: {
-          $mergeObjects: "$$ROOT",
+        amountReceived: {
+          $first: "$amountReceived",
         },
-      },
-    },
-    {
-      $replaceRoot: {
-        newRoot: {
-          $arrayToObject: {
-            $concatArrays: [
-              [
-                {
-                  k: "_id",
-                  v: "$_id",
-                },
-              ],
-              {
-                $objectToArray: "$rootFields",
-              },
-            ],
+        discount: {
+          $first: "$discount",
+        },
+        salesTotal: {
+          $first: "$salesTotal",
+        },
+        paymentType: {
+          $first: "$paymentType",
+        },
+        change: {
+          $first: "$change",
+        },
+        grandTotal: {
+          $first: "$grandTotal",
+        },
+        hasDelivery: {
+          $first: "$hasDelivery",
+        },
+        customer: {
+          $first: "$customer",
+        },
+        notes: {
+          $first: "$notes",
+        },
+        items: {
+          $push: {
+            item_id: "$items._id",
+            product: "$productDetails",
+            variant: "$variantDetails",
+            quantity: "$items.quantity",
           },
         },
       },
     },
     {
-      $project: {
-        saleItems: 0,
+      $sort: {
+        _id: -1,
       },
     },
-  ];
-  const result = await Models.aggregate(pipeline);
-  return result;
-};
-
-const getById = async (id) => {
-  const result = await Models.findById(id);
+  ]);
   return result;
 };
 
 const add = async (req) => {
-  const saleData = req.body;
+  const { stocks } = req.body;
 
-  const newSale = new Models({
-    paidAmount: saleData.paidAmount,
-    paymentType: saleData.paymentType || "Cash",
-    change: saleData.change,
-    totalSalesAmount: saleData.totalSalesAmount,
-    totalItems: saleData.totalItems,
-    hasDelivery: saleData.hasDelivery,
-  });
+  const sale = new Models(req.body);
 
-  const savedSale = await newSale.save();
+  const savedSale = await sale.save();
 
-  if (!!saleData.hasDelivery) {
-    const deliveryData = saleData.delivery;
-    const newDelivery = new ModelDelivery({
+  for (const itemData of stocks) {
+    const saleItem = new SalesItemModel({
+      product: itemData.product,
+      variant: itemData.variant,
       sale: savedSale._id,
-      recipientName: deliveryData.recipientName,
-      contactNo: deliveryData.contactNo,
-      address: deliveryData.address,
-      notes: deliveryData.notes,
-      deliveryDate: deliveryData.deliveryDate || new Date(),
+      quantity: itemData.quantity,
+      price: itemData.price,
     });
-    await newDelivery.save();
+    await saleItem.save();
+
+    if (itemData.variant) {
+      const variant = await ProductVariantModel.findById(itemData.variant);
+      if (variant) {
+        variant.stocks -= itemData.quantity;
+        await variant.save();
+
+        const product = await ProductModel.findById(itemData.product);
+        if (product) {
+          const variants = await ProductVariantModel.find({
+            _id: { $in: product.variants },
+          });
+          product.stocks = variants.reduce((acc, v) => acc + v.stocks, 0);
+          await product.save();
+        }
+      }
+    } else {
+      const product = await ProductModel.findById(itemData.product);
+      if (product) {
+        product.stocks -= itemData.quantity;
+        await product.save();
+      }
+    }
   }
 
-  const saleItems = saleData.saleItems.map((item) => ({
-    ...item,
-    sale: savedSale._id,
-  }));
-
-  const savedSaleItems = await ModelSaleItems.create(saleItems);
-
-  const customer = new ModelCustomer({
-    name: saleData.customerName,
-    sale: savedSale._id,
-  });
-
-  await customer.save();
-
-  return { sale: savedSale, saleItems: savedSaleItems };
+  return savedSale;
 };
 
 const update = async (id, data) => {

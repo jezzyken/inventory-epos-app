@@ -2,27 +2,24 @@ const mongoose = require("mongoose");
 
 const saleItemSchema = new mongoose.Schema(
   {
-    product:  {
+    product: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Product"
+      ref: "Product",
     },
-    user:  {
+    sale: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User"
+      ref: "Sale",
     },
-    itemPrice: {
-      type: String,
-    },
-    salePrice: {
-      type: String,
+    variant: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ProductVariant",
     },
     quantity: {
-      type: String,
+      type: Number ,
     },
-    sale:  {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Sale"
-    }
+    subTotal: {
+      type: Number ,
+    },
   },
   {
     timestamp: true,
