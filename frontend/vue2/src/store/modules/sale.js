@@ -40,7 +40,7 @@ const actions = {
 
   async updateItem({ commit }, data) {
     try {
-      const response = await axios.put(`${url}/${endpoint}/${data._id}`, data);
+      const response = await axios.put(`${url}/${endpoint}/${data.id}`, data);
       return response.data;
     } catch (error) {
       return error.response;

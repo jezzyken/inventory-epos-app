@@ -270,7 +270,7 @@ export default {
       getProductItems: "product/getItems",
       addItem: "sale/addItem",
       getSalesById: "sale/getItemById",
-      updateItem: "stock/updateItem",
+      updateItem: "sale/updateItem",
       deleteItem: "stockItem/deleteItem",
     }),
 
@@ -366,15 +366,12 @@ export default {
       const data = {
         id: this.$route?.params?.id,
         data: {
-          date: this.items.date,
-          notes: this.items.notes,
-          status: this.items.status,
-          stocks: this.items.stocks,
+          ...this.items,
           deletedItems: this.deleteItemId,
         },
       };
       await this.updateItem(data);
-      this.$router.push("/stock");
+      this.$router.push("/sale");
     },
 
     async onDeleteItem(stock = null, i) {
