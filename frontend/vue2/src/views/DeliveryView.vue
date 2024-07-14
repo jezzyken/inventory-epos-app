@@ -1,11 +1,32 @@
 <template>
   <v-container>
+    <ViewDeliveryDialog
+      ref="product"
+      :items="selectedItems"
+      @get-items="initialize"
+    />
     <v-data-table
       :headers="headers"
       :items="desserts"
       sort-by="calories"
       class="elevation-1"
     >
+      <template v-slot:[`item.status`]="{ item }">
+        <v-chip
+          dark
+          label
+          :color="
+            item.status === 'delivered'
+              ? 'light-green darken-1'
+              : 'amber darken-1'
+          "
+          small
+          class="mr-1 text-uppercase"
+        >
+          {{ item.status }}
+        </v-chip>
+      </template>
+
       <template v-slot:top>
         <v-toolbar flat>
           <v-toolbar-title>Delivery</v-toolbar-title>
@@ -63,16 +84,43 @@
           </v-dialog>
         </v-toolbar>
       </template>
-
+      <!-- 
       <template v-slot:[`item.actions`]="{ item }">
-        <v-btn x-small color="warning" @click="editItem(item)"> edit </v-btn>
+        <v-btn x-small color="warning" @click="editItem(item)"> view </v-btn>
 
         <span class="mr-1"></span>
 
         <v-btn x-small color="error" dark @click="deleteItem(item)">
           delete
         </v-btn>
+      </template> -->
+
+      <template v-slot:[`item.actions`]="{ item }">
+        <v-menu bottom left>
+          <template v-slot:activator="{ attrs, on }">
+            <v-btn
+              v-bind="attrs"
+              v-on="on"
+              class="white--text pa-3"
+              x-small
+              color="blue-grey"
+            >
+              options <v-icon right dark> mdi-chevron-down </v-icon>
+            </v-btn>
+          </template>
+
+          <v-list>
+            <v-list-item
+              v-for="(action, i) in actions"
+              :key="i"
+              @click="handleAction(action.title, item)"
+            >
+              <v-list-item-title>{{ action.title }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </template>
+
       <template v-slot:no-data>
         <v-btn color="primary" @click="initialize"> Reset </v-btn>
       </template>
@@ -83,8 +131,12 @@
 <script>
 /*eslint-disable*/
 import { mapActions } from "vuex";
+import ViewDeliveryDialog from "@/components/products/ViewDeliveryDialog.vue";
 
 export default {
+  components: {
+    ViewDeliveryDialog,
+  },
   data: () => ({
     dialog: false,
     dialogDelete: false,
@@ -136,6 +188,8 @@ export default {
       name: "",
     },
     itemId: null,
+    selectedItems: {},
+    actions: [{ title: "View" }, { title: "Delete" }],
   }),
 
   computed: {
@@ -168,12 +222,12 @@ export default {
     async initialize() {
       const results = await this.getItems();
       this.desserts = results.result;
+      console.log("clicked me");
     },
 
     editItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-      this.dialog = true;
+      this.$refs.product.showDialog(true, item);
+      this.selectedItems = item;
     },
 
     deleteItem(item) {
@@ -214,6 +268,19 @@ export default {
         await this.addItem(this.editedItem);
       }
       this.close();
+    },
+
+    handleAction(action, item) {
+      switch (action) {
+        case "View":
+          this.editItem(item);
+          break;
+        case "Delete":
+          this.deleteItem(item);
+          break;
+        default:
+          break;
+      }
     },
   },
 };
