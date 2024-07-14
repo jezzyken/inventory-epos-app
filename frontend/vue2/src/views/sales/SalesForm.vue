@@ -17,6 +17,65 @@
           ></v-text-field>
         </v-col>
         <v-col cols="12">
+          <v-radio-group
+            v-model="items.hasDelivery"
+            row
+            @change="onSelectDelivery(items.hasDelivery)"
+          >
+            <v-radio label="Yes" :value="true"></v-radio>
+            <v-radio label="No" :value="false"></v-radio>
+          </v-radio-group>
+        </v-col>
+
+        <div v-if="items.hasDelivery">
+          <v-row class="pa-4">
+            <v-col cols="4">
+              <v-text-field
+                v-model="items.delivery.recipientName"
+                label="Recipient Name"
+                outlined
+              ></v-text-field>
+            </v-col>
+            <v-col cols="4">
+              <v-text-field
+                v-model="items.delivery.contactNo"
+                label="Contact No"
+                outlined
+              ></v-text-field>
+            </v-col>
+            <v-col cols="4">
+              <v-text-field
+                v-model="items.delivery.deliveryDate"
+                label="Delivery Date"
+                outlined
+              ></v-text-field>
+            </v-col>
+            <v-col cols="8">
+              <v-text-field
+                v-model="items.delivery.address"
+                label="Delivery Address"
+                outlined
+              ></v-text-field>
+            </v-col>
+            <v-col cols="4">
+              <v-text-field
+                v-model="items.delivery.deliveryFee"
+                label="Delivery Fee"
+                outlined
+              ></v-text-field>
+            </v-col>
+
+            <v-col cols="12">
+              <v-text-field
+                v-model="items.delivery.notes"
+                label="Notes"
+                outlined
+              ></v-text-field>
+            </v-col>
+          </v-row>
+        </div>
+
+        <v-col cols="12">
           <div class="d-flex">
             <v-select
               v-model="items.product"
@@ -111,7 +170,15 @@
                   <span>Total</span>
                 </td>
                 <td class="pa-5">
-                  <span>{{ salesTotal }}</span>
+                  <span>P {{ salesTotal }}</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="pa-5">
+                  <span>Delivery Fee</span>
+                </td>
+                <td class="pa-5">
+                  <span>P {{ deliveryFee }}</span>
                 </td>
               </tr>
               <tr>
@@ -119,7 +186,7 @@
                   <span>Discount</span>
                 </td>
                 <td class="pa-5">
-                  <span>{{ discount }}</span>
+                  <span>P {{ discount }}</span>
                 </td>
               </tr>
               <tr>
@@ -127,7 +194,7 @@
                   <span>Grand total</span>
                 </td>
                 <td class="pa-5">
-                  <span>{{ grandTotal }}</span>
+                  <span>P {{ grandTotal }}</span>
                 </td>
               </tr>
             </tbody>
@@ -142,7 +209,6 @@
             v-model="items.discount"
             label="Discount"
             outlined
-            @input="onAddDiscount(items.discount)"
           ></v-text-field>
         </v-col>
         <v-col cols="12" md="3">
@@ -191,6 +257,7 @@
 
 <script>
 /*eslint-disable */
+import delivery from "@/store/modules/delivery";
 import { mapActions } from "vuex";
 
 export default {
@@ -200,6 +267,8 @@ export default {
   data() {
     return {
       items: {
+        hasDelivery: null,
+        delivery: {},
         stocks: [],
       },
       isLoading: false,
@@ -216,7 +285,6 @@ export default {
       productId: null,
       payment: ["Cash", "Dedit"],
       deleteItemId: [],
-      discount: 0,
     };
   },
 
@@ -244,7 +312,7 @@ export default {
         return total + subtotal;
       }, 0);
 
-      return subtotal;
+      return subtotal.toFixed(2);
     },
 
     grandTotal() {
@@ -254,7 +322,21 @@ export default {
         return total + subtotal;
       }, 0);
 
-      return subtotal - this.discount;
+      return (subtotal + +this.deliveryFee - this.discount).toFixed(2);
+    },
+
+    deliveryFee() {
+      if (this.items.hasDelivery) {
+        const fee = this.items.delivery.deliveryFee;
+        return fee ? parseFloat(fee).toFixed(2) : "0.00";
+      }
+      return "0.00";
+    },
+
+    discount() {
+      return this.items.discount
+        ? parseFloat(this.items.discount).toFixed(2)
+        : "0.00";
     },
   },
 
@@ -268,68 +350,79 @@ export default {
   methods: {
     ...mapActions({
       getProductItems: "product/getItems",
-      addItem: "sale/addItem",
       getSalesById: "sale/getItemById",
+      getDeliveryBySalesItemId: "delivery/getDeliveryBySalesItemId",
+      addItem: "sale/addItem",
       updateItem: "sale/updateItem",
       deleteItem: "stockItem/deleteItem",
     }),
 
     async initialize() {
       this.isLoading = true;
-      const response = await this.getSalesById(this.$route.params.id);
+      try {
+        const [salesResponse, deliveryResponse] = await Promise.all([
+          this.getSalesById(this.$route.params.id),
+          this.getDeliveryBySalesItemId(this.$route.params.id),
+        ]);
 
-      const {
-        date,
-        referenceCode,
-        amountReceived,
-        discount,
-        salesTotal,
-        paymentType,
-        change,
-        grandTotal,
-        hasDelivery,
-        notes,
-        customer,
-        items,
-      } = response.result[0];
+        const sale = salesResponse.result[0];
 
-      this.items.date = date;
-      this.items.referenceCode = referenceCode;
-      this.items.amountReceived = amountReceived;
-      this.items.discount = discount;
-      this.items.salesTotal = salesTotal;
-      this.items.paymentType = paymentType;
-      this.items.change = change;
-      this.items.grandTotal = grandTotal;
-      this.items.hasDelivery = hasDelivery;
-      this.items.notes = notes;
-      this.items.customer = customer;
-      this.onAddDiscount(discount)
-
-      for (let item of items) {
-        const data = {
-          name: item.product.name,
-          quantity: item.quantity,
-          availableStocks: item.product.stocks,
-          product: item.product._id,
-          items_id: item.item_id,
-          sellingPrice: item.product.sellingPrice,
-          subTotal:
-            parseFloat(item.product.sellingPrice) * parseInt(item.quantity || 0),
-        };
-
-        if (item.product.type === "Variants") {
-          data.variant = item.variant._id;
-          data.name = `${item.product.name}-${item.variant.name}`;
-          data.availableStocks = item.variant.stocks;
-          data.sellingPrice = item.variant.sellingPrice;
-          data.subTotal = parseFloat(item.variant.sellingPrice) * parseInt(item.quantity || 0);
+        if (deliveryResponse.result.length > 0) {
+          const delivery = deliveryResponse.result[0];
+          Object.assign(this.items.delivery, delivery);
         }
 
-        this.items.stocks.push(data);
-      }
+        const saleFields = [
+          "date",
+          "referenceCode",
+          "amountReceived",
+          "discount",
+          "salesTotal",
+          "paymentType",
+          "change",
+          "discount",
+          "grandTotal",
+          "hasDelivery",
+          "notes",
+          "customer",
+        ];
+        saleFields.forEach((field) => {
+          this.$set(this.items, field, sale[field]);
+        });
 
-      this.isLoading = false;
+        this.items.stocks = sale.items.map((item) => {
+          const baseData = {
+            name: item.product.name,
+            quantity: item.quantity,
+            availableStocks: item.product.stocks,
+            product: item.product._id,
+            items_id: item.item_id,
+            sellingPrice: item.product.sellingPrice,
+            subTotal:
+              parseFloat(item.product.sellingPrice) *
+              parseInt(item.quantity || 0),
+          };
+
+          if (item.product.type === "Variants") {
+            return {
+              ...baseData,
+              variant: item.variant._id,
+              name: `${item.product.name}-${item.variant.name}`,
+              availableStocks: item.variant.stocks,
+              sellingPrice: item.variant.sellingPrice,
+              subTotal:
+                parseFloat(item.variant.sellingPrice) *
+                parseInt(item.quantity || 0),
+            };
+          }
+
+          return baseData;
+        });
+      } catch (error) {
+        console.error("Error initializing data:", error);
+      } finally {
+        this.isLoading = false;
+      }
     },
 
     async onSelectItem(item) {
@@ -367,6 +460,8 @@ export default {
         id: this.$route?.params?.id,
         data: {
           ...this.items,
+          salesTotal: this.salesTotal,
+          grandTotal: this.grandTotal,
           deletedItems: this.deleteItemId,
         },
       };
@@ -410,9 +505,7 @@ export default {
         this.updateSubTotal(index);
       }
     },
-    onAddDiscount(discount) {
-      this.discount = discount;
-    },
+
     onAddAmount(amount) {
       if (
         typeof +amount === "number" &&
@@ -423,6 +516,10 @@ export default {
       } else {
         this.items.change = 0;
       }
+    },
+
+    onSelectDelivery(delivery) {
+      console.log(delivery);
     },
   },
 };

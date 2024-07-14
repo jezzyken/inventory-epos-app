@@ -10,56 +10,69 @@
         <v-toolbar-title>Sale</v-toolbar-title>
         <v-divider class="mx-4" inset vertical></v-divider>
         <v-spacer></v-spacer>
-          <v-dialog v-model="dialog" max-width="500px">
-            <template v-slot:activator="{}">
-              <v-btn color="primary" dark class="mb-2" :to="{ name: 'AddSales' }">
-                Add
-              </v-btn>
-            </template>
-            <v-card>
-              <v-card-title>
-                <span class="text-h5">{{ formTitle }}</span>
-              </v-card-title>
+        <v-dialog v-model="dialog" max-width="500px">
+          <template v-slot:activator="{}">
+            <v-btn color="primary" dark class="mb-2" :to="{ name: 'AddSales' }">
+              Add
+            </v-btn>
+          </template>
+          <v-card>
+            <v-card-title>
+              <span class="text-h5">{{ formTitle }}</span>
+            </v-card-title>
 
-              <v-card-text>
-                <v-container>
-                  <v-row>
-                    <v-col cols="12">
-                      <v-text-field v-model="editedItem.name" label="Name"></v-text-field>
-                    </v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col cols="12">
-                      <v-text-field v-model="editedItem.company" label="Company"></v-text-field>
-                    </v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col cols="12">
-                      <v-text-field v-model="editedItem.email" label="Email"></v-text-field>
-                    </v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col cols="12">
-                      <v-text-field v-model="editedItem.contactNo" label="Contact No"></v-text-field>
-                    </v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col cols="12">
-                      <v-text-field v-model="editedItem.address" label="Address"></v-text-field>
-                    </v-col>
-                  </v-row>
-                </v-container>
-              </v-card-text>
+            <v-card-text>
+              <v-container>
+                <v-row>
+                  <v-col cols="12">
+                    <v-text-field
+                      v-model="editedItem.name"
+                      label="Name"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col cols="12">
+                    <v-text-field
+                      v-model="editedItem.company"
+                      label="Company"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col cols="12">
+                    <v-text-field
+                      v-model="editedItem.email"
+                      label="Email"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col cols="12">
+                    <v-text-field
+                      v-model="editedItem.contactNo"
+                      label="Contact No"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col cols="12">
+                    <v-text-field
+                      v-model="editedItem.address"
+                      label="Address"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-card-text>
 
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="close">
-                  Cancel
-                </v-btn>
-                <v-btn color="blue darken-1" text @click="save"> Save </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" text @click="close"> Cancel </v-btn>
+              <v-btn color="blue darken-1" text @click="save"> Save </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
         <v-dialog v-model="dialogDelete" max-width="500px">
           <v-card>
             <v-card-title class="text-h5"
@@ -82,11 +95,37 @@
 
     <template v-slot:[`item.hasDelivery`]="{ item }">
       <v-chip dark color="success" small class="mr-1">
-        {{ item.hasDelivery ? 'Yes' : 'No' }}
+        {{ item.hasDelivery ? "Yes" : "No" }}
       </v-chip>
     </template>
 
     <template v-slot:[`item.actions`]="{ item }">
+      <v-menu bottom left>
+        <template v-slot:activator="{ attrs, on }">
+          <v-btn
+            v-bind="attrs"
+            v-on="on"
+            class="white--text pa-3"
+            x-small
+            color="blue-grey"
+          >
+            options <v-icon right dark> mdi-chevron-down </v-icon>
+          </v-btn>
+        </template>
+
+        <v-list>
+          <v-list-item
+            v-for="(action, i) in actions"
+            :key="i"
+            @click="handleAction(action.title, item)"
+          >
+            <v-list-item-title>{{ action.title }}</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    </template>
+
+    <!-- <template v-slot:[`item.actions`]="{ item }">
       <v-btn x-small color="primary" @click="onViewItem(item._id)">
         view
       </v-btn>
@@ -96,7 +135,7 @@
       <v-btn x-small color="error" dark @click="deleteItem(item)">
         delete
       </v-btn>
-    </template>
+    </template> -->
     <template v-slot:no-data>
       <v-btn color="primary" @click="initialize"> Reset </v-btn>
     </template>
@@ -153,6 +192,7 @@ export default {
       name: "",
     },
     itemId: null,
+    actions: [{ title: "Edit" }, { title: "Delete" }],
   }),
 
   computed: {
@@ -229,6 +269,19 @@ export default {
         await this.addItem(this.editedItem);
       }
       this.close();
+    },
+
+    handleAction(action, item) {
+      switch (action) {
+        case "Edit":
+          this.$router.push({ name: "EditSales", params: { id: item._id } });
+          break;
+        case "Delete":
+          this.deleteItem(item);
+          break;
+        default:
+          break;
+      }
     },
   },
 };

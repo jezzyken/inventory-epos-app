@@ -20,6 +20,15 @@ const actions = {
     }
   },
 
+  async getDeliveryBySalesItemId({ commit }, id) {
+    try {
+      const response = await axios.get(`${url}/${endpoint}/${id}/sales`);
+      return response.data;
+    } catch (error) {
+      return error.response;
+    }
+  },
+
   async addItem({ commit }, data) {
     try {
       const response = await axios.post(`${url}/${endpoint}`, data);
@@ -30,10 +39,13 @@ const actions = {
   },
 
   async updateItem({ commit }, data) {
+
+    console.log(data)
     try {
-      const response = await axios.put(`${url}/${endpoint}/${data._id}`, data);
+      const response = await axios.put(`${url}/${endpoint}/${data.id}`, {status: data.status});
       return response.data;
     } catch (error) {
+      console.log(error)
       return error.response;
     }
   },
