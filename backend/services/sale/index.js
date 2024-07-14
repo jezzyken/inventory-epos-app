@@ -2,6 +2,7 @@ const Models = require("../../models/Sale");
 const SalesItemModel = require("../../models/SalesItem");
 const ProductModel = require("../../models/Product");
 const ProductVariantModel = require("../../models/ProductVariant");
+const DeliveryModel = require("../../models/Delivery");
 
 const ObjectId = require("mongoose").Types.ObjectId;
 
@@ -135,11 +136,17 @@ const getById = async (id) => {
 };
 
 const add = async (req) => {
-  const { stocks } = req.body;
+  const { stocks, hasDelivery, delivery } = req.body;
 
   const sale = new Models(req.body);
 
   const savedSale = await sale.save();
+
+  if(hasDelivery){
+    const newDelivery = new DeliveryModel(delivery)
+    newDelivery.sale = sale._id
+    newDelivery.save()
+  }
 
   for (const itemData of stocks) {
     const saleItem = new SalesItemModel({
@@ -191,6 +198,8 @@ const update = async (id, data) => {
     stocks,
     customer,
     deletedItems,
+    hasDelivery,
+    delivery
   } = data;
 
   const sale = await Models.findById(id);
@@ -297,6 +306,25 @@ const update = async (id, data) => {
         }
       }
     }
+  }
+
+  if (hasDelivery) {
+    let deliveryRecord = await DeliveryModel.findOne({ sale: id });
+    if (!deliveryRecord) {
+      deliveryRecord = new DeliveryModel({
+        sale: id,
+        ...delivery 
+      });
+    } else {
+      deliveryRecord.recipientName = delivery.recipientName;
+      deliveryRecord.contactNo = delivery.contactNo;
+      deliveryRecord.address = delivery.address;
+      deliveryRecord.notes = delivery.notes;
+      deliveryRecord.deliveryDate = delivery.deliveryDate;
+      deliveryRecord.deliveryFee = delivery.deliveryFee;
+      deliveryRecord.status = delivery.status;
+    }
+    await deliveryRecord.save();
   }
   return results;
 };

@@ -11,8 +11,22 @@ const get = catchAsync(async (req, res) => {
   return res.status(200).send(data);
 });
 
-const getById = catchAsync(async (req, res) => {
+const getById = catchAsync(async (req, res, next) => {
   const result = await service.getById(req.params.id);
+
+  if (!result) {
+    return next(new AppError("No Item found with that ID", 404));
+  }
+  const data = {
+    success: true,
+    result,
+  };
+  return res.status(200).send(data);
+});
+
+const getBySalesId = catchAsync(async (req, res, next) => {
+  console.log(req.params.id);
+  const result = await service.getBySalesId(req.params.id);
 
   if (!result) {
     return next(new AppError("No Item found with that ID", 404));
@@ -34,7 +48,8 @@ const add = catchAsync(async (req, res) => {
 });
 
 const update = catchAsync(async (req, res, next) => {
-  const results = await service.update(req.params.id, req.body);
+
+  const results = await service.update(req.params.id, req.body.status);
   if (!results) {
     return next(new AppError("No Item found with that ID", 404));
   }
@@ -57,6 +72,7 @@ const remove = catchAsync(async (req, res) => {
 module.exports = {
   get,
   getById,
+  getBySalesId,
   add,
   update,
   remove,

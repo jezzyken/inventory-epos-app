@@ -6,9 +6,6 @@ const deliverySchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Sale"
     },
-    name: {
-      type: String,
-    },
     recipientName: {
       type: String,
     },
@@ -24,6 +21,9 @@ const deliverySchema = new mongoose.Schema(
     deliveryDate: {
       type: Date,
       default: Date.now()
+    },
+    deliveryFee: {
+      type: Number,
     },
     status: {
       type: String,
