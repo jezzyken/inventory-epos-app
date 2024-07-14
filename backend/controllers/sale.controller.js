@@ -34,7 +34,7 @@ const add = catchAsync(async (req, res) => {
 });
 
 const update = catchAsync(async (req, res, next) => {
-  const results = await service.update(req.params.id, req.body);
+  const results = await service.update(req.params.id, req.body.data);
   if (!results) {
     return next(new AppError("No Item found with that ID", 404));
   }

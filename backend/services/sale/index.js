@@ -179,9 +179,125 @@ const add = async (req) => {
 };
 
 const update = async (id, data) => {
-  const results = await Models.findByIdAndUpdate(id, data, {
-    new: true,
-  });
+  const {
+    date,
+    amountReceived,
+    discount,
+    salesTotal,
+    paymentType,
+    change,
+    grandTotal,
+    notes,
+    stocks,
+    customer,
+    deletedItems,
+  } = data;
+
+  const sale = await Models.findById(id);
+
+  sale.date = date;
+  sale.amountReceived = amountReceived;
+  sale.discount = discount;
+  sale.salesTotal = salesTotal;
+  sale.paymentType = paymentType;
+  sale.change = change;
+  sale.grandTotal = grandTotal;
+  sale.notes = notes;
+  sale.customer = customer;
+
+  const results = await sale.save();
+
+  if (deletedItems && deletedItems.length > 0) {
+    for (const itemId of deletedItems) {
+      const saleItem = await SalesItemModel.findById(itemId);
+      if (saleItem) {
+        const previousQuantity = saleItem.quantity;
+
+        if (saleItem.variant) {
+          const variant = await ProductVariantModel.findById(saleItem.variant);
+          if (variant) {
+            variant.stocks += previousQuantity;
+            await variant.save();
+          }
+        } else {
+          const product = await ProductModel.findById(saleItem.product);
+          if (product) {
+            product.stocks += previousQuantity;
+            await product.save();
+          }
+        }
+
+        await SalesItemModel.findByIdAndDelete(itemId);
+      }
+    }
+  }
+
+  for (const stockData of stocks) {
+    const stockItemId = stockData.items_id;
+    const quantity = stockData.quantity;
+    const subTotal = stockData.subTotal;
+
+    let stockItem;
+    let previousQuantity = 0;
+    let currentQuantity = quantity;
+
+    if (stockItemId) {
+      stockItem = await SalesItemModel.findById(stockItemId);
+      if (!stockItem) {
+        throw new Error(`StockItem with ID ${stockItemId} not found`);
+      }
+      previousQuantity = stockItem.quantity;
+      stockItem.quantity = quantity;
+      stockItem.subTotal = subTotal;
+      await stockItem.save();
+
+      currentQuantity = quantity;
+    } else {
+      stockItem = new SalesItemModel({
+        product: stockData.product,
+        variant: stockData.variant,
+        sale: id,
+        quantity: stockData.quantity,
+        subTotal: stockData.subTotal,
+      });
+      await stockItem.save();
+    }
+
+    if (previousQuantity !== currentQuantity) {
+      const quantityChange = currentQuantity - previousQuantity;
+
+      if (stockData.variant) {
+        const variant = await ProductVariantModel.findById(stockData.variant);
+        if (variant) {
+          if (quantityChange > 0) {
+            variant.stocks -= Math.abs(quantityChange);
+          } else {
+            variant.stocks += Math.abs(quantityChange);
+          }
+          await variant.save();
+
+          const product = await ProductModel.findById(stockData.product);
+          if (product) {
+            const variants = await ProductVariantModel.find({
+              _id: { $in: product.variants },
+            });
+            product.stocks = variants.reduce((acc, v) => acc + v.stocks, 0);
+            await product.save();
+          }
+        }
+      } else {
+        const product = await ProductModel.findById(stockData.product);
+        if (product) {
+          if (quantityChange > 0) {
+            product.stocks -= Math.abs(quantityChange);
+          } else {
+            product.stocks += Math.abs(quantityChange);
+          }
+          await product.save();
+        }
+      }
+    }
+  }
   return results;
 };
 
