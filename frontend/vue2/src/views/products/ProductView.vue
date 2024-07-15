@@ -215,11 +215,6 @@ export default {
         align: "start",
         value: "type",
       },
-      // {
-      //   text: "Quantity",
-      //   align: "start",
-      //   value: "stocksQuantity",
-      // },
       { text: "Actions", value: "actions", sortable: false },
     ],
     items: [],
