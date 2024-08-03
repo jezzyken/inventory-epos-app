@@ -11,18 +11,18 @@
 </template>
 
 <script>
-
-import AppBar from './AppBar.vue';
-import Drawer from './Drawer.vue';
+import AppBar from "./AppBar.vue";
+import Drawer from "./Drawer.vue";
 export default {
   name: "DashboardView",
   components: {
-    AppBar, Drawer
+    AppBar,
+    Drawer,
   },
-}
+};
 </script>
 <style scoped>
-.main-container{
+.main-container {
   margin: 20px;
 }
 </style>
