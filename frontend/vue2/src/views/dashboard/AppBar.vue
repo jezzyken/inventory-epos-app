@@ -1,26 +1,28 @@
 <template>
-  <v-app-bar app>
+  <v-app-bar app color="white">
     <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
     <v-toolbar-title>{{ capitalizedRouteName }}</v-toolbar-title>
+    <v-spacer></v-spacer>
+    <v-btn v-if="isAuthenticated" @click="logout" text
+      ><v-icon dark> mdi-logout-variant </v-icon></v-btn
+    >
   </v-app-bar>
 </template>
+
 <script>
-import { mapMutations, mapState } from "vuex";
+import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 
 export default {
   name: "AppBar",
-  data() {
-    return {};
-  },
   computed: {
-    ...mapState(["drawer"]),
-    drawer: {
-      get() {
-        return this.$store.state.drawer;
-      },
-      set(val) {
-        this.$store.commit("SET_DRAWER", val);
-      },
+    ...mapState({
+      drawer: (state) => state.drawer,
+    }),
+    ...mapGetters("auth", ["isAuthenticated", "user"]),
+    userName() {
+      return this.user && (this.user.fname || this.user.lname)
+        ? `${this.user.fname} ${this.user.lname}`
+        : "";
     },
     capitalizedRouteName() {
       if (this.$route.name) {
@@ -33,6 +35,7 @@ export default {
     },
   },
   methods: {
+    ...mapActions("auth", ["logout"]),
     ...mapMutations({
       setDrawer: "SET_DRAWER",
     }),
