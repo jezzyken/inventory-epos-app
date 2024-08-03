@@ -6,13 +6,14 @@
       :headers="headers"
       :items="items"
       :loading="isLoading"
-      sort-by="calories"
       class="elevation-1 mt-4"
+      :search="search"
     >
       <template v-slot:top>
         <v-toolbar flat>
           <div style="width: 400px">
             <v-text-field
+              v-model="search"
               filled
               rounded
               dense
@@ -238,11 +239,11 @@ export default {
     showFuck: false,
     selectedItems: {},
     actions: [
-      { title: "View" },
       { title: "Product History" },
       { title: "Edit" },
       { title: "Delete" },
     ],
+    search: "",
   }),
 
   computed: {

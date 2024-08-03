@@ -87,6 +87,7 @@
             :items="type"
             label="Type"
             outlined
+            :disabled="pageMode.label === 'update'"
           ></v-select>
         </v-col>
         <v-col cols="12" md="3">
@@ -108,6 +109,7 @@
             v-model="items.stocks"
             label="Intial Stocks"
             outlined
+            :disabled="pageMode.label === 'update'"
           ></v-text-field>
         </v-col>
       </v-row>
@@ -116,7 +118,8 @@
     <v-sheet elevation="1" class="pa-5 mt-5" v-if="items.type === 'Variants'">
       <p class="text-button">Variant Information</p>
       <v-divider class="mb-5" />
-      <v-row>
+
+      <v-row v-show="pageMode.label !== 'update'">
         <v-col cols="12" md="5">
           <!-- v-model="items.variant" optional model-->
           <v-select
@@ -185,19 +188,20 @@
         <v-col cols="12" md="3">
           <v-row>
             <v-col cols="6">
-            <v-text-field
-              v-model="variants.stocks"
-              label="Initial Stocks"
-              outlined
-            ></v-text-field>
-          </v-col>
-          <v-col cols="6">
-            <v-text-field
-              v-model="variants.stockAlert"
-              label="Stock Alert"
-              outlined
-            ></v-text-field>
-          </v-col>
+              <v-text-field
+                v-model="variants.stocks"
+                label="Initial Stockss"
+                outlined
+                :disabled="pageMode.label === 'update'"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="6">
+              <v-text-field
+                v-model="variants.stockAlert"
+                label="Stock Alert"
+                outlined
+              ></v-text-field>
+            </v-col>
           </v-row>
         </v-col>
       </v-row>
@@ -215,7 +219,6 @@
 
 <script>
 /*eslint-disable */
-import variant from "@/store/modules/variant";
 import { mapActions } from "vuex";
 
 export default {
@@ -241,6 +244,7 @@ export default {
       chips: "",
       variationAttributes: [],
       isLoadingVariant: false,
+      test: "sample data",
     };
   },
   computed: {

@@ -257,7 +257,6 @@
 
 <script>
 /*eslint-disable */
-import delivery from "@/store/modules/delivery";
 import { mapActions } from "vuex";
 
 export default {
@@ -531,6 +530,7 @@ export default {
   display: flex !important;
   align-items: center !important;
 }
+
 .outside-bordered-table {
   border: 1px solid rgba(0, 0, 0, 0.12);
 }
