@@ -1,15 +1,38 @@
 <template>
   <v-container>
-    <v-data-table :headers="headers" :items="desserts" sort-by="calories" class="elevation-1">
+    <v-data-table
+      :headers="headers"
+      :items="desserts"
+      sort-by="calories"
+      class="elevation-1 mt-n2"
+      :loading="isLoading"
+      :search="search"
+    >
       <template v-slot:top>
         <v-toolbar flat>
-          <v-toolbar-title>Unit</v-toolbar-title>
-          <v-divider class="mx-4" inset vertical></v-divider>
+          <div style="width: 400px">
+            <v-text-field
+              v-model="search"
+              filled
+              rounded
+              dense
+              hide-details
+              placeholder="Search"
+              append-icon="mdi-filter-variant"
+            ></v-text-field>
+          </div>
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog" max-width="500px">
             <template v-slot:activator="{ on, attrs }">
-              <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
-                Add
+              <v-btn
+                color="primary"
+                dark
+                class="mb-2"
+                small
+                v-bind="attrs"
+                v-on="on"
+              >
+                new
               </v-btn>
             </template>
             <v-card>
@@ -21,7 +44,10 @@
                 <v-container>
                   <v-row>
                     <v-col cols="12">
-                      <v-text-field v-model="editedItem.name" label="Brand Name"></v-text-field>
+                      <v-text-field
+                        v-model="editedItem.name"
+                        label="Unit Name"
+                      ></v-text-field>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -38,11 +64,17 @@
           </v-dialog>
           <v-dialog v-model="dialogDelete" max-width="500px">
             <v-card>
-              <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
+              <v-card-title class="text-h5"
+                >Are you sure you want to delete this item?</v-card-title
+              >
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
-                <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+                <v-btn color="blue darken-1" text @click="closeDelete"
+                  >Cancel</v-btn
+                >
+                <v-btn color="blue darken-1" text @click="deleteItemConfirm"
+                  >OK</v-btn
+                >
                 <v-spacer></v-spacer>
               </v-card-actions>
             </v-card>
@@ -76,7 +108,7 @@ export default {
     dialogDelete: false,
     headers: [
       {
-        text: "Brand",
+        text: "Unit Name",
         align: "start",
         sortable: false,
         value: "name",
@@ -91,7 +123,9 @@ export default {
     defaultItem: {
       name: "",
     },
-    itemId: null
+    itemId: null,
+    search: "",
+    isLoading: false,
   }),
 
   computed: {
@@ -115,15 +149,17 @@ export default {
 
   methods: {
     ...mapActions({
-      "getItems": "unit/getItem",
-      "addItem": "unit/addItem",
-      "removeItem": "unit/deleteItem",
-      "updateItem": "unit/updateItem",
+      getItems: "unit/getItem",
+      addItem: "unit/addItem",
+      removeItem: "unit/deleteItem",
+      updateItem: "unit/updateItem",
     }),
 
     async initialize() {
-      const results = await this.getItems()
-      this.desserts = results.result
+      this.isLoading = true;
+      const results = await this.getItems();
+      this.desserts = results.result;
+      this.isLoading = false;
     },
 
     editItem(item) {
@@ -134,13 +170,13 @@ export default {
 
     deleteItem(item) {
       this.editedIndex = this.desserts.indexOf(item);
-      this.itemId = item._id
+      this.itemId = item._id;
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
 
     async deleteItemConfirm() {
-      await this.removeItem(this.itemId)
+      await this.removeItem(this.itemId);
       this.desserts.splice(this.editedIndex, 1);
       this.closeDelete();
     },
@@ -164,10 +200,10 @@ export default {
     async save() {
       if (this.editedIndex > -1) {
         Object.assign(this.desserts[this.editedIndex], this.editedItem);
-        await this.updateItem(this.editedItem)
+        await this.updateItem(this.editedItem);
       } else {
         this.desserts.push(this.editedItem);
-        await this.addItem(this.editedItem)
+        await this.addItem(this.editedItem);
       }
       this.close();
     },

@@ -1,15 +1,37 @@
 <template>
-  <div>
-    <v-data-table :headers="headers" :items="items" sort-by="calories" class="elevation-1">
+  <v-container>
+    <v-data-table
+      :headers="headers"
+      :items="items"
+      class="elevation-1 mt-n2"
+      :loading="isLoading"
+      :search="search"
+    >
       <template v-slot:top>
         <v-toolbar flat>
-          <v-toolbar-title>Variants</v-toolbar-title>
-          <v-divider class="mx-4" inset vertical></v-divider>
+          <div style="width: 400px">
+            <v-text-field
+              v-model="search"
+              filled
+              rounded
+              dense
+              hide-details
+              placeholder="Search"
+              append-icon="mdi-filter-variant"
+            ></v-text-field>
+          </div>
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog" max-width="500px">
             <template v-slot:activator="{ on, attrs }">
-              <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
-                Add
+              <v-btn
+                color="primary"
+                dark
+                class="mb-2"
+                small
+                v-bind="attrs"
+                v-on="on"
+              >
+                new
               </v-btn>
             </template>
             <v-card>
@@ -21,14 +43,31 @@
                 <v-container>
                   <v-row>
                     <v-col cols="12">
-                      <v-text-field v-model="editedItem.name" label="Variant Name" outlined></v-text-field>
+                      <v-text-field
+                        v-model="editedItem.name"
+                        label="Variant Name"
+                        outlined
+                      ></v-text-field>
                     </v-col>
                     <v-col cols="12">
-                      <v-combobox v-model="editedItem.values" chips clearable label="Enter variant items" multiple
-                        outlined>
-                        <template v-slot:selection="{ attrs, item, select, selected }">
-                          <v-chip v-bind="attrs" :input-value="selected" close @click="select"
-                            @click:close="remove(item)">
+                      <v-combobox
+                        v-model="editedItem.values"
+                        chips
+                        clearable
+                        label="Enter variant items"
+                        multiple
+                        outlined
+                      >
+                        <template
+                          v-slot:selection="{ attrs, item, select, selected }"
+                        >
+                          <v-chip
+                            v-bind="attrs"
+                            :input-value="selected"
+                            close
+                            @click="select"
+                            @click:close="remove(item)"
+                          >
                             <strong>{{ item }}</strong>
                           </v-chip>
                         </template>
@@ -37,7 +76,12 @@
                       <!-- <v-text-field v-model="editedItem.name" label="Items"></v-text-field> -->
                     </v-col>
                     <v-col cols="12">
-                      <v-select v-model="editedItem.isActive" :items="status" label="Status" outlined></v-select>
+                      <v-select
+                        v-model="editedItem.isActive"
+                        :items="status"
+                        label="Status"
+                        outlined
+                      ></v-select>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -54,11 +98,17 @@
           </v-dialog>
           <v-dialog v-model="dialogDelete" max-width="500px">
             <v-card>
-              <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
+              <v-card-title class="text-h5"
+                >Are you sure you want to delete this item?</v-card-title
+              >
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
-                <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+                <v-btn color="blue darken-1" text @click="closeDelete"
+                  >Cancel</v-btn
+                >
+                <v-btn color="blue darken-1" text @click="deleteItemConfirm"
+                  >OK</v-btn
+                >
                 <v-spacer></v-spacer>
               </v-card-actions>
             </v-card>
@@ -79,7 +129,7 @@
         <v-btn color="primary" @click="initialize"> Reset </v-btn>
       </template>
     </v-data-table>
-  </div>
+  </v-container>
 </template>
 
 <script>
@@ -125,6 +175,8 @@ export default {
     },
     itemId: null,
     status: ["Active", "Disable"],
+    search: "",
+    isLoading: false,
   }),
 
   computed: {
@@ -155,13 +207,13 @@ export default {
     }),
 
     async initialize() {
+      this.isLoading = true;
       const response = await this.getItems();
       this.items = response.result.map((item) => ({
         ...item,
         isActive: item.isActive ? "Active" : "Disable",
       }));
-
-      console.log(response.result);
+      this.isLoading = false;
     },
 
     editItem(item) {

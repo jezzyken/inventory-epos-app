@@ -81,7 +81,7 @@ export default {
           {
             action: "mdi-contacts",
             items: [
-              { title: "Customer", route: "/customer" },
+              // { title: "Customer", route: "/customer" },
               { title: "Supplier", route: "/supplier" },
             ],
             title: "Contacts",

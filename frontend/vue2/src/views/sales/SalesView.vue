@@ -2,18 +2,34 @@
   <v-data-table
     :headers="headers"
     :items="desserts"
-    sort-by="calories"
-    class="elevation-1"
+    :loading="isLoading"
+    class="elevation-1 mt-4"
+    :search="search"
   >
     <template v-slot:top>
       <v-toolbar flat>
-        <v-toolbar-title>Sale</v-toolbar-title>
-        <v-divider class="mx-4" inset vertical></v-divider>
+        <div style="width: 400px">
+          <v-text-field
+            v-model="search"
+            filled
+            rounded
+            dense
+            hide-details
+            placeholder="Search"
+            append-icon="mdi-filter-variant"
+          ></v-text-field>
+        </div>
         <v-spacer></v-spacer>
         <v-dialog v-model="dialog" max-width="500px">
           <template v-slot:activator="{}">
-            <v-btn color="primary" dark class="mb-2" :to="{ name: 'AddSales' }">
-              Add
+            <v-btn
+              color="primary"
+              dark
+              class="mb-2"
+              :to="{ name: 'AddSales' }"
+              small
+            >
+              new
             </v-btn>
           </template>
           <v-card>
@@ -193,6 +209,8 @@ export default {
     },
     itemId: null,
     actions: [{ title: "Edit" }, { title: "Delete" }],
+    isLoading: false,
+    search: "",
   }),
 
   computed: {

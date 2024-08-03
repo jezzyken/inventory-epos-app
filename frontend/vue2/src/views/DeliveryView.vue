@@ -8,8 +8,9 @@
     <v-data-table
       :headers="headers"
       :items="desserts"
-      sort-by="calories"
-      class="elevation-1"
+      :loading="isLoading"
+      class="elevation-1 mt-4"
+      :search="search"
     >
       <template v-slot:[`item.status`]="{ item }">
         <v-chip
@@ -29,12 +30,28 @@
 
       <template v-slot:top>
         <v-toolbar flat>
-          <v-toolbar-title>Delivery</v-toolbar-title>
-          <v-divider class="mx-4" inset vertical></v-divider>
+          <div style="width: 400px">
+            <v-text-field
+              v-model="search"
+              filled
+              rounded
+              dense
+              hide-details
+              placeholder="Search"
+              append-icon="mdi-filter-variant"
+            ></v-text-field>
+          </div>
           <v-spacer></v-spacer>
           <template v-slot:activator="{ on, attrs }">
-            <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
-              Add
+            <v-btn
+              color="primary"
+              dark
+              class="mb-2"
+              v-bind="attrs"
+              v-on="on"
+              small
+            >
+              new
             </v-btn>
           </template>
           <v-dialog v-model="dialogDelete" max-width="500px">
@@ -56,16 +73,6 @@
           </v-dialog>
         </v-toolbar>
       </template>
-      <!-- 
-      <template v-slot:[`item.actions`]="{ item }">
-        <v-btn x-small color="warning" @click="editItem(item)"> view </v-btn>
-
-        <span class="mr-1"></span>
-
-        <v-btn x-small color="error" dark @click="deleteItem(item)">
-          delete
-        </v-btn>
-      </template> -->
 
       <template v-slot:[`item.actions`]="{ item }">
         <v-menu bottom left>
@@ -162,6 +169,8 @@ export default {
     itemId: null,
     selectedItems: {},
     actions: [{ title: "View" }, { title: "Delete" }],
+    isLoading: false,
+    search: "",
   }),
 
   computed: {
