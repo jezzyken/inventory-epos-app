@@ -1,13 +1,38 @@
 <template>
   <v-container v-if="!isLoading">
     <v-sheet elevation="1" class="pa-5">
+      <p class="text-button">Product Information</p>
+      <v-divider class="mb-5" />
       <v-row>
         <v-col cols="12" md="6">
-          <v-text-field
-            v-model="items.date"
-            label="Date"
-            outlined
-          ></v-text-field>
+          <v-menu
+            ref="menu1"
+            v-model="menu"
+            :close-on-content-click="false"
+            :return-value.sync="items.date"
+            transition="scale-transition"
+            offset-y
+            min-width="auto"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-model="items.date"
+                label="Date"
+                prepend-inner-icon="mdi-calendar"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+                outlined
+              ></v-text-field>
+            </template>
+            <v-date-picker v-model="items.date" no-title scrollable>
+              <v-spacer></v-spacer>
+              <v-btn text color="primary" @click="menu = false"> Cancel </v-btn>
+              <v-btn text color="primary" @click="$refs.menu1.save(items.date)">
+                OK
+              </v-btn>
+            </v-date-picker>
+          </v-menu>
         </v-col>
         <v-col cols="12" md="6">
           <v-text-field
@@ -17,17 +42,25 @@
           ></v-text-field>
         </v-col>
         <v-col cols="12">
-          <v-radio-group
-            v-model="items.hasDelivery"
-            row
-            @change="onSelectDelivery(items.hasDelivery)"
-          >
-            <v-radio label="Yes" :value="true"></v-radio>
-            <v-radio label="No" :value="false"></v-radio>
-          </v-radio-group>
+          <div class="d-flex">
+            <span class="align-self-center mr-3">Has Delivery:</span>
+
+            <v-radio-group
+              v-model="items.hasDelivery"
+              row
+              @change="onSelectDelivery(items.hasDelivery)"
+            >
+              <v-radio label="Yes" :value="true"></v-radio>
+              <v-radio label="No" :value="false"></v-radio>
+            </v-radio-group>
+          </div>
         </v-col>
 
         <div v-if="items.hasDelivery">
+          <div class="pa-5">
+            <p class="text-button">Product Information</p>
+            <v-divider class="mb-5" />
+          </div>
           <v-row class="pa-4">
             <v-col cols="4">
               <v-text-field
@@ -44,11 +77,44 @@
               ></v-text-field>
             </v-col>
             <v-col cols="4">
-              <v-text-field
-                v-model="items.delivery.deliveryDate"
-                label="Delivery Date"
-                outlined
-              ></v-text-field>
+              <v-menu
+                ref="menu2"
+                v-model="deliveryDateMenu"
+                :close-on-content-click="false"
+                :return-value.sync="items.delivery.deliveryDate"
+                transition="scale-transition"
+                offset-y
+                min-width="auto"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                    v-model="items.delivery.deliveryDate"
+                    label="Delivery Date"
+                    prepend-inner-icon="mdi-calendar"
+                    readonly
+                    v-bind="attrs"
+                    v-on="on"
+                    outlined
+                  ></v-text-field>
+                </template>
+                <v-date-picker
+                  v-model="items.delivery.deliveryDate"
+                  no-title
+                  scrollable
+                >
+                  <v-spacer></v-spacer>
+                  <v-btn text color="primary" @click="deliveryDateMenu = false">
+                    Cancel
+                  </v-btn>
+                  <v-btn
+                    text
+                    color="primary"
+                    @click="$refs.menu2.save(items.delivery.deliveryDate)"
+                  >
+                    OK
+                  </v-btn>
+                </v-date-picker>
+              </v-menu>
             </v-col>
             <v-col cols="8">
               <v-text-field
@@ -93,6 +159,8 @@
     </v-sheet>
 
     <v-sheet elevation="1" class="pa-5 mt-5">
+      <p class="text-button">Sales</p>
+      <v-divider class="mb-5" />
       <v-simple-table>
         <template v-slot:default>
           <thead>
@@ -258,6 +326,7 @@
 <script>
 /*eslint-disable */
 import { mapActions } from "vuex";
+import moment from "moment";
 
 export default {
   props: {
@@ -267,8 +336,17 @@ export default {
     return {
       items: {
         hasDelivery: null,
-        delivery: {},
+        delivery: {
+          deliveryDate: new Date(
+            Date.now() - new Date().getTimezoneOffset() * 60000
+          )
+            .toISOString()
+            .substr(0, 10),
+        },
         stocks: [],
+        date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+          .toISOString()
+          .substr(0, 10),
       },
       isLoading: false,
       category: [],
@@ -284,6 +362,8 @@ export default {
       productId: null,
       payment: ["Cash", "Dedit"],
       deleteItemId: [],
+      menu: false,
+      deliveryDateMenu: false,
     };
   },
 
@@ -368,6 +448,11 @@ export default {
 
         if (deliveryResponse.result.length > 0) {
           const delivery = deliveryResponse.result[0];
+          if (delivery.deliveryDate) {
+            delivery.deliveryDate = moment(delivery.deliveryDate).format(
+              "YYYY-MM-DD"
+            );
+          }
           Object.assign(this.items.delivery, delivery);
         }
 
@@ -386,7 +471,15 @@ export default {
           "customer",
         ];
         saleFields.forEach((field) => {
-          this.$set(this.items, field, sale[field]);
+          if (field === "date") {
+            this.$set(
+              this.items,
+              field,
+              moment(sale[field]).format("YYYY-MM-DD")
+            );
+          } else {
+            this.$set(this.items, field, sale[field]);
+          }
         });
 
         this.items.stocks = sale.items.map((item) => {

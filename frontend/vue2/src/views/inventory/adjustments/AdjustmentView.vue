@@ -113,19 +113,29 @@
       </template>
 
       <template v-slot:[`item.actions`]="{ item }">
-        <v-btn
-          x-small
-          color="warning"
-          :to="{ name: 'EditAdjustment', params: { id: item._id } }"
-        >
-          edit
-        </v-btn>
+        <v-menu bottom left>
+          <template v-slot:activator="{ attrs, on }">
+            <v-btn
+              v-bind="attrs"
+              v-on="on"
+              class="white--text pa-3"
+              x-small
+              color="blue-grey"
+            >
+              options <v-icon right dark> mdi-chevron-down </v-icon>
+            </v-btn>
+          </template>
 
-        <span class="mr-1"></span>
-
-        <v-btn x-small color="error" dark @click="deleteItem(item)">
-          delete
-        </v-btn>
+          <v-list>
+            <v-list-item
+              v-for="(action, i) in actions"
+              :key="i"
+              @click="handleAction(action.title, item)"
+            >
+              <v-list-item-title>{{ action.title }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </template>
       <template v-slot:no-data>
         <v-btn color="primary" @click="initialize"> Reset </v-btn>
@@ -137,6 +147,7 @@
 <script>
 /*eslint-disable*/
 import { mapActions } from "vuex";
+import moment from "moment";
 
 export default {
   data: () => ({
@@ -186,6 +197,7 @@ export default {
     itemId: null,
     isLoading: false,
     search: "",
+    actions: [{ title: "Edit" }, { title: "Delete" }],
   }),
 
   computed: {
@@ -211,15 +223,18 @@ export default {
   methods: {
     ...mapActions({
       getItems: "adjustment/getItem",
-      addItem: "stock/addItem",
-      removeItem: "stock/deleteItem",
-      updateItem: "stock/updateItem",
+      addItem: "adjustment/addItem",
+      removeItem: "adjustment/deleteItem",
+      updateItem: "adjustment/updateItem",
     }),
 
     async initialize() {
       this.isLoading = true;
       const results = await this.getItems();
-      this.desserts = results.result;
+      this.desserts = results.result.map((item) => ({
+        ...item,
+        date: moment(item.date).format("YYYY-MM-DD"),
+      }));
       this.isLoading = false;
     },
 
@@ -267,6 +282,22 @@ export default {
         await this.addItem(this.editedItem);
       }
       this.close();
+    },
+
+    handleAction(action, item) {
+      switch (action) {
+        case "Edit":
+          this.$router.push({
+            name: "EditAdjustment",
+            params: { id: item._id },
+          });
+          break;
+        case "Delete":
+          this.deleteItem(item);
+          break;
+        default:
+          break;
+      }
     },
   },
 };

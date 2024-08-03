@@ -1,4 +1,6 @@
 <template>
+  <!-- src="https://cdn.vuetifyjs.com/images/backgrounds/bg-2.jpg" -->
+
   <v-navigation-drawer v-model="$store.state.drawer" dark class="nav-bg" app>
     <DrawerListVue />
   </v-navigation-drawer>
@@ -11,33 +13,20 @@ export default {
   name: "AppDrawer",
   components: { DrawerListVue },
   data() {
-    return {};
+    return {
+      imageUrl: "https://cdn.vuetifyjs.com/images/backgrounds/bg-2.jpg",
+    };
   },
 };
 </script>
 
 <style scoped>
 .nav-bg {
-  background: hsla(333, 100%, 53%, 1);
-
+  background: rgb(36, 36, 79);
   background: linear-gradient(
-    270deg,
-    hsla(333, 100%, 53%, 1) 0%,
-    hsla(33, 94%, 57%, 1) 100%
+    0deg,
+    rgba(36, 36, 79, 1) 5%,
+    rgba(15, 49, 196, 1) 96%
   );
-
-  background: -moz-linear-gradient(
-    270deg,
-    hsla(333, 100%, 53%, 1) 0%,
-    hsla(33, 94%, 57%, 1) 100%
-  );
-
-  background: -webkit-linear-gradient(
-    270deg,
-    hsla(333, 100%, 53%, 1) 0%,
-    hsla(33, 94%, 57%, 1) 100%
-  );
-
-  filter: progid: DXImageTransform.Microsoft.gradient( startColorstr="#FF0F7B", endColorstr="#F89B29", GradientType=1 );
 }
 </style>

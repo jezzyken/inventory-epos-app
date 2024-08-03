@@ -111,6 +111,7 @@
 /*eslint-disable*/
 import { mapActions } from "vuex";
 import ViewDeliveryDialog from "@/components/products/ViewDeliveryDialog.vue";
+import moment from "moment";
 
 export default {
   components: {
@@ -202,8 +203,11 @@ export default {
 
     async initialize() {
       const results = await this.getItems();
-      this.desserts = results.result;
-      console.log("clicked me");
+      console.log(results);
+      this.desserts = results.result.map((item) => ({
+        ...item,
+        deliveryDate: moment(item.deliveryDate).format("YYYY-MM-DD"),
+      }));
     },
 
     editItem(item) {

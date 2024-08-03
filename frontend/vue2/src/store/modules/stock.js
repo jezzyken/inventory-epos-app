@@ -43,14 +43,18 @@ const actions = {
       const response = await axios.post(`${url}/${endpoint}`, data);
       return response.data;
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return error.response;
     }
   },
 
   async updateItem({ commit }, data) {
+    console.log(data);
     try {
-      const response = await axios.put(`${url}/${endpoint}/${data.id}`, data.data);
+      const response = await axios.put(
+        `${url}/${endpoint}/${data.id}`,
+        data.data
+      );
       return response.data;
     } catch (error) {
       return error.response;
