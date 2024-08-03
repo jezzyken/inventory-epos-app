@@ -1,17 +1,41 @@
 <template>
   <v-container v-if="!isLoading">
-    <!-- <div v-if="mode === 'add'"> -->
     <v-sheet elevation="1" class="pa-5">
+      <p class="text-button">Product Information</p>
+      <v-divider class="mb-5" />
       <v-row>
         <v-col cols="12" md="6">
-          <v-text-field
-            v-model="items.date"
-            label="Date"
-            outlined
-          ></v-text-field>
+          <v-menu
+            ref="menu"
+            v-model="menu"
+            :close-on-content-click="false"
+            :return-value.sync="items.date"
+            transition="scale-transition"
+            offset-y
+            min-width="auto"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-model="items.date"
+                label="Date"
+                prepend-inner-icon="mdi-calendar"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+                outlined
+              ></v-text-field>
+            </template>
+            <v-date-picker v-model="items.date" no-title scrollable>
+              <v-spacer></v-spacer>
+              <v-btn text color="primary" @click="menu = false"> Cancel </v-btn>
+              <v-btn text color="primary" @click="$refs.menu.save(items.date)">
+                OK
+              </v-btn>
+            </v-date-picker>
+          </v-menu>
         </v-col>
-        <v-col cols="12" md="6">
-          <v-select
+        <!-- <v-col cols="12" md="6"> -->
+        <!-- <v-select
             v-model="items.supplier"
             label="Supplier"
             :items="suppliers"
@@ -19,11 +43,11 @@
             item-value="_id"
             return-object
             outlined
-          ></v-select>
-        </v-col>
-        <v-col cols="12">
+          ></v-select> -->
+        <!-- </v-col> -->
+        <v-col cols="6">
           <div class="d-flex">
-            <v-select
+            <v-autocomplete
               v-model="items.product"
               label="Products"
               :items="products"
@@ -32,13 +56,15 @@
               outlined
               @change="onSelectItem"
               return-object
-            ></v-select>
+            ></v-autocomplete>
           </div>
         </v-col>
       </v-row>
     </v-sheet>
 
     <v-sheet elevation="1" class="pa-5 mt-5">
+      <p class="text-button">Stocks</p>
+      <v-divider class="mb-5" />
       <v-simple-table>
         <template v-slot:default>
           <thead>
@@ -46,7 +72,7 @@
               <th class="text-left">Product</th>
               <th class="text-left">Stocks</th>
               <th class="text-center">Quantity</th>
-              <th class="text-left">Supplier</th>
+              <!-- <th class="text-left">Supplier</th> -->
               <th class="text-left">Actions</th>
             </tr>
           </thead>
@@ -77,7 +103,7 @@
                   </v-btn>
                 </div>
               </td>
-              <td class="pa-5">
+              <!-- <td class="pa-5">
                 <div style="width: 80%">
                   <v-select
                     v-model="stock.supplier"
@@ -89,7 +115,7 @@
                     hide-details
                   ></v-select>
                 </div>
-              </td>
+              </td> -->
               <td>
                 <v-btn dark color="error" small @click="onDeleteItem(stock, i)">
                   <v-icon>mdi-trash-can-outline</v-icon>
@@ -134,6 +160,7 @@
 <script>
 /*eslint-disable */
 import { mapActions } from "vuex";
+import moment from "moment";
 
 export default {
   props: {
@@ -143,6 +170,9 @@ export default {
     return {
       items: {
         stocks: [],
+        date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+          .toISOString()
+          .substr(0, 10),
       },
       isLoading: false,
       category: [],
@@ -159,6 +189,7 @@ export default {
       productId: null,
       status: ["Pending", "Completed"],
       deleteItemId: [],
+      menu: false,
     };
   },
   computed: {
@@ -204,23 +235,22 @@ export default {
 
       this.items.status = status;
       this.items.notes = notes;
-      this.items.date = date;
-
+      this.items.date = moment(date).format("YYYY-MM-DD");
 
       for (let item of items) {
         const data = {
           name: item.product.name,
           quantity: item.quantity,
           availableStocks: item.product.stocks,
-          supplier: item.supplier._id,
+          // supplier: item.supplier._id,
           product: item.product._id,
           items_id: item.item_id,
         };
 
         if (item.product.type === "Variants") {
           data.variant = item.variant._id;
-          data.name = `${item.product.name}-${item.variant.name}`
-          data.availableStocks = item.variant.stocks
+          data.name = `${item.product.name}-${item.variant.name}`;
+          data.availableStocks = item.variant.stocks;
         }
 
         this.items.stocks.push(data);
@@ -230,18 +260,30 @@ export default {
     },
 
     async onSelectItem(item) {
-      const data = {
-        product: item._id,
-        supplier: this.items.supplier._id,
-        name: item.name,
-        availableStocks: item.availableStocks,
-      };
+      const existingItem = this.items.stocks.find((stock) =>
+        item.type === "Variants"
+          ? stock.product === item._id && stock.variant === item.variants._id
+          : stock.product === item._id
+      );
 
-      if (item.type === "Variants") {
-        data.variant = item.variants._id;
+      console.log(existingItem);
+
+      if (!existingItem) {
+        const data = {
+          product: item._id,
+          // supplier: this.items.supplier._id,
+          name: item.name,
+          availableStocks: item.stocks,
+        };
+
+        if (item.type === "Variants") {
+          data.variant = item.variants._id;
+          data.name = item.name;
+          data.availableStocks = item.variants.stocks;
+        }
+
+        this.items.stocks.push(data);
       }
-
-      this.items.stocks.push(data);
     },
 
     async onAddItem() {
@@ -251,6 +293,7 @@ export default {
         status: this.items.status,
         stocks: this.items.stocks,
       };
+
       await this.addItem(data);
       this.$router.push("/stock");
     },
@@ -263,9 +306,10 @@ export default {
           notes: this.items.notes,
           status: this.items.status,
           stocks: this.items.stocks,
-          deletedItems: this.deleteItemId
+          deletedItems: this.deleteItemId,
         },
       };
+
       await this.updateItem(data);
       this.$router.push("/stock");
     },
@@ -280,9 +324,9 @@ export default {
     },
 
     async fetch() {
-      const suppliers = await this.getSupplierItems();
+      // const suppliers = await this.getSupplierItems();
       const products = await this.getProductItems();
-      this.suppliers = suppliers.result;
+      // this.suppliers = suppliers.result;
       this.products = products.result.map((product) => {
         if (product.type === "Variants") {
           product.name = `${product.name}-${product.variants.name}`;
@@ -291,6 +335,7 @@ export default {
         return product;
       });
 
+      console.log(this.products);
     },
   },
 };

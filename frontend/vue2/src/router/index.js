@@ -19,13 +19,13 @@ const routes = [
         path: "/product/add",
         name: "AddProduct",
         component: () => import("@/views/products/ProductForm"),
-        props: { mode: 'add' }
+        props: { mode: "add" },
       },
       {
         path: "/product/:id/edit",
         name: "EditProduct",
         component: () => import("@/views/products/ProductForm"),
-        props: true
+        props: true,
       },
       {
         path: "/brand",
@@ -59,13 +59,13 @@ const routes = [
         path: "/stock/add",
         name: "AddStock",
         component: () => import("@/views/inventory/stocks/StockForm"),
-        props: { mode: 'add' }
+        props: { mode: "add" },
       },
       {
         path: "/stock/:id/edit",
         name: "EditStock",
         component: () => import("@/views/inventory/stocks/StockForm"),
-        props: true
+        props: true,
       },
       {
         path: "/adjustment",
@@ -76,13 +76,13 @@ const routes = [
         path: "/adjustment/add",
         name: "AddAjustment",
         component: () => import("@/views/inventory/adjustments/AdjustmentForm"),
-        props: { mode: 'add' }
+        props: { mode: "add" },
       },
       {
         path: "/adjustment/:id/edit",
         name: "EditAdjustment",
         component: () => import("@/views/inventory/adjustments/AdjustmentForm"),
-        props: true
+        props: true,
       },
       // ----end of Inventory----
 
@@ -128,20 +128,20 @@ const routes = [
       // ----sales----
       {
         path: "/sale",
-        name: "stock",
-        component: () => import("@/views/sales/SalesView")
+        name: "sale",
+        component: () => import("@/views/sales/SalesView"),
       },
       {
         path: "/sale/add",
         name: "AddSales",
         component: () => import("@/views/sales/SalesForm"),
-        props: { mode: 'add' }
+        props: { mode: "add" },
       },
       {
         path: "/sale/:id/edit",
         name: "EditSales",
         component: () => import("@/views/sales/SalesForm"),
-        props: true
+        props: true,
       },
       {
         path: "/sales/view",

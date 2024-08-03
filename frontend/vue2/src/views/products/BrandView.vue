@@ -82,13 +82,29 @@
       </template>
 
       <template v-slot:[`item.actions`]="{ item }">
-        <v-btn x-small color="warning" @click="editItem(item)"> edit </v-btn>
+        <v-menu bottom left>
+          <template v-slot:activator="{ attrs, on }">
+            <v-btn
+              v-bind="attrs"
+              v-on="on"
+              class="white--text pa-3"
+              x-small
+              color="blue-grey"
+            >
+              options <v-icon right dark> mdi-chevron-down </v-icon>
+            </v-btn>
+          </template>
 
-        <span class="mr-1"></span>
-
-        <v-btn x-small color="error" dark @click="deleteItem(item)">
-          delete
-        </v-btn>
+          <v-list>
+            <v-list-item
+              v-for="(action, i) in actions"
+              :key="i"
+              @click="handleAction(action.title, item)"
+            >
+              <v-list-item-title>{{ action.title }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </template>
       <template v-slot:no-data>
         <v-btn color="primary" @click="initialize"> Reset </v-btn>
@@ -125,6 +141,7 @@ export default {
     itemId: null,
     search: "",
     isLoading: false,
+    actions: [{ title: "Edit" }, { title: "Delete" }],
   }),
 
   computed: {
@@ -210,6 +227,19 @@ export default {
       }
       this.isLoading = false;
       this.close();
+    },
+
+    handleAction(action, item) {
+      switch (action) {
+        case "Edit":
+          this.editItem(item);
+          break;
+        case "Delete":
+          this.deleteItem(item);
+          break;
+        default:
+          break;
+      }
     },
   },
 };
