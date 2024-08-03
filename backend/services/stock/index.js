@@ -239,13 +239,12 @@ const add = async (req) => {
 };
 
 const update = async (id, data) => {
-  const { status, notes, stocks, deletedItems } = data;
-
-  console.log(stocks)
+  const { status, notes, stocks, deletedItems, date } = data;
 
   const stock = await Models.findById(id);
   stock.status = status;
   stock.notes = notes;
+  stock.date = date;
   const results = await stock.save();
 
   if (deletedItems && deletedItems.length > 0) {
@@ -306,7 +305,7 @@ const update = async (id, data) => {
 
       currentQuantity = quantity;
     } else {
-      stockItem = new StockItemModel({  
+      stockItem = new StockItemModel({
         product: stockData.product,
         variant: stockData.variant,
         supplier: stockData.supplier,
