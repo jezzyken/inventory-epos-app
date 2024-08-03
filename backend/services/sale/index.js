@@ -33,8 +33,6 @@ const get = async () => {
 };
 
 const getById = async (id) => {
-
-  console.log(id)
   const result = await Models.aggregate([
     {
       $match: {
@@ -86,6 +84,9 @@ const getById = async (id) => {
     {
       $group: {
         _id: "$_id",
+        date: {
+          $first: "$date",
+        },
         amountReceived: {
           $first: "$referenceCode",
         },
@@ -142,10 +143,10 @@ const add = async (req) => {
 
   const savedSale = await sale.save();
 
-  if(hasDelivery){
-    const newDelivery = new DeliveryModel(delivery)
-    newDelivery.sale = sale._id
-    newDelivery.save()
+  if (hasDelivery) {
+    const newDelivery = new DeliveryModel(delivery);
+    newDelivery.sale = sale._id;
+    newDelivery.save();
   }
 
   for (const itemData of stocks) {
@@ -199,7 +200,7 @@ const update = async (id, data) => {
     customer,
     deletedItems,
     hasDelivery,
-    delivery
+    delivery,
   } = data;
 
   const sale = await Models.findById(id);
@@ -313,7 +314,7 @@ const update = async (id, data) => {
     if (!deliveryRecord) {
       deliveryRecord = new DeliveryModel({
         sale: id,
-        ...delivery 
+        ...delivery,
       });
     } else {
       deliveryRecord.recipientName = delivery.recipientName;
