@@ -234,10 +234,11 @@ const add = async (req) => {
 };
 
 const update = async (id, data) => {
-  const { reason, stocks, deletedItems } = data;
+  const { reason, stocks, deletedItems, date } = data;
 
   const adjustment = await Models.findById(id);
   adjustment.reason = reason;
+  adjustment.date = date;
   const results = await adjustment.save();
 
   if (deletedItems && deletedItems.length > 0) {
