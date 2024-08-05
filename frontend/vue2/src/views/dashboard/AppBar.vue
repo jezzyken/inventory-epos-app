@@ -15,9 +15,7 @@ import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 export default {
   name: "AppBar",
   computed: {
-    ...mapState({
-      drawer: (state) => state.drawer,
-    }),
+    ...mapState(["drawer"]),
     ...mapGetters("auth", ["isAuthenticated", "user"]),
     userName() {
       return this.user && (this.user.fname || this.user.lname)
@@ -32,6 +30,14 @@ export default {
           .join(" ");
       }
       return "";
+    },
+    drawer: {
+      get() {
+        return this.$store.state.drawer;
+      },
+      set(val) {
+        this.$store.commit("SET_DRAWER", val);
+      },
     },
   },
   methods: {
