@@ -39,6 +39,7 @@
             block
             class="mt-n3"
             @click="login"
+            :disabled="isLoading"
           >
             Sign In
           </v-btn>
@@ -47,6 +48,10 @@
 
       <br />
     </v-card>
+
+    <v-snackbar v-model="snackbar" :timeout="3000" color="red" top>
+      {{ snackbarMessage }}
+    </v-snackbar>
   </v-sheet>
 </template>
 
@@ -58,15 +63,26 @@ export default {
     password: null,
     loading: false,
     show: false,
+    isLoading: false,
+    snackbar: false,
+    snackbarMessage: "",
   }),
 
   methods: {
-    login() {
+    async login() {
+      this.isLoading = true;
       const user = {
         email: this.email,
         password: this.password,
       };
-      this.$store.dispatch("auth/login", user);
+      const response = await this.$store.dispatch("auth/login", user);
+      if (response.status === 500) {
+        this.snackbarMessage = "Invalid login credentials";
+        this.snackbar = true;
+        this.isLoading = false;
+        return;
+      }
+      this.isLoading = false;
     },
   },
 };
