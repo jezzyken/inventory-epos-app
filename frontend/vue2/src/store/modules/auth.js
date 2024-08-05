@@ -48,9 +48,10 @@ const actions = {
 
       commit("AUTH_SUCCESS", { token, user });
       router.push("/");
+      return res.data;
     } catch (err) {
-      console.log(err);
       commit("AUTH_ERROR", err.response.data.msg);
+      return err.response;
     }
   },
   async register({ commit }, data) {
