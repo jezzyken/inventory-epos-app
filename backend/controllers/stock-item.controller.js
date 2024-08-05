@@ -1,8 +1,7 @@
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const Models = require("../models/AdjustmentItem");
-const service = require("../services/AdjustmentItem");
-
+const service = require("../services/adjustmentItem");
 
 const get = catchAsync(async (req, res) => {
   const result = await service.get();
@@ -67,7 +66,7 @@ const remove = catchAsync(async (req, res) => {
   }
 
   const result = await service.remove(stockItem);
-  
+
   const data = {
     success: true,
     result,
