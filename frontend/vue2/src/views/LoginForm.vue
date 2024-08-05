@@ -20,15 +20,16 @@
         </v-col>
         <v-col cols="12">
           <v-text-field
+            :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
             class="mt-n3"
             v-model="password"
             label="Password"
             placeholder="Enter your password"
-            clearable
             outlined
+            :type="show ? 'text' : 'password'"
+            @click:append="show = !show"
           ></v-text-field>
         </v-col>
-
         <v-col cols="12">
           <v-btn
             color="success"
@@ -56,6 +57,7 @@ export default {
     email: null,
     password: null,
     loading: false,
+    show: false,
   }),
 
   methods: {
