@@ -5,25 +5,11 @@
       <v-divider class="mb-5" />
       <v-row>
         <v-col cols="12" md="6">
-          <v-menu
-            ref="menu1"
-            v-model="menu"
-            :close-on-content-click="false"
-            :return-value.sync="items.date"
-            transition="scale-transition"
-            offset-y
-            min-width="auto"
-          >
+          <v-menu ref="menu1" v-model="menu" :close-on-content-click="false" :return-value.sync="items.date"
+            transition="scale-transition" offset-y min-width="auto">
             <template v-slot:activator="{ on, attrs }">
-              <v-text-field
-                v-model="items.date"
-                label="Date"
-                prepend-inner-icon="mdi-calendar"
-                readonly
-                v-bind="attrs"
-                v-on="on"
-                outlined
-              ></v-text-field>
+              <v-text-field v-model="items.date" label="Date" prepend-inner-icon="mdi-calendar" readonly v-bind="attrs"
+                v-on="on" outlined></v-text-field>
             </template>
             <v-date-picker v-model="items.date" no-title scrollable>
               <v-spacer></v-spacer>
@@ -35,21 +21,13 @@
           </v-menu>
         </v-col>
         <v-col cols="12" md="6">
-          <v-text-field
-            v-model="items.customer"
-            label="Customer"
-            outlined
-          ></v-text-field>
+          <v-text-field v-model="items.customer" label="Customer" outlined></v-text-field>
         </v-col>
         <v-col cols="12">
           <div class="d-flex">
             <span class="align-self-center mr-3">Has Delivery:</span>
 
-            <v-radio-group
-              v-model="items.hasDelivery"
-              row
-              @change="onSelectDelivery(items.hasDelivery)"
-            >
+            <v-radio-group v-model="items.hasDelivery" row @change="onSelectDelivery(items.hasDelivery)">
               <v-radio label="Yes" :value="true"></v-radio>
               <v-radio label="No" :value="false"></v-radio>
             </v-radio-group>
@@ -63,96 +41,47 @@
           </div>
           <v-row class="pa-4">
             <v-col cols="4">
-              <v-text-field
-                v-model="items.delivery.recipientName"
-                label="Recipient Name"
-                outlined
-              ></v-text-field>
+              <v-text-field v-model="items.delivery.recipientName" label="Recipient Name" outlined></v-text-field>
             </v-col>
             <v-col cols="4">
-              <v-text-field
-                v-model="items.delivery.contactNo"
-                label="Contact No"
-                outlined
-              ></v-text-field>
+              <v-text-field v-model="items.delivery.contactNo" label="Contact No" outlined></v-text-field>
             </v-col>
             <v-col cols="4">
-              <v-menu
-                ref="menu2"
-                v-model="deliveryDateMenu"
-                :close-on-content-click="false"
-                :return-value.sync="items.delivery.deliveryDate"
-                transition="scale-transition"
-                offset-y
-                min-width="auto"
-              >
+              <v-menu ref="menu2" v-model="deliveryDateMenu" :close-on-content-click="false"
+                :return-value.sync="items.delivery.deliveryDate" transition="scale-transition" offset-y
+                min-width="auto">
                 <template v-slot:activator="{ on, attrs }">
-                  <v-text-field
-                    v-model="items.delivery.deliveryDate"
-                    label="Delivery Date"
-                    prepend-inner-icon="mdi-calendar"
-                    readonly
-                    v-bind="attrs"
-                    v-on="on"
-                    outlined
-                  ></v-text-field>
+                  <v-text-field v-model="items.delivery.deliveryDate" label="Delivery Date"
+                    prepend-inner-icon="mdi-calendar" readonly v-bind="attrs" v-on="on" outlined></v-text-field>
                 </template>
-                <v-date-picker
-                  v-model="items.delivery.deliveryDate"
-                  no-title
-                  scrollable
-                >
+                <v-date-picker v-model="items.delivery.deliveryDate" no-title scrollable>
                   <v-spacer></v-spacer>
                   <v-btn text color="primary" @click="deliveryDateMenu = false">
                     Cancel
                   </v-btn>
-                  <v-btn
-                    text
-                    color="primary"
-                    @click="$refs.menu2.save(items.delivery.deliveryDate)"
-                  >
+                  <v-btn text color="primary" @click="$refs.menu2.save(items.delivery.deliveryDate)">
                     OK
                   </v-btn>
                 </v-date-picker>
               </v-menu>
             </v-col>
             <v-col cols="8">
-              <v-text-field
-                v-model="items.delivery.address"
-                label="Delivery Address"
-                outlined
-              ></v-text-field>
+              <v-text-field v-model="items.delivery.address" label="Delivery Address" outlined></v-text-field>
             </v-col>
             <v-col cols="4">
-              <v-text-field
-                v-model="items.delivery.deliveryFee"
-                label="Delivery Fee"
-                outlined
-              ></v-text-field>
+              <v-text-field v-model="items.delivery.deliveryFee" label="Delivery Fee" outlined></v-text-field>
             </v-col>
 
             <v-col cols="12">
-              <v-text-field
-                v-model="items.delivery.notes"
-                label="Notes"
-                outlined
-              ></v-text-field>
+              <v-text-field v-model="items.delivery.notes" label="Notes" outlined></v-text-field>
             </v-col>
           </v-row>
         </div>
 
         <v-col cols="12">
           <div class="d-flex">
-            <v-select
-              v-model="items.product"
-              label="Products"
-              :items="products"
-              item-text="name"
-              item-value="productCode"
-              outlined
-              @change="onSelectItem"
-              return-object
-            ></v-select>
+            <v-select v-model="items.product" label="Products" :items="products" item-text="name"
+              item-value="productCode" outlined @change="onSelectItem" return-object></v-select>
           </div>
         </v-col>
       </v-row>
@@ -186,32 +115,14 @@
               </td>
               <td>
                 <div class="d-flex justify-center">
-                  <v-btn
-                    dark
-                    color="primary"
-                    small
-                    fab
-                    @click="incrementQuantity(i)"
-                  >
+                  <v-btn dark color="primary" small fab @click="incrementQuantity(i)">
                     <v-icon>mdi-plus</v-icon>
                   </v-btn>
                   <div style="width: 75px">
-                    <v-text-field
-                      v-model="stock.quantity"
-                      class="text-center mx-2"
-                      outlined
-                      hide-details
-                      dense
-                      @input="updateSubTotal(i)"
-                    ></v-text-field>
+                    <v-text-field v-model="stock.quantity" class="text-center mx-2" outlined hide-details dense
+                      @input="updateSubTotal(i)"></v-text-field>
                   </div>
-                  <v-btn
-                    dark
-                    color="primary"
-                    small
-                    fab
-                    @click="decrementQuantity(i)"
-                  >
+                  <v-btn dark color="primary" small fab @click="decrementQuantity(i)">
                     <v-icon>mdi-minus</v-icon>
                   </v-btn>
                 </div>
@@ -273,42 +184,20 @@
     <v-sheet elevation="1" class="pa-5 mt-5" v-if="items.stocks != 0">
       <v-row>
         <v-col cols="12" md="3">
-          <v-text-field
-            v-model="items.discount"
-            label="Discount"
-            outlined
-          ></v-text-field>
+          <v-text-field v-model="items.discount" label="Discount" outlined></v-text-field>
         </v-col>
         <v-col cols="12" md="3">
-          <v-select
-            v-model="items.paymentType"
-            label="Payment"
-            :items="payment"
-            outlined
-          ></v-select>
+          <v-select v-model="items.paymentType" label="Payment" :items="payment" outlined></v-select>
         </v-col>
         <v-col cols="12" md="3">
-          <v-text-field
-            v-model="items.amountReceived"
-            label="Cash"
-            outlined
-            @input="onAddAmount"
-          ></v-text-field>
+          <v-text-field v-model="items.amountReceived" label="Cash" outlined @input="onAddAmount"></v-text-field>
         </v-col>
         <v-col cols="12" md="3">
-          <v-text-field
-            v-model="items.change"
-            label="Change"
-            outlined
-          ></v-text-field>
+          <v-text-field v-model="items.change" label="Change" outlined></v-text-field>
         </v-col>
 
         <v-col cols="12" md="12">
-          <v-text-field
-            v-model="items.notes"
-            label="Notes"
-            outlined
-          ></v-text-field>
+          <v-text-field v-model="items.notes" label="Notes" outlined></v-text-field>
         </v-col>
       </v-row>
     </v-sheet>
@@ -316,9 +205,9 @@
     <v-row justify="end" class="ma-0 mt-6">
       <v-btn dark :color="buttonState.color" @click="buttonState.action">{{
         buttonState.label
-      }}</v-btn>
+        }}</v-btn>
       <div class="ma-1"></div>
-      <v-btn>clear</v-btn>
+      <v-btn>cancel</v-btn>
     </v-row>
   </v-container>
 </template>

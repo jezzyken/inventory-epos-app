@@ -13,13 +13,99 @@ const get = async () => {
         from: "saleitems",
         localField: "_id",
         foreignField: "sale",
-        as: "sale",
+        as: "items",
       },
     },
     {
       $addFields: {
         noOfItems: {
-          $size: "$sale",
+          $size: "$items",
+        },
+      },
+    },
+    {
+      $unwind: {
+        path: "$items",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: "products",
+        localField: "items.product",
+        foreignField: "_id",
+        as: "productDetails",
+      },
+    },
+    {
+      $unwind: {
+        path: "$productDetails",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: "productvariants",
+        localField: "items.variant",
+        foreignField: "_id",
+        as: "variantDetails",
+      },
+    },
+    {
+      $unwind: {
+        path: "$variantDetails",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $group: {
+        _id: "$_id",
+        date: {
+          $first: "$date",
+        },
+        amountReceived: {
+          $first: "$referenceCode",
+        },
+        amountReceived: {
+          $first: "$amountReceived",
+        },
+        discount: {
+          $first: "$discount",
+        },
+        salesTotal: {
+          $first: "$salesTotal",
+        },
+        paymentType: {
+          $first: "$paymentType",
+        },
+        change: {
+          $first: "$change",
+        },
+        grandTotal: {
+          $first: "$grandTotal",
+        },
+        hasDelivery: {
+          $first: "$hasDelivery",
+        },
+        customer: {
+          $first: "$customer",
+        },
+        notes: {
+          $first: "$notes",
+        },
+        referenceCode: {
+          $first: "$referenceCode",
+        },
+        noOfItems: {
+          $first: "$noOfItems",
+        },
+        items: {
+          $push: {
+            item_id: "$items._id",
+            product: "$productDetails",
+            variant: "$variantDetails",
+            quantity: "$items.quantity",
+          },
         },
       },
     },
