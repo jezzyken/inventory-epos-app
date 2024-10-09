@@ -2,11 +2,122 @@ const Models = require("../../models/Delivery");
 const ObjectId = require("mongoose").Types.ObjectId;
 
 const get = async () => {
-  const result = await Models.find();
-  return result;
+  const results = await Models.aggregate([
+    {
+      $lookup: {
+        from: "sales",
+        localField: "sale",
+        foreignField: "_id",
+        as: "saleDetails",
+      },
+    },
+    {
+      $unwind: {
+        path: "$saleDetails",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: "saleitems",
+        localField: "saleDetails._id",
+        foreignField: "sale",
+        as: "items",
+      },
+    },
+    {
+      $addFields: {
+        noOfItems: {
+          $size: "$items",
+        },
+      },
+    },
+    {
+      $unwind: {
+        path: "$items",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: "products",
+        localField: "items.product",
+        foreignField: "_id",
+        as: "productDetails",
+      },
+    },
+    {
+      $unwind: {
+        path: "$productDetails",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: "productvariants",
+        localField: "items.variant",
+        foreignField: "_id",
+        as: "variantDetails",
+      },
+    },
+    {
+      $unwind: {
+        path: "$variantDetails",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $group: {
+        _id: "$_id",
+        recipientName: {
+          $first: "$recipientName",
+        },
+        contactNo: {
+          $first: "$contactNo",
+        },
+        address: {
+          $first: "$address",
+        },
+        notes: {
+          $first: "$notes",
+        },
+        deliveryDate: {
+          $first: "$deliveryDate",
+        },
+        deliveryFee: {
+          $first: "$deliveryFee",
+        },
+        status: {
+          $first: "$status",
+        },
+        saleDetails: {
+          $first: "$saleDetails",
+        },
+        noOfItems: {
+          $first: "$noOfItems",
+        },
+        items: {
+          $push: {
+            item_id: "$items._id",
+            product: "$productDetails",
+            variant: "$variantDetails",
+            quantity: "$items.quantity",
+          },
+        },
+      },
+    },
+    {
+      $sort: {
+        _id: -1,
+      },
+    },
+  ]);
+
+  return results;
 };
 
 const getById = async (id) => {
+  console.log(id)
   const result = await Models.findById(id);
   return result;
 };
