@@ -125,6 +125,7 @@ export default {
     actions: [{ title: "View" }, { title: "Delete" }],
     isLoading: false,
     search: "",
+    saleDetails: null
   }),
 
   computed: {
@@ -164,6 +165,7 @@ export default {
     },
 
     editItem(item) {
+      console.log(item)
       this.$refs.product.showDialog(true, item);
       this.selectedItems = item;
     },

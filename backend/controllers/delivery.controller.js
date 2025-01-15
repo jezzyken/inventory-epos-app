@@ -8,6 +8,8 @@ const get = catchAsync(async (req, res) => {
     success: true,
     result,
   };
+
+  console.log(result)
   return res.status(200).send(data);
 });
 
