@@ -3,53 +3,83 @@
     <v-dialog v-model="dialog" persistent max-width="800px" scrollable>
       <v-card v-if="hasItems">
         <v-card-title>
-          <span class="text-h5">{{ items.name }}</span>
+          <span class="text-h5">Delivery Details</span>
           <v-spacer></v-spacer>
-          <div>
-            <v-chip small class="ma-1" color="success" text-color="white">
-              {{ items.brand.name }}
-            </v-chip>
-            <v-chip small class="ma-1" color="orange" text-color="white">
-              {{ items.category.name }}
-            </v-chip>
-          </div>
+          <v-chip small :color="items.status === 'delivered' ? 'success' : 'warning'" text-color="white">
+            {{ items.status }}
+          </v-chip>
         </v-card-title>
 
         <v-card-text style="height: 600px">
-          <div class="my-4 text-subtitle-1">
-            Product Code • {{ items.productCode }}
+          <div class="delivery-info mb-4">
+            <h3 class="text-h6">Delivery Information</h3>
+            <v-simple-table>
+              <tbody>
+                <tr>
+                  <td class="font-weight-medium">Date:</td>
+                  <td>{{ items.deliveryDate }}</td>
+                </tr>
+                <tr>
+                  <td class="font-weight-medium">Recipient:</td>
+                  <td>{{ items.recipientName }}</td>
+                </tr>
+                <tr>
+                  <td class="font-weight-medium">Contact:</td>
+                  <td>{{ items.contactNo }}</td>
+                </tr>
+                <tr>
+                  <td class="font-weight-medium">Address:</td>
+                  <td>{{ items.address }}</td>
+                </tr>
+                <tr>
+                  <td class="font-weight-medium">Notes:</td>
+                  <td>{{ items.notes }}</td>
+                </tr>
+              </tbody>
+            </v-simple-table>
           </div>
 
-          <div>
-            {{ items.description }}
-          </div>
+          <v-divider></v-divider>
 
-          <v-divider class="mt-3"></v-divider>
+          <!-- Sale Information -->
+          <div v-if="saleDetails" class="sale-info mt-4">
+            <h3 class="text-h6">Sale Information</h3>
+            <v-simple-table>
+              <tbody>
+                <tr>
+                  <td class="font-weight-medium">Reference Code:</td>
+                  <td>{{ saleDetails.referenceCode }}</td>
+                </tr>
+                <tr>
+                  <td class="font-weight-medium">Payment Type:</td>
+                  <td>{{ saleDetails.paymentType }}</td>
+                </tr>
+                <tr>
+                  <td class="font-weight-medium">Amount Received:</td>
+                  <td>{{ formatCurrency(saleDetails.amountReceived) }}</td>
+                </tr>
+                <tr>
+                  <td class="font-weight-medium">Discount:</td>
+                  <td>{{ formatCurrency(saleDetails.discount) }}</td>
+                </tr>
+                <tr>
+                  <td class="font-weight-medium">Grand Total:</td>
+                  <td>{{ formatCurrency(saleDetails.grandTotal) }}</td>
+                </tr>
+              </tbody>
+            </v-simple-table>
 
-          <v-card-title>Prices</v-card-title>
-
-          <div>
-            <v-data-table
-              :headers="headers"
-              :items="prices"
-              :items-per-page="-1"
-              class="elevation-1"
-              :hide-default-footer="true"
-              :loading="isLoading"
-            ></v-data-table>
-          </div>
-
-          <v-card-title>Stocks</v-card-title>
-
-          <div>
-            <v-data-table
-              :headers="stocksHeader"
-              :items="stocks"
-              :items-per-page="-1"
-              class="elevation-1"
-              :hide-default-footer="true"
-              :loading="isLoading"
-            ></v-data-table>
+            <!-- Sale Items -->
+            <h4 class="text-subtitle-1 mt-4">Items</h4>
+            <v-data-table :headers="saleItemHeaders" :items="saleDetails.items" :items-per-page="-1" class="elevation-1"
+              :hide-default-footer="true">
+              <template v-slot:[`item.price`]="{ item }">
+                {{ formatCurrency(item.variant.price) }}
+              </template>
+              <template v-slot:[`item.total`]="{ item }">
+                {{ formatCurrency(item.variant.price * item.quantity) }}
+              </template>
+            </v-data-table>
           </div>
         </v-card-text>
 
@@ -57,9 +87,6 @@
           <v-spacer></v-spacer>
           <v-btn color="blue darken-1" text @click="dialog = false">
             Close
-          </v-btn>
-          <v-btn color="blue darken-1" text @click="dialog = false">
-            Save
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -70,74 +97,70 @@
 <script>
 /*eslint-disable */
 import { mapActions } from "vuex";
+import moment from "moment";
+
 export default {
   data: () => ({
-    headers: [
-      {
-        text: "Unit",
-        sortable: false,
-        value: "unit.name",
-      },
-      {
-        text: "Variant",
-        sortable: false,
-        value: "variant.name",
-      },
-      {
-        text: "Colors",
-        sortable: false,
-        value: "color",
-      },
-      { text: "Item Price", value: "itemPrice", sortable: false },
-      { text: "Sale Price", value: "salePrice", sortable: false },
-    ],
-
-    stocksHeader: [
-      {
-        text: "Supplier",
-        align: "start",
-        sortable: false,
-        value: "supplier.name",
-      },
-      { text: "Variant", value: "variant.name", sortable: false },
-      { text: "Quantity", value: "quantity", sortable: false },
-    ],
-
     dialog: false,
-    prices: [],
     isLoading: false,
     items: [],
-    stocks: [],
+    saleDetails: null,
+    saleItemHeaders: [
+      { text: "Product", value: "product.name" },
+      { text: "Variant", value: "variant.name" },
+      { text: "Quantity", value: "quantity" },
+      { text: "Unit Price", value: "price" },
+      { text: "Total", value: "total" }
+    ]
   }),
+
   computed: {
     hasItems() {
       return Object.keys(this.items).length > 0;
-    },
+    }
   },
 
   methods: {
     ...mapActions({
-      getItemById: "product/getItemById",
-      getStockItems: "stock/getStockItems",
+      getSaleById: "sales/getById"
     }),
 
     async initialize() {
       this.isLoading = true;
-      let id = await this.items._id;
-      const products = await this.getItemById(id);
-      const stocks = await this.getStockItems(id);
-      this.prices = products.result.prices.map(item => ({
-        ...item,
-        color: item.color.map(color => color.name).join(", ")
-      }))
-      this.stocks = stocks.result;
+      if (this.items.sale) {
+        try {
+          const response = await this.getSaleById(this.items.sale);
+          this.saleDetails = response.result[0];
+        } catch (error) {
+          console.error("Error fetching sale details:", error);
+        }
+      }
       this.isLoading = false;
     },
+
     showDialog(dialog, items) {
       this.dialog = dialog;
       this.items = items;
       this.initialize();
     },
-  },
+
+    formatCurrency(amount) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'PHP'
+      }).format(amount);
+    },
+
+    formatDate(date) {
+      return moment(date).format('YYYY-MM-DD');
+    }
+  }
 };
 </script>
+
+<style scoped>
+.delivery-info,
+.sale-info {
+  padding: 16px;
+}
+</style>

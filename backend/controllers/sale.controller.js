@@ -4,6 +4,7 @@ const service = require("../services/sale");
 
 const get = catchAsync(async (req, res) => {
   const result = await service.get();
+  console.log(result)
   const data = {
     success: true,
     result,

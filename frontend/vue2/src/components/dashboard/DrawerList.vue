@@ -4,8 +4,7 @@
       <v-list-item class="px-2">
         <v-list-item-avatar>
           <v-img
-            src="https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?size=338&ext=jpg&ga=GA1.1.2008272138.1721001600&semt=ais_user"
-          ></v-img>
+            src="https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?size=338&ext=jpg&ga=GA1.1.2008272138.1721001600&semt=ais_user"></v-img>
         </v-list-item-avatar>
       </v-list-item>
 
@@ -28,30 +27,15 @@
         </v-list-item-icon>
         <v-list-item-title>{{ item.title }}</v-list-item-title>
       </v-list-item>
-      <v-list-group
-        v-for="list in item.list"
-        :key="list.title"
-        v-model="list.active"
-        :prepend-icon="list.action"
-        @click.prevent="openRoute(list)"
-        :append-icon="list.appendIcon"
-        no-action
-        link
-        active-class="white--text"
-      >
+      <v-list-group v-for="list in item.list" :key="list.title" v-model="list.active" :prepend-icon="list.action"
+        @click.prevent="openRoute(list)" :append-icon="list.appendIcon" no-action link active-class="white--text">
         <template v-slot:activator>
           <v-list-item-content>
             <v-list-item-title v-text="list.title"></v-list-item-title>
           </v-list-item-content>
         </template>
 
-        <v-list-item
-          v-for="child in list.items"
-          :key="child.title"
-          :to="child.route"
-          link
-          active-class="white--text"
-        >
+        <v-list-item v-for="child in list.items" :key="child.title" :to="child.route" link active-class="white--text">
           <v-list-item-title v-text="child.title"></v-list-item-title>
         </v-list-item>
       </v-list-group>
@@ -130,9 +114,9 @@ export default {
           },
           {
             action: "mdi-chart-box",
-            items: [],
             title: "Reports",
-            appendIcon: "mdi-chevron-down",
+            appendIcon: "",
+            route: "/reports",
           },
         ],
       },

@@ -38,10 +38,18 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
   }
 );
 
-// Hash the password before saving the user
+userSchema.virtual('fullName').get(function() {
+  if (this.mname) {
+    return `${this.fname} ${this.mname} ${this.lname}`;
+  }
+  return `${this.fname} ${this.lname}`;
+});
+
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
 
@@ -53,6 +61,10 @@ userSchema.pre("save", async function (next) {
     next(err);
   }
 });
+
+userSchema.methods.comparePassword = async function(candidatePassword) {
+  return bcrypt.compare(candidatePassword, this.password);
+};
 
 const User = mongoose.model("User", userSchema);
 
