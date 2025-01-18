@@ -3,20 +3,13 @@
     <v-dialog v-model="dialog" persistent max-width="800px" scrollable>
       <v-card v-if="hasItems">
         <v-card-title>
-          <span class="text-h5"
-            >{{ items.recipientName }} • ({{ items.contactNo }})</span
-          >
+          <span class="text-h5">{{ items.recipientName }} • ({{ items.contactNo }})</span>
           <v-spacer></v-spacer>
           <div>
-            <v-chip
-              small
-              class="ma-1"
-              :color="items.status === 'pending' ? 'warning' : 'success'"
-              text-color="white"
-            >
+            <v-chip small class="ma-1" :color="items.status === 'pending' ? 'warning' : 'success'" text-color="white">
               <span class="text-uppercase text-caption">{{
                 items.status
-              }}</span>
+                }}</span>
             </v-chip>
             <!-- <v-chip small class="ma-1" color="orange" text-color="white">
                items.category.name 
@@ -26,16 +19,12 @@
 
         <v-card-text style="height: 600px">
           <div>
-            <span class="my-4 text-overline font-weight-bold"
-              >Delivery Address</span
-            >
+            <span class="my-4 text-overline font-weight-bold">Delivery Address</span>
             <br />
             <span>{{ items.address }}</span>
           </div>
           <div>
-            <span class="my-4 text-overline font-weight-bold"
-              >Delivery Date •</span
-            >
+            <span class="my-4 text-overline font-weight-bold">Delivery Date •</span>
             <span>{{ items.deliveryDate }}</span>
           </div>
           <div>
@@ -245,14 +234,14 @@ export default {
     showDialog(dialog, items) {
       this.dialog = dialog;
       this.items = items;
-      this.initialize(items.sale);
+      this.initialize(items.saleDetails._id);
     },
 
     async onUpdateStatus(status) {
       let newStatus = status === "delivered" ? "pending" : "delivered";
       await this.updateItem({ id: this.items._id, status: newStatus });
       this.dialog = false
-       this.$emit('get-items');
+      this.$emit('get-items');
     },
   },
 };

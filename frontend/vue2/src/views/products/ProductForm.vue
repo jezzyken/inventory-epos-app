@@ -5,112 +5,51 @@
       <v-divider class="mb-5" />
       <v-row>
         <v-col cols="12" md="3">
-          <v-text-field
-            v-model="items.name"
-            label="Name"
-            outlined
-          ></v-text-field>
+          <v-text-field v-model="items.name" label="Name" outlined></v-text-field>
         </v-col>
         <v-col cols="12" md="3">
-          <v-text-field
-            v-model="items.productCode"
-            label="Product Code"
-            outlined
-          ></v-text-field>
+          <v-text-field v-model="items.productCode" label="Product Code" outlined></v-text-field>
         </v-col>
         <v-col cols="12" md="3">
-          <v-select
-            v-model="items.category"
-            label="Category"
-            :items="category"
-            item-text="name"
-            item-value="_id"
-            outlined
-          ></v-select>
+          <v-select v-model="items.category" label="Category" :items="category" item-text="name" item-value="_id"
+            outlined></v-select>
         </v-col>
         <v-col cols="12" md="3">
-          <v-select
-            v-model="items.brand"
-            label="Brand"
-            :items="brand"
-            item-text="name"
-            item-value="_id"
-            outlined
-          ></v-select>
+          <v-select v-model="items.brand" label="Brand" :items="brand" item-text="name" item-value="_id"
+            outlined></v-select>
         </v-col>
         <v-col cols="12" md="6">
-          <v-text-field
-            v-model="items.description"
-            label="Description"
-            outlined
-          ></v-text-field>
+          <v-text-field v-model="items.description" label="Description" outlined></v-text-field>
         </v-col>
         <v-col cols="12" md="3">
-          <v-select
-            v-model="items.supplier"
-            label="Supplier"
-            :items="suppliers"
-            item-text="name"
-            item-value="_id"
-            outlined
-          ></v-select>
+          <v-select v-model="items.supplier" label="Supplier" :items="suppliers" item-text="name" item-value="_id"
+            outlined></v-select>
         </v-col>
 
         <v-col cols="12" md="3">
-          <v-text-field
-            v-model="items.criticalLimit"
-            label="Critical Limit"
-            outlined
-          ></v-text-field>
+          <v-text-field v-model="items.criticalLimit" label="Critical Limit" outlined></v-text-field>
         </v-col>
         <v-col cols="12" md="3">
-          <v-select
-            :items="units"
-            v-model="items.unit"
-            label="Unit"
-            item-text="name"
-            item-value="_id"
-            outlined
-          ></v-select>
+          <v-select :items="units" v-model="items.unit" label="Unit" item-text="name" item-value="_id"
+            outlined></v-select>
         </v-col>
 
         <v-col cols="12" md="9">
-          <v-text-field
-            v-model="items.image"
-            label="Image URL"
-            outlined
-          ></v-text-field>
+          <v-text-field v-model="items.image" label="Image URL" outlined></v-text-field>
         </v-col>
         <v-col cols="12" md="3">
-          <v-select
-            v-model="items.type"
-            :items="type"
-            label="Type"
-            outlined
-            :disabled="pageMode.label === 'update'"
-          ></v-select>
+          <v-select v-model="items.type" :items="type" label="Type" outlined
+            :disabled="pageMode.label === 'update'"></v-select>
         </v-col>
         <v-col cols="12" md="3">
-          <v-text-field
-            v-model="items.productCost"
-            label="Product Cost"
-            outlined
-          ></v-text-field>
+          <v-text-field v-model="items.productCost" label="Product Cost" outlined></v-text-field>
         </v-col>
         <v-col cols="12" md="3">
-          <v-text-field
-            v-model="items.sellingPrice"
-            label="Product Price"
-            outlined
-          ></v-text-field>
+          <v-text-field v-model="items.sellingPrice" label="Product Price" outlined></v-text-field>
         </v-col>
         <v-col cols="12" md="3">
-          <v-text-field
-            v-model="items.stocks"
-            label="Intial Stocks"
-            outlined
-            :disabled="pageMode.label === 'update'"
-          ></v-text-field>
+          <v-text-field v-model="items.stocks" label="Intial Stocks" outlined
+            :disabled="pageMode.label === 'update'"></v-text-field>
         </v-col>
       </v-row>
     </v-sheet>
@@ -122,15 +61,8 @@
       <v-row v-show="pageMode.label !== 'update'">
         <v-col cols="12" md="5">
           <!-- v-model="items.variant" optional model-->
-          <v-select
-            :items="variants"
-            label="Variants"
-            item-text="name"
-            @change="onSelectVariant"
-            return-object
-            outlined
-            :loading="isLoadingVariant"
-          ></v-select>
+          <v-select :items="variants" label="Variants" item-text="name" @change="onSelectVariant" return-object outlined
+            :loading="isLoadingVariant"></v-select>
         </v-col>
       </v-row>
 
@@ -139,22 +71,10 @@
           <span>{{ vt.name }}</span>
         </v-col>
         <v-col cols="6">
-          <v-combobox
-            v-model="vt.selectedValue"
-            :items="vt.variant"
-            chips
-            label="Select variant value"
-            multiple
-            outlined
-            @input="onSelectVariantAttrib"
-          >
+          <v-combobox v-model="vt.selectedValue" :items="vt.variant" chips label="Select variant value" multiple
+            outlined @input="onSelectVariantAttrib">
             <template v-slot:selection="{ attrs, item, select, selected }">
-              <v-chip
-                v-bind="attrs"
-                :input-value="selected"
-                close
-                @click="select"
-              >
+              <v-chip v-bind="attrs" :input-value="selected" close @click="select">
                 <strong>{{ item }}</strong>
               </v-chip>
             </template>
@@ -164,43 +84,23 @@
 
       <v-row v-for="variants in items.variants" :key="variants.skuCode">
         <v-col cols="12" md="3">
-          <v-text-field
-            :v-model="variants.skuCode"
-            label="Product Price"
-            :value="`${items.name}-${variants.name}`"
-            outlined
-          ></v-text-field>
+          <v-text-field :v-model="variants.skuCode" label="Product Price" :value="`${items.name}-${variants.name}`"
+            outlined></v-text-field>
         </v-col>
         <v-col cols="12" md="3">
-          <v-text-field
-            v-model="variants.productCost"
-            label="Product Cost"
-            outlined
-          ></v-text-field>
+          <v-text-field v-model="variants.productCost" label="Product Cost" outlined></v-text-field>
         </v-col>
         <v-col cols="12" md="3">
-          <v-text-field
-            v-model="variants.sellingPrice"
-            label="Selling Price"
-            outlined
-          ></v-text-field>
+          <v-text-field v-model="variants.sellingPrice" label="Selling Price" outlined></v-text-field>
         </v-col>
         <v-col cols="12" md="3">
           <v-row>
             <v-col cols="6">
-              <v-text-field
-                v-model="variants.stocks"
-                label="Initial Stockss"
-                outlined
-                :disabled="pageMode.label === 'update'"
-              ></v-text-field>
+              <v-text-field v-model="variants.stocks" label="Initial Stockss" outlined
+                :disabled="pageMode.label === 'update'"></v-text-field>
             </v-col>
             <v-col cols="6">
-              <v-text-field
-                v-model="variants.stockAlert"
-                label="Stock Alert"
-                outlined
-              ></v-text-field>
+              <v-text-field v-model="variants.stockAlert" label="Stock Alert" outlined></v-text-field>
             </v-col>
           </v-row>
         </v-col>
@@ -210,7 +110,7 @@
     <v-row justify="end" class="ma-0 mt-6">
       <v-btn dark :color="pageMode.color" @click="pageMode.action">{{
         pageMode.label
-      }}</v-btn>
+        }}</v-btn>
       <div class="ma-1"></div>
       <v-btn>clear</v-btn>
     </v-row>

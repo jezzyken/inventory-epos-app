@@ -184,6 +184,13 @@ const routes = [
         meta: { requiresAuth: true },
       },
       // ----end of sales----
+
+      {
+        path: "/reports",
+        name: "reports",
+        component: () => import("@/views/Reports/ReportView.vue"),
+        meta: { requiresAuth: true },
+      },
     ],
   },
   {
