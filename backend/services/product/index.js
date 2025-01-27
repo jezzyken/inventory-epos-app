@@ -1,5 +1,6 @@
 const Models = require("../../models/Product");
 const ProductVariantModel = require("../../models/ProductVariant");
+const { uploadImage } = require("../../utils/imageUpload");
 
 const ObjectId = require("mongoose").Types.ObjectId;
 
@@ -43,7 +44,13 @@ const get = async () => {
 
 const getItems = async () => {
   const result = Models.aggregate([
-    ...createLookupStage("productvariants", "variants", "_id", "variants", true),
+    ...createLookupStage(
+      "productvariants",
+      "variants",
+      "_id",
+      "variants",
+      true
+    ),
     {
       $addFields: {
         availableStocks: {
@@ -139,10 +146,15 @@ const add = async (req) => {
     variants,
   } = req.body;
 
+  let uploadedImage;
+  if (image) {
+    uploadedImage = await uploadImage(image);
+  }
+
   const productData = {
     name,
     type,
-    image,
+    image: uploadedImage,
     productCode,
     category,
     brand,
@@ -153,16 +165,28 @@ const add = async (req) => {
     sellingPrice,
     supplier,
     stocks,
-    variants,
   };
 
   const product = new Models(productData);
 
   if (type === "Variants") {
-    const productVariant = await ProductVariantModel.insertMany(variants);
+    const processedVariants = await Promise.all(
+      variants.map(async (variant) => {
+        let variantImage = variant.image
+          ? await uploadImage(variant.image)
+          : null;
+        return {
+          ...variant,
+          image: variantImage,
+          productId: product._id,
+        };
+      })
+    );
+
+    const productVariant = await ProductVariantModel.insertMany(
+      processedVariants
+    );
     product.variants = productVariant.map((variant) => variant._id);
-    product.save();
-    return;
   }
 
   return await product.save();
@@ -185,6 +209,11 @@ const update = async (req, product) => {
     variants,
   } = req.body;
 
+  let uploadedImage;
+  if (image && image !== product.image) {
+    uploadedImage = await uploadImage(image);
+  }
+
   product.name = name || product.name;
   product.productCode = productCode || product.productCode;
   product.type = type || product.type;
@@ -196,10 +225,14 @@ const update = async (req, product) => {
   product.brand = brand || product.brand._id;
   product.sellingPrice = sellingPrice || product.sellingPrice;
   product.productCost = productCost || product.productCost;
-  product.image = image || product.image;
+  product.image = uploadedImage || product.image;
 
   if (variants && variants.length > 0) {
     for (const variant of variants) {
+      if (variant.image) {
+        variant.image = await uploadImage(variant.image);
+      }
+
       if (variant._id) {
         await ProductVariantModel.findByIdAndUpdate(variant._id, variant, {
           new: true,

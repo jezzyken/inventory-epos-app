@@ -6,8 +6,9 @@ const saleSchema = new mongoose.Schema(
       type: Date,
       default: Date.now(),
     },
-    referenceCode: {
+    referenceNo: {
       type: String,
+      unique: true,
     },
     amountReceived: {
       type: Number,
@@ -44,26 +45,35 @@ const saleSchema = new mongoose.Schema(
     },
   },
   {
-    timestamp: true,
+    timestamps: true,
   }
 );
 
-saleSchema.pre("save", function (next) {
-  if (!this.isNew) {
-    return next();
-  }
+saleSchema.pre("save", async function (next) {
+  try {
+    if (!this.isNew) {
+      return next();
+    }
 
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  const length = 8;
-  let referenceCode = "";
-  for (let i = 0; i < length; i++) {
-    referenceCode += characters.charAt(
-      Math.floor(Math.random() * characters.length)
+    const year = new Date().getFullYear();
+
+    const lastSale = await this.constructor.findOne(
+      {},
+      {},
+      { sort: { referenceNo: -1 } }
     );
-  }
 
-  this.referenceCode = referenceCode;
-  next();
+    let nextNumber = 1;
+    if (lastSale && lastSale.referenceNo) {
+      const lastNumber = parseInt(lastSale.referenceNo.split("-")[2]);
+      nextNumber = lastNumber + 1;
+    }
+
+    this.referenceNo = `SL-${year}-${String(nextNumber).padStart(4, "0")}`;
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
 const Sale = mongoose.model("Sale", saleSchema);

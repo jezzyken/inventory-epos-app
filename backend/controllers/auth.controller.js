@@ -13,6 +13,9 @@ const create = catchAsync(async (req, res) => {
 
 const login = catchAsync(async (req, res) => {
   const { token, user } = await service.login(req.body);
+
+  console.log(user);
+
   return res.status(200).send({ token, user, success: true });
 });
 

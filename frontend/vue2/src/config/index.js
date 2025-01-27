@@ -10,6 +10,9 @@ if (process.env.NODE_ENV === "production") {
   url = `/api/${API_VERSION}/${SERVER}`;
 }
 
+
+console.log(url)
+
 module.exports = {
   url,
 };
