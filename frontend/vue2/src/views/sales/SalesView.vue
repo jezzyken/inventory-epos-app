@@ -138,7 +138,7 @@
 <script>
 /*eslint-disable*/
 import { mapActions } from "vuex";
-import moment from "moment"
+import moment from "moment";
 
 export default {
   data: () => ({
@@ -239,7 +239,7 @@ export default {
       const results = await this.getItems();
       this.items = results.result.map((item) => ({
         ...item,
-        date: moment(item.date).format("MMM DD YYYY hh:mm A")
+        date: moment(item.date).format("MMM DD YYYY hh:mm A"),
       }));
     },
 
