@@ -77,6 +77,7 @@ const getBySaleId = async (id) => {
 };
 
 const add = async (req) => {
+  console.log(req.body)
   const item = new Models(req.body);
   const result = await item.save();
   return result;

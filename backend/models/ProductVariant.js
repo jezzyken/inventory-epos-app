@@ -31,6 +31,9 @@ const productVariantSchema = new mongoose.Schema(
     stocks: {
       type: Number
     },
+    image: {
+      type: String,
+    },
   },
   {
     timestamps: true,

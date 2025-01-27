@@ -137,53 +137,58 @@ const getById = async (id) => {
 };
 
 const add = async (req) => {
-  const { stocks, hasDelivery, delivery } = req.body;
+  try {
+    const { stocks, hasDelivery, delivery } = req.body;
 
-  const sale = new Models(req.body);
+    const sale = new Models(req.body);
 
-  const savedSale = await sale.save();
+    const savedSale = await sale.save();
 
-  if (hasDelivery) {
-    const newDelivery = new DeliveryModel(delivery);
-    newDelivery.sale = sale._id;
-    newDelivery.save();
-  }
+    if (hasDelivery) {
+      const newDelivery = new DeliveryModel(delivery);
+      newDelivery.sale = sale._id;
+      await newDelivery.save();
+    }
 
-  for (const itemData of stocks) {
-    const saleItem = new SalesItemModel({
-      product: itemData.product,
-      variant: itemData.variant,
-      sale: savedSale._id,
-      quantity: itemData.quantity,
-      price: itemData.price,
-    });
-    await saleItem.save();
+    for (const itemData of stocks) {
+      const saleItem = new SalesItemModel({
+        product: itemData.product,
+        variant: itemData.variant,
+        sale: savedSale._id,
+        quantity: itemData.quantity,
+        price: itemData.price,
+      });
+      await saleItem.save();
 
-    if (itemData.variant) {
-      const variant = await ProductVariantModel.findById(itemData.variant);
-      if (variant) {
-        variant.stocks -= itemData.quantity;
-        await variant.save();
+      if (itemData.variant) {
+        const variant = await ProductVariantModel.findById(itemData.variant);
+        if (variant) {
+          variant.stocks -= itemData.quantity;
+          await variant.save();
 
+          const product = await ProductModel.findById(itemData.product);
+          if (product) {
+            const variants = await ProductVariantModel.find({
+              _id: { $in: product.variants },
+            });
+            product.stocks = variants.reduce((acc, v) => acc + v.stocks, 0);
+            await product.save();
+          }
+        }
+      } else {
         const product = await ProductModel.findById(itemData.product);
         if (product) {
-          const variants = await ProductVariantModel.find({
-            _id: { $in: product.variants },
-          });
-          product.stocks = variants.reduce((acc, v) => acc + v.stocks, 0);
+          product.stocks -= itemData.quantity;
           await product.save();
         }
       }
-    } else {
-      const product = await ProductModel.findById(itemData.product);
-      if (product) {
-        product.stocks -= itemData.quantity;
-        await product.save();
-      }
     }
-  }
 
-  return savedSale;
+    return savedSale;
+  } catch (error) {
+    console.error("Error adding sale:", error);
+    throw new Error("Failed to add sale");
+  }
 };
 
 const update = async (id, data) => {

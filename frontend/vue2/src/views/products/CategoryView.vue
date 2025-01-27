@@ -1,116 +1,145 @@
+<!-- eslint-disable-next-line  -->
+<!-- eslint-disable  -->
+
 <template>
-  <v-container>
-    <v-data-table
-      :headers="headers"
-      :items="desserts"
-      sort-by="calories"
-      class="elevation-1 mt-n2"
-      :search="search"
-      :loading="isLoading"
-    >
-      <template v-slot:top>
-        <v-toolbar flat>
-          <div style="width: 400px">
+  <v-container fluid>
+    <v-card class="mt-2">
+      <v-card-title class="py-2">
+        <v-row align="center" no-gutters>
+          <v-col cols="12" sm="4">
             <v-text-field
               v-model="search"
-              filled
-              rounded
-              dense
               hide-details
-              placeholder="Search"
-              append-icon="mdi-filter-variant"
+              dense
+              outlined
+              placeholder="Search categories..."
+              prepend-inner-icon="mdi-magnify"
+              clearable
             ></v-text-field>
-          </div>
+          </v-col>
           <v-spacer></v-spacer>
-          <v-dialog v-model="dialog" max-width="500px">
+          <v-col cols="auto">
+            <v-btn
+              color="primary"
+              @click="dialog = true"
+              depressed
+              class="ml-2"
+            >
+              <v-icon left>mdi-plus</v-icon>
+              New Category
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-title>
+
+      <v-data-table
+        :headers="headers"
+        :items="desserts"
+        :loading="isLoading"
+        :search="search"
+        :items-per-page="10"
+        :footer-props="{
+          'items-per-page-options': [5, 10, 25, 50],
+          showFirstLastPage: true,
+          'items-per-page-text': 'Categories per page',
+          'page-text': '{0}-{1} of {2}',
+        }"
+        multi-sort
+        class="elevation-0"
+      >
+        <template v-slot:item.name="{ item }">
+          <div class="font-weight-medium">{{ item.name }}</div>
+        </template>
+
+        <template v-slot:item.actions="{ item }">
+          <v-menu offset-y left :close-on-content-click="true">
             <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                color="primary"
-                dark
-                class="mb-2"
-                small
-                v-bind="attrs"
-                v-on="on"
-              >
-                new
+              <v-btn small text v-bind="attrs" v-on="on" class="px-2">
+                <v-icon>mdi-dots-vertical</v-icon>
               </v-btn>
             </template>
-            <v-card>
-              <v-card-title>
-                <span class="text-h5">{{ formTitle }}</span>
-              </v-card-title>
 
-              <v-card-text>
-                <v-container>
-                  <v-row>
-                    <v-col cols="12">
-                      <v-text-field
-                        v-model="editedItem.name"
-                        label="Category Name"
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
-                </v-container>
-              </v-card-text>
-
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="close">
-                  Cancel
-                </v-btn>
-                <v-btn color="blue darken-1" text @click="save"> Save </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-          <v-dialog v-model="dialogDelete" max-width="500px">
-            <v-card>
-              <v-card-title class="text-h5"
-                >Are you sure you want to delete this item?</v-card-title
+            <v-list dense>
+              <v-list-item
+                v-for="action in actions"
+                :key="action.title"
+                @click="handleAction(action.title, item)"
               >
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="closeDelete"
-                  >Cancel</v-btn
-                >
-                <v-btn color="blue darken-1" text @click="deleteItemConfirm"
-                  >OK</v-btn
-                >
-                <v-spacer></v-spacer>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-        </v-toolbar>
-      </template>
+                <v-list-item-icon class="mr-2">
+                  <v-icon small :color="action.color">
+                    {{ action.icon }}
+                  </v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>{{ action.title }}</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+        </template>
 
-      <template v-slot:[`item.actions`]="{ item }">
-        <v-menu bottom left>
-          <template v-slot:activator="{ attrs, on }">
-            <v-btn
-              v-bind="attrs"
-              v-on="on"
-              class="white--text pa-3"
-              x-small
-              color="blue-grey"
-            >
-              options <v-icon right dark> mdi-chevron-down </v-icon>
-            </v-btn>
-          </template>
+        <template v-slot:no-data>
+          <v-alert type="info" class="ma-4" outlined>
+            No categories found.
+          </v-alert>
+        </template>
 
-          <v-list>
-            <v-list-item
-              v-for="(action, i) in actions"
-              :key="i"
-              @click="handleAction(action.title, item)"
-            >
-              <v-list-item-title>{{ action.title }}</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
-      </template>
-      <template v-slot:no-data>
-        <v-btn color="primary" @click="initialize"> Reset </v-btn>
-      </template>
-    </v-data-table>
+        <template v-slot:progress>
+          <v-overlay absolute color="white">
+            <v-progress-circular indeterminate size="64" />
+          </v-overlay>
+        </template>
+      </v-data-table>
+    </v-card>
+
+    <!-- Add/Edit Dialog -->
+    <v-dialog v-model="dialog" max-width="400" persistent>
+      <v-card>
+        <v-card-title class="headline">
+          {{ formTitle }}
+        </v-card-title>
+        <v-card-text>
+          <v-text-field
+            v-model="editedItem.name"
+            label="Category Name"
+            outlined
+            dense
+            hide-details="auto"
+            class="mt-4"
+          ></v-text-field>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn text @click="close">Cancel</v-btn>
+          <v-btn color="primary" text @click="save" :loading="isLoading">
+            Save
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Delete Dialog -->
+    <v-dialog v-model="dialogDelete" max-width="400" persistent>
+      <v-card>
+        <v-card-title class="headline">Confirm Delete</v-card-title>
+        <v-card-text>
+          Are you sure you want to delete this category? This action cannot be
+          undone.
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn text @click="closeDelete">Cancel</v-btn>
+          <v-btn
+            color="error"
+            text
+            @click="deleteItemConfirm"
+            :loading="isLoading"
+          >
+            Delete
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -129,7 +158,7 @@ export default {
         sortable: false,
         value: "name",
       },
-      { text: "Actions", value: "actions", sortable: false },
+      { text: "Actions", value: "actions", sortable: false, align: "end" },
     ],
     desserts: [],
     editedIndex: -1,
@@ -142,7 +171,18 @@ export default {
     itemId: null,
     search: "",
     isLoading: false,
-    actions: [{ title: "Edit" }, { title: "Delete" }],
+    actions: [
+      {
+        title: "Edit",
+        icon: "mdi-pencil",
+        color: "primary",
+      },
+      {
+        title: "Delete",
+        icon: "mdi-delete",
+        color: "error",
+      },
+    ],
   }),
 
   computed: {
@@ -240,3 +280,43 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+.v-data-table {
+  &::v-deep {
+    .v-data-table__wrapper {
+      table {
+        thead {
+          tr {
+            th {
+              font-weight: 600;
+              text-transform: uppercase;
+              font-size: 0.875rem;
+              white-space: nowrap;
+            }
+          }
+        }
+        tbody {
+          tr {
+            td {
+              font-size: 0.875rem;
+              color: rgba(0, 0, 0, 0.87);
+            }
+            &:hover {
+              background-color: #f5f5f5 !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.v-card {
+  border-radius: 8px;
+
+  .v-card__title {
+    border-bottom: 1px solid #e0e0e0;
+  }
+}
+</style>

@@ -9,16 +9,16 @@ const get = async () => {
   const result = await Models.aggregate([
     {
       $lookup: {
-        from: "stockitems",
+        from: "adjustmentitems",
         localField: "_id",
-        foreignField: "stock",
-        as: "stock",
+        foreignField: "adjustment",
+        as: "adjustment",
       },
     },
     {
       $addFields: {
         noOfItems: {
-          $size: "$stock",
+          $size: "$adjustment",
         },
       },
     },
@@ -28,6 +28,8 @@ const get = async () => {
       },
     },
   ]);
+
+  console.log(result)
   return result;
 };
 

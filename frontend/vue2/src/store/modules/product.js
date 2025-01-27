@@ -23,7 +23,7 @@ const actions = {
   async getItems({ commit }) {
     try {
       const response = await axios.get(`${url}/${endpoint}/items`);
-      console.log(response)
+      console.log(response);
       return response.data;
     } catch (error) {
       return error.response;
@@ -48,22 +48,94 @@ const actions = {
     }
   },
 
-  async addItem({ commit }, data) {
+  async uploadImage({ commit }, imageData) {
     try {
-      const response = await axios.post(`${url}/${endpoint}`, data);
-      return response.data;
+      // If imageData is already a URL, return it
+      if (typeof imageData === "string" && imageData.startsWith("http")) {
+        return imageData;
+      }
+
+      const formData = new FormData();
+
+      // If imageData is a base64 string, convert it to a blob
+      if (typeof imageData === "string" && imageData.startsWith("data:image")) {
+        const response = await fetch(imageData);
+        const blob = await response.blob();
+        formData.append("image", blob, "image.jpg");
+      } else {
+        formData.append("image", imageData);
+      }
+
+      const response = await axios.post(`${url}/upload`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      return response.data.url;
     } catch (error) {
-      console.log(error)
-      return error.response;
+      console.error("Upload error:", error);
+      throw new Error("Failed to upload image");
     }
   },
 
-  async updateItem({ commit }, data) {
+  async addItem({ dispatch }, payload) {
     try {
-      const response = await axios.put(`${url}/${endpoint}/${data.id}`, data.data);
-      return response.data;
+      let processedPayload = { ...payload };
+
+      if (payload.image && payload.image.startsWith("data:image")) {
+        processedPayload.image = await dispatch("uploadImage", payload.image);
+      }
+
+      if (payload.type === "Variants" && payload.variants) {
+        processedPayload.variants = await Promise.all(
+          payload.variants.map(async (variant) => {
+            let processedVariant = { ...variant };
+            if (variant.image && variant.image.startsWith("data:image")) {
+              processedVariant.image = await dispatch(
+                "uploadImage",
+                variant.image
+              );
+            }
+            return processedVariant;
+          })
+        );
+      }
+
+      return await axios.post(`${url}/${endpoint}`, processedPayload);
     } catch (error) {
-      return error.response;
+      console.error("Error adding item:", error);
+      throw error;
+    }
+  },
+
+  async updateItem({ dispatch }, { id, data }) {
+    try {
+      let processedData = { ...data };
+
+      if (data.image && data.image.startsWith("data:image")) {
+        processedData.image = await dispatch("uploadImage", data.image);
+      }
+
+      if (data.type === "Variants" && data.variants) {
+        processedData.variants = await Promise.all(
+          data.variants.map(async (variant) => {
+            let processedVariant = { ...variant };
+            if (variant.image && variant.image.startsWith("data:image")) {
+              processedVariant.image = await dispatch(
+                "uploadImage",
+                variant.image
+              );
+            }
+            return processedVariant;
+          })
+        );
+      }
+
+      return await axios.put(`${url}/${endpoint}/${id}`, processedData);
+    } catch (error) {
+      console.error("Error updating item:", error);
+      throw error;
     }
   },
 
@@ -75,6 +147,7 @@ const actions = {
       return error.response;
     }
   },
+
 };
 
 const mutations = {
