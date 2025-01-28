@@ -64,9 +64,6 @@ const get = async () => {
           $first: "$date",
         },
         amountReceived: {
-          $first: "$referenceCode",
-        },
-        amountReceived: {
           $first: "$amountReceived",
         },
         discount: {
@@ -93,8 +90,8 @@ const get = async () => {
         notes: {
           $first: "$notes",
         },
-        referenceCode: {
-          $first: "$referenceCode",
+        referenceNo: {
+          $first: "$referenceNo",
         },
         noOfItems: {
           $first: "$noOfItems",

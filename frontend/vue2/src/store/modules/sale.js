@@ -16,6 +16,7 @@ const actions = {
       const response = await axios.get(`${url}/${endpoint}`);
       return response.data;
     } catch (error) {
+      console.log(error.response)
       return error.response;
     }
   },

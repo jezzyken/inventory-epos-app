@@ -34,7 +34,7 @@
 
       <v-data-table
         :headers="headers"
-        :items="desserts"
+        :items="items"
         :loading="isLoading"
         :search="search"
         :items-per-page="10"
@@ -237,6 +237,10 @@ export default {
 
     async initialize() {
       const results = await this.getItems();
+
+
+      console.log(results)
+
       this.items = results.result.map((item) => ({
         ...item,
         date: moment(item.date).format("MMM DD YYYY hh:mm A"),
