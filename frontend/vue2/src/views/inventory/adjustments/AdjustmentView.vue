@@ -7,24 +7,12 @@
       <v-card-title class="py-2">
         <v-row align="center" no-gutters>
           <v-col cols="12" sm="4">
-            <v-text-field
-              v-model="search"
-              hide-details
-              dense
-              outlined
-              placeholder="Search adjustments..."
-              prepend-inner-icon="mdi-magnify"
-              clearable
-            ></v-text-field>
+            <v-text-field v-model="search" hide-details dense outlined placeholder="Search adjustments..."
+              prepend-inner-icon="mdi-magnify" clearable></v-text-field>
           </v-col>
           <v-spacer></v-spacer>
           <v-col cols="auto">
-            <v-btn
-              color="primary"
-              :to="{ name: 'AddAjustment' }"
-              depressed
-              class="ml-2"
-            >
+            <v-btn color="primary" :to="{ name: 'AddAjustment' }" depressed class="ml-2">
               <v-icon left>mdi-plus</v-icon>
               New Adjustment
             </v-btn>
@@ -32,21 +20,13 @@
         </v-row>
       </v-card-title>
 
-      <v-data-table
-        :headers="headers"
-        :items="desserts"
-        :loading="isLoading"
-        :search="search"
-        :items-per-page="10"
+      <v-data-table :headers="headers" :items="desserts" :loading="isLoading" :search="search" :items-per-page="10"
         :footer-props="{
           'items-per-page-options': [5, 10, 25, 50],
           showFirstLastPage: true,
           'items-per-page-text': 'Adjustments per page',
           'page-text': '{0}-{1} of {2}',
-        }"
-        multi-sort
-        class="elevation-0"
-      >
+        }" multi-sort class="elevation-0">
         <template v-slot:item.date="{ item }">
           <div class="font-weight-medium">{{ item.date }}</div>
         </template>
@@ -80,11 +60,7 @@
             </template>
 
             <v-list dense>
-              <v-list-item
-                v-for="action in actions"
-                :key="action.title"
-                @click="handleAction(action.title, item)"
-              >
+              <v-list-item v-for="action in actions" :key="action.title" @click="handleAction(action.title, item)">
                 <v-list-item-icon class="mr-2">
                   <v-icon small :color="action.color">
                     {{ action.icon }}
@@ -123,12 +99,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn text @click="closeDelete">Cancel</v-btn>
-          <v-btn
-            color="error"
-            text
-            @click="deleteItemConfirm"
-            :loading="isLoading"
-          >
+          <v-btn color="error" text @click="deleteItemConfirm" :loading="isLoading">
             Delete
           </v-btn>
         </v-card-actions>
@@ -323,12 +294,14 @@ export default {
             }
           }
         }
+
         tbody {
           tr {
             td {
               font-size: 0.875rem;
               color: rgba(0, 0, 0, 0.87);
             }
+
             &:hover {
               background-color: #f5f5f5 !important;
             }
