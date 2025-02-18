@@ -20,6 +20,10 @@ const saleItemSchema = new mongoose.Schema(
     subTotal: {
       type: Number ,
     },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
   {
     timestamp: true,

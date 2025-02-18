@@ -11,12 +11,12 @@
               prepend-inner-icon="mdi-magnify" clearable></v-text-field>
           </v-col>
           <v-spacer></v-spacer>
-          <v-col cols="auto">
+          <!-- <v-col cols="auto">
             <v-btn color="primary" :to="{ name: 'AddSales' }" depressed class="ml-2">
               <v-icon left>mdi-plus</v-icon>
               New Sale
             </v-btn>
-          </v-col>
+          </v-col> -->
         </v-row>
       </v-card-title>
 
@@ -161,15 +161,15 @@ export default {
     itemId: null,
     actions: [
       {
-        title: "Edit",
+        title: "View",
         icon: "mdi-pencil",
         color: "primary",
       },
-      {
-        title: "Delete",
-        icon: "mdi-delete",
-        color: "error",
-      },
+      // {
+      //   title: "Delete",
+      //   icon: "mdi-delete",
+      //   color: "error",
+      // },
     ],
     isLoading: false,
     search: "",
@@ -260,7 +260,7 @@ export default {
 
     handleAction(action, item) {
       switch (action) {
-        case "Edit":
+        case "View":
           this.$router.push({ name: "EditSales", params: { id: item._id } });
           break;
         case "Delete":

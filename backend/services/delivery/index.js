@@ -117,7 +117,6 @@ const get = async () => {
 };
 
 const getById = async (id) => {
-  console.log(id)
   const result = await Models.findById(id);
   return result;
 };
@@ -133,12 +132,13 @@ const add = async (req) => {
   return result;
 };
 
-const update = async (id, status) => {
+const update = async (id, status, markBy) => {
   const result = await Models.updateOne(
     { _id: id },
     {
       $set: {
         status,
+        markBy,
       },
     }
   );

@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 
 const deliverySchema = new mongoose.Schema(
   {
-    sale:  {
+    sale: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Sale"
+      ref: "Sale",
     },
     recipientName: {
       type: String,
@@ -20,7 +20,7 @@ const deliverySchema = new mongoose.Schema(
     },
     deliveryDate: {
       type: Date,
-      default: Date.now()
+      default: Date.now(),
     },
     deliveryFee: {
       type: Number,
@@ -28,8 +28,12 @@ const deliverySchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["delivered", "pending"],
-      default: "pending"
-    }
+      default: "pending",
+    },
+    markBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
   {
     timestamp: true,

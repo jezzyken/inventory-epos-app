@@ -29,7 +29,6 @@ const get = async () => {
     },
   ]);
 
-  console.log(result)
   return result;
 };
 

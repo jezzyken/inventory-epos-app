@@ -11,6 +11,8 @@ const protect = (req, res, next) => {
     token = req.headers.authorization.split(" ")[1];
   }
 
+  console.log(token)
+
   if (!token) {
     return next(new AppError("No token provided, authorization denied", 401));
   }

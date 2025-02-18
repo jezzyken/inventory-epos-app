@@ -96,6 +96,9 @@ const get = async () => {
         noOfItems: {
           $first: "$noOfItems",
         },
+        createdAt: {
+          $first: "$createdAt",
+        },
         items: {
           $push: {
             item_id: "$items._id",
@@ -221,9 +224,12 @@ const getById = async (id) => {
 
 const add = async (req) => {
   try {
-    const { stocks, hasDelivery, delivery } = req.body;
+    const { stocks, hasDelivery, delivery, userId } = req.body;
 
-    const sale = new Models(req.body);
+    const sale = new Models({
+      ...req.body,
+      user: userId,
+    });
 
     const savedSale = await sale.save();
 

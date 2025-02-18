@@ -9,7 +9,6 @@ const get = catchAsync(async (req, res) => {
     result,
   };
 
-  console.log(result)
   return res.status(200).send(data);
 });
 
@@ -27,7 +26,6 @@ const getById = catchAsync(async (req, res, next) => {
 });
 
 const getBySalesId = catchAsync(async (req, res, next) => {
-  console.log(req.params.id);
   const result = await service.getBySalesId(req.params.id);
 
   if (!result) {
@@ -50,11 +48,16 @@ const add = catchAsync(async (req, res) => {
 });
 
 const update = catchAsync(async (req, res, next) => {
+  const results = await service.update(
+    req.params.id,
+    req.body.status,
+    req.body.markBy
+  );
 
-  const results = await service.update(req.params.id, req.body.status);
   if (!results) {
     return next(new AppError("No Item found with that ID", 404));
   }
+
   const data = {
     success: true,
     results,

@@ -110,7 +110,7 @@ export default {
     ],
     salesHeaders: [
       { text: 'Date', value: 'date' },
-      { text: 'Reference', value: 'referenceCode' },
+      { text: 'Reference', value: 'referenceNo' },
       { text: 'Customer', value: 'customer' },
       { text: 'Total', value: 'grandTotal' },
       { text: 'Payment Type', value: 'paymentType' }

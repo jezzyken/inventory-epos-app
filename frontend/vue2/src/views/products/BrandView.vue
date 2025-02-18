@@ -103,14 +103,20 @@
             label="Brand Name"
             outlined
             dense
-            hide-details="auto"
-            class="mt-4"
+            :rules="[rules.required, rules.lettersOnly]"
+            @input="validateInput"
           ></v-text-field>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn text @click="close">Cancel</v-btn>
-          <v-btn color="primary" text @click="save" :loading="isLoading">
+          <v-btn
+            color="primary"
+            text
+            @click="save"
+            :loading="isLoading"
+            :disabled="!isValid"
+          >
             Save
           </v-btn>
         </v-card-actions>
@@ -142,7 +148,6 @@
   </v-container>
 </template>
 <script>
-
 /*eslint-disable*/
 import { mapActions } from "vuex";
 
@@ -176,6 +181,10 @@ export default {
     itemId: null,
     search: "",
     isLoading: false,
+    rules: {
+      required: (v) => !!v || "Brand name is required",
+      lettersOnly: (v) => /^[A-Za-z\s]+$/.test(v) || "Only letters allowed",
+    },
     actions: [
       {
         title: "Edit",
@@ -193,6 +202,9 @@ export default {
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
+    },
+    isValid() {
+      return this.editedItem.name && /^[A-Za-z\s]+$/.test(this.editedItem.name);
     },
   },
 
@@ -216,6 +228,10 @@ export default {
       removeItem: "brand/deleteItem",
       updateItem: "brand/updateItem",
     }),
+
+    validateInput(value) {
+      this.editedItem.name = value.replace(/[^A-Za-z\s]/g, "");
+    },
 
     async initialize() {
       this.isLoading = true;
@@ -262,6 +278,13 @@ export default {
     },
 
     async save() {
+      if (
+        !this.editedItem.name ||
+        !this.rules.lettersOnly(this.editedItem.name)
+      ) {
+        return;
+      }
+
       this.isLoading = true;
       if (this.editedIndex > -1) {
         Object.assign(this.desserts[this.editedIndex], this.editedItem);
@@ -305,12 +328,14 @@ export default {
             }
           }
         }
+
         tbody {
           tr {
             td {
               font-size: 0.875rem;
               color: rgba(0, 0, 0, 0.87);
             }
+
             &:hover {
               background-color: #f5f5f5 !important;
             }

@@ -1,7 +1,7 @@
 <template>
   <v-sheet class="login-container" color="primary" height="100vh">
     <div class="text-center mb-6">
-      <h1 class="text-h3 font-weight-bold white--text">Welcome Back</h1>
+      <h1 class="text-h5 font-weight-bold white--text">Dtio Hardware Login</h1>
     </div>
     
     <v-card class="login-card pa-8" elevation="8" width="450">

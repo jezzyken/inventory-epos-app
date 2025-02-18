@@ -12,7 +12,6 @@ const get = catchAsync(async (req, res) => {
 });
 
 const getById = catchAsync(async (req, res, next) => {
-  console.log('getting items 1')
 
   const result = await service.getById(req.params.id);
 
@@ -27,7 +26,6 @@ const getById = catchAsync(async (req, res, next) => {
 });
 
 const getItems = catchAsync(async (req, res) => {
-  console.log('getting items')
   const result = await service.getItems();
   const data = {
     success: true,

@@ -34,7 +34,6 @@ router.get('/summary', async (req, res) => {
       }
   ]);
 
-      console.log(dailySales)
 
       const monthlySales = await Sale.aggregate([
           {

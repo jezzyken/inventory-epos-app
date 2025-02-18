@@ -100,8 +100,6 @@ router.get("/sales", async (req, res) => {
 
     const sales = await Sale.find(query).populate("user");
 
-    console.log({sales})
-
     const salesDetails = await Promise.all(
       sales.map(async (sale) => {
         const saleItems = await SaleItem.find({ sale: sale._id })
@@ -117,7 +115,7 @@ router.get("/sales", async (req, res) => {
 
         return {
           date: moment(sale.date).tz('Asia/Singapore').format('YYYY-MM-DD HH:mm:ss'),
-          referenceCode: sale.referenceCode,
+          referenceNo: sale.referenceNo,
           customer: sale.customer,
           salesPerson: sale.user?.name,
           items: items,

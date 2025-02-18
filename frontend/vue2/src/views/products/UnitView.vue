@@ -79,9 +79,7 @@
         </template>
 
         <template v-slot:no-data>
-          <v-alert type="info" class="ma-4" outlined>
-            No units found.
-          </v-alert>
+          <v-alert type="info" class="ma-4" outlined> No units found. </v-alert>
         </template>
 
         <template v-slot:progress>
@@ -111,7 +109,13 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn text @click="close">Cancel</v-btn>
-          <v-btn color="primary" text @click="save" :loading="isLoading">
+          <v-btn
+            color="primary"
+            text
+            @click="save"
+            :loading="isLoading"
+            :disabled="!isValid"
+          >
             Save
           </v-btn>
         </v-card-actions>
@@ -182,11 +186,18 @@ export default {
         color: "error",
       },
     ],
+    rules: {
+      required: (v) => !!v || "Brand name is required",
+      lettersOnly: (v) => /^[A-Za-z\s]+$/.test(v) || "Only letters allowed",
+    },
   }),
 
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
+    },
+    isValid() {
+      return this.editedItem.name && /^[A-Za-z\s]+$/.test(this.editedItem.name);
     },
   },
 
@@ -210,6 +221,10 @@ export default {
       removeItem: "unit/deleteItem",
       updateItem: "unit/updateItem",
     }),
+
+    validateInput(value) {
+      this.editedItem.name = value.replace(/[^A-Za-z\s]/g, "");
+    },
 
     async initialize() {
       this.isLoading = true;
@@ -254,6 +269,13 @@ export default {
     },
 
     async save() {
+      if (
+        !this.editedItem.name ||
+        !this.rules.lettersOnly(this.editedItem.name)
+      ) {
+        return;
+      }
+
       if (this.editedIndex > -1) {
         Object.assign(this.desserts[this.editedIndex], this.editedItem);
         await this.updateItem(this.editedItem);
