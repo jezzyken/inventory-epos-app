@@ -1,9 +1,15 @@
 <template>
   <v-sheet class="login-container" color="primary" height="100vh">
+
     <div class="text-center mb-6">
-      <h1 class="text-h5 font-weight-bold white--text">Dtio Hardware Login</h1>
+      <v-img
+        src="https://res.cloudinary.com/dkzmrhziz/image/upload/v1737899330/465896762_901043648835454_2004024976825526829_n_hy608s.jpg"
+        max-width="200"
+        class="mx-auto mb-4"
+        alt="Logo"
+      />
     </div>
-    
+
     <v-card class="login-card pa-8" elevation="8" width="450">
       <v-form @submit.prevent="login">
         <v-text-field
