@@ -50,8 +50,8 @@ router.get("/products", async (req, res) => {
 router.get("/inventory", async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
-
     const query = {};
+
     if (startDate && endDate) {
       query.date = {
         $gte: moment(startDate).tz('Asia/Singapore').startOf('day').toDate(),
@@ -59,10 +59,13 @@ router.get("/inventory", async (req, res) => {
       };
     }
 
-    const stockMovements = await StockItem.find(query)
+    const stocks = await Stock.find(query);
+    const stockIds = stocks.map(stock => stock._id);
+
+    const stockMovements = await StockItem.find({ stock: { $in: stockIds } })
       .populate({
         path: "product",
-        populate: ["brand", "category", "supplier"],
+        populate: ["brand", "category"],
       })
       .populate("variant")
       .populate("stock")

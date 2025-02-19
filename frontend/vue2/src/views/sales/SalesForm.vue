@@ -99,7 +99,7 @@
               <th class="text-left">Stocks</th>
               <th class="text-center">Quantity</th>
               <th class="text-left">Sub Total</th>
-              <th class="text-left">Actions</th>
+              <!-- <th class="text-left">Actions</th> -->
             </tr>
           </thead>
           <tbody>
@@ -130,11 +130,11 @@
               <td class="pa-5">
                 <span>{{ stock.subTotal.toFixed(2) }}</span>
               </td>
-              <td>
+              <!-- <td>
                 <v-btn dark color="error" small @click="onDeleteItem(stock, i)">
                   <v-icon>mdi-trash-can-outline</v-icon>
                 </v-btn>
-              </td>
+              </td> -->
             </tr>
           </tbody>
         </template>

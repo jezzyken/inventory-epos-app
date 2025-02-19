@@ -101,7 +101,7 @@ export default {
       },
     ],
     singleItems: [
-      // { title: "Sales", action: "mdi-invoice-list", route: "/sale" },
+      { title: "Sales", action: "mdi-invoice-list", route: "/sale" },
       { title: "Delivery", action: "mdi-truck-delivery", route: "/delivery" },
       { title: "Users", action: "mdi-account-group", route: "/user" },
       { title: "Reports", action: "mdi-chart-box", route: "/reports" },

@@ -409,10 +409,10 @@ export default {
       const response = await this.getItemById(this.$route.params.id);
       this.items = {
         ...response.result,
-        brand: response.result.brand._id,
-        category: response.result.category._id,
-        supplier: response.result.supplier._id,
-        unit: response.result.unit._id,
+        brand: response.result?.brand?._id,
+        category: response.result?.category?._id,
+        supplier: response.result?.supplier?._id,
+        unit: response.result?.unit?._id,
       };
       this.isLoading = false;
     },

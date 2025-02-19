@@ -106,7 +106,7 @@ export default {
       { text: 'Variant', value: 'variantName' },
       { text: 'Quantity', value: 'quantity' },
       { text: 'Status', value: 'status' },
-      { text: 'Supplier', value: 'supplier' }
+      // { text: 'Supplier', value: 'supplier' }
     ],
     salesHeaders: [
       { text: 'Date', value: 'date' },
