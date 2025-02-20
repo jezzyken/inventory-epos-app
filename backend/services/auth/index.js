@@ -21,15 +21,22 @@ const create = async ({ fname, mname, lname, email, password, role }) => {
   return user;
 };
 
-const login = async ({ email, password }) => {
+const login = async ({ email, password, isMobile = false }) => {
   const user = await Model.findOne({ email });
-  
+
+  console.log(user)
+  console.log(email, password, isMobile)
+
   if (!user) {
     throw new Error("Invalid credentials");
   }
 
-  if (user.role === 'Cashier') {
-    throw new Error("Access denied for this role");
+  if (user.role === 'Admin' && isMobile) {
+    throw new Error("Admin access not allowed on mobile devices");
+  }
+
+  if (user.role === 'Cashier' && !isMobile) {
+    throw new Error("Non-admin access not allowed on desktop devices");
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
