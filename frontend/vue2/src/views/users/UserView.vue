@@ -72,7 +72,12 @@
         </template>
 
         <template v-slot:item.actions="{ item }">
-          <v-menu offset-y left :close-on-content-click="true">
+          <v-menu
+            v-if="item.email !== 'admin@app.dev'"
+            offset-y
+            left
+            :close-on-content-click="true"
+          >
             <template v-slot:activator="{ on, attrs }">
               <v-btn small text v-bind="attrs" v-on="on" class="px-2">
                 <v-icon>mdi-dots-vertical</v-icon>
@@ -164,12 +169,14 @@
             v-if="editedIndex === -1"
             v-model="editedItem.password"
             label="Password"
-            type="password"
+            :type="showPassword ? 'text' : 'password'"
             outlined
             dense
             hide-details="auto"
             class="mb-4"
             required
+            :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            @click:append="showPassword = !showPassword"
           ></v-text-field>
 
           <v-select
@@ -298,6 +305,7 @@ export default {
         color: "error",
       },
     ],
+    showPassword: false,
   }),
 
   computed: {

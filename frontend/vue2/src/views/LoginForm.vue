@@ -84,7 +84,7 @@ export default {
         });
         
         if (response.status === 500) {
-          throw new Error('Invalid credentials');
+          throw new Error(response.data.message);
         }
       } catch (error) {
         this.snackbarMessage = error.message;

@@ -23,8 +23,13 @@ const create = async ({ fname, mname, lname, email, password, role }) => {
 
 const login = async ({ email, password }) => {
   const user = await Model.findOne({ email });
+  
   if (!user) {
     throw new Error("Invalid credentials");
+  }
+
+  if (user.role === 'Cashier') {
+    throw new Error("Access denied for this role");
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
