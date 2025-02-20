@@ -31,6 +31,11 @@ const login = async ({ email, password, isMobile = false }) => {
     throw new Error("Invalid credentials");
   }
 
+  // Add status check
+  if (user.status !== 'active') {
+    throw new Error("Account is not active. Please contact support.");
+  }
+
   if (user.role === 'Admin' && isMobile) {
     throw new Error("Admin access not allowed on mobile devices");
   }
